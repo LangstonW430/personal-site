@@ -1,0 +1,30 @@
+---
+/*
+ * The document shell every route shares: doctype, Head, skip link, body
+ * grounds. What differs per page — the register's tabular list, a record's
+ * rail-and-prose split — starts inside the slot, because CLAUDE.md's layout
+ * principle is that no two of those share a grid.
+ */
+import Head from '../components/Head.astro';
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description: string;
+	path: string;
+	image?: string;
+}
+
+const { title, description, path, image } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<Head title={title} description={description} path={path} image={image} />
+	</head>
+	<body class="bg-board text-ink">
+		<a href="#main" class="skip-link">Skip to record</a>
+		<slot />
+	</body>
+</html>

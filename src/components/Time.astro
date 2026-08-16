@@ -1,0 +1,15 @@
+---
+/* Every date on the site renders through here so <time datetime> and the
+ * display text can never drift apart — they're the same formatDate call. */
+import { formatDate } from '../lib/format';
+
+interface Props {
+	date: Date;
+	class?: string;
+}
+
+const { date, class: className } = Astro.props;
+const iso = formatDate(date);
+---
+
+<time datetime={iso} class={className}>{iso}</time>

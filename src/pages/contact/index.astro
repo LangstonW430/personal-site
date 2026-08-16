@@ -1,18 +1,33 @@
 ---
-/* Route and heading only — prose is Langston's to write. */
-import Head from '../../components/Head.astro';
-import '../../styles/global.css';
+/* Structure only — the actual contact channel is Langston's call, not
+ * something to invent on his behalf, so the value itself stays [[UNWRITTEN]]
+ * alongside the prose. */
+import Base from '../../layouts/Base.astro';
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<Head title="Contact — Langston" description="Get in touch." path="/contact/" />
-	</head>
-	<body class="bg-board text-ink">
-		<main class="px-entry py-register">
-			<p><a href="/">&larr; Register</a></p>
-			<h1 class="font-prose text-xl leading-display mt-entry">Contact</h1>
-		</main>
-	</body>
-</html>
+<Base title="Contact — Langston" description="Get in touch." path="/contact/">
+	<main id="main" class="px-entry py-register max-w-[62rem] mx-auto">
+		<p class="no-print"><a href="/">&larr; Register</a></p>
+
+		<article>
+			<header>
+				<h1 class="font-prose text-xl leading-display mt-entry">Contact</h1>
+				<p class="font-prose leading-prose mt-field max-w-[62ch]">
+					[[UNWRITTEN]] A line or two on what kind of work this is for — recruiting conversations,
+					freelance inquiries — and what to expect back.
+				</p>
+			</header>
+
+			<dl class="mt-register bg-card border border-rule p-entry flex flex-col gap-field max-w-[24rem]">
+				<div>
+					<dt class="field-label">Email</dt>
+					<dd class="font-record font-typed text-sm leading-record">[[UNWRITTEN]]</dd>
+				</div>
+				<div>
+					<dt class="field-label">Elsewhere</dt>
+					<dd class="font-record font-typed text-sm leading-record">[[UNWRITTEN]]</dd>
+				</div>
+			</dl>
+		</article>
+	</main>
+</Base>

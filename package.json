@@ -11,10 +11,13 @@
     "preview": "astro preview",
     "check": "astro check",
     "check:content": "node scripts/check-content.mjs",
+    "lint": "node scripts/lint-spacing.mjs",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.5",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
     "@astrojs/vercel": "^11.0.5",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.2.2",
@@ -22,7 +25,9 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^26.2.0",
+    "satori": "^0.29.0",
     "typescript": "^6.0.3"
   }
 }

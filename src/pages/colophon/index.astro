@@ -1,18 +1,58 @@
 ---
-/* Route and heading only — prose is Langston's to write. */
-import Head from '../../components/Head.astro';
-import '../../styles/global.css';
+/*
+ * The colophon: traditionally a printer's specification note — paper,
+ * typeface, press, date. The `<dl>` below is the same idea applied to a
+ * static site and is real, sourced from the project's own settled stack
+ * decisions (astro.config.mjs, package.json, global.css) rather than
+ * invented. Only the narrative prose is Langston's to write, hence the
+ * [[UNWRITTEN]] paragraphs.
+ */
+import Base from '../../layouts/Base.astro';
+
+const spec: { label: string; value: string }[] = [
+	{ label: 'Framework', value: 'Astro 7, TypeScript strict' },
+	{ label: 'Styling', value: 'Tailwind v4, default scales wiped' },
+	{ label: 'Type', value: 'Commit Mono + Source Serif 4 Variable, self-hosted' },
+	{ label: 'Content', value: 'MDX in src/content/, no CMS' },
+	{ label: 'Hosting', value: 'Vercel, static output' },
+	{ label: 'Client JS', value: 'None — every route is prerendered' },
+];
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<Head title="Colophon — Langston" description="How this site is built and what it runs on." path="/colophon/" />
-	</head>
-	<body class="bg-board text-ink">
-		<main class="px-entry py-register">
-			<p><a href="/">&larr; Register</a></p>
-			<h1 class="font-prose text-xl leading-display mt-entry">Colophon</h1>
-		</main>
-	</body>
-</html>
+<Base title="Colophon — Langston" description="How this site is built and what it runs on." path="/colophon/">
+	<main id="main" class="px-entry py-register max-w-[62rem] mx-auto">
+		<p class="no-print"><a href="/">&larr; Register</a></p>
+
+		<article>
+			<header>
+				<h1 class="font-prose text-xl leading-display mt-entry">Colophon</h1>
+				<p class="font-prose leading-prose mt-field max-w-[62ch]">
+					[[UNWRITTEN]] A short note on why this site is built the way it is — the register conceit, the
+					stack decisions, what got left out on purpose.
+				</p>
+			</header>
+
+			<div class="mt-register grid gap-entry grid-cols-1 md:grid-cols-[15rem_1fr]">
+				<dl class="bg-card border border-rule p-entry flex flex-col gap-field">
+					{
+						spec.map((row) => (
+							<div>
+								<dt class="field-label">{row.label}</dt>
+								<dd class="font-record font-typed text-sm leading-record">{row.value}</dd>
+							</div>
+						))
+					}
+				</dl>
+
+				<div class="font-prose leading-prose max-w-[62ch]">
+					<p>
+						[[UNWRITTEN]] Longer notes on the design tradition this site borrows from — the accession
+						record, the herbarium sheet, the auction catalogue entry — and why a personal site built for
+						recruiters and freelance clients ended up looking like a registrar's ledger instead of a
+						portfolio.
+					</p>
+				</div>
+			</div>
+		</article>
+	</main>
+</Base>

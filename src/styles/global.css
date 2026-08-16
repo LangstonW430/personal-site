@@ -260,4 +260,81 @@
 		 * derived from the token so the two can never drift apart. */
 		margin-inline-end: calc(var(--tracking-label) * -1);
 	}
+
+	/*
+	 * .skip-link — the one piece of chrome on the page that must be invisible
+	 * until it isn't. Off-screen (not display:none, which would drop it from
+	 * the accessibility tree and defeat the point) until focused, then it has
+	 * to be unmistakable.
+	 *
+	 * The offset uses a literal rem, not a spacing token: translate is off the
+	 * spacing allowlist on purpose (design-directions.md) because it's track
+	 * positioning, not padding/margin/gap rhythm — this is the same family of
+	 * exception as tokens-test.astro's chip heights and hairline gaps.
+	 */
+	.skip-link {
+		position: absolute;
+		left: var(--spacing-entry);
+		top: var(--spacing-entry);
+		transform: translateY(-6rem);
+		z-index: 50;
+		background-color: var(--color-card);
+		color: var(--color-ink);
+		padding: var(--spacing-pair) var(--spacing-entry);
+		border: 1px solid var(--color-rule);
+		font-family: var(--font-record);
+		font-weight: var(--font-weight-typed);
+		font-size: var(--text-sm);
+		transition: transform 0.15s ease;
+	}
+
+	.skip-link:focus-visible {
+		transform: translateY(0);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.skip-link {
+			transition: none;
+		}
+	}
+}
+
+/* ---------------------------------------------------------------------------
+ * PRINT
+ *
+ * A record printed is a catalogue entry, not a web page: no nav chrome, no
+ * skip link, no focus rings, no violet (it's a screen accent, not an ink a
+ * printer should be asked to reproduce). Link hrefs are resolved inline so a
+ * printed page carries the same information a browser would — a URL you
+ * cannot click still has to be legible.
+ * ------------------------------------------------------------------------- */
+@media print {
+	.skip-link,
+	.no-print {
+		display: none !important;
+	}
+
+	:where(a[href]) {
+		color: var(--color-ink);
+		text-decoration: underline;
+	}
+
+	/* Only resolve hrefs that mean something on paper. Internal record links
+	 * repeat the site's own path structure back at the reader, which is noise
+	 * — external links (a client's live site, a source repository) are the
+	 * ones a printed page can't otherwise carry. */
+	:where(a[href^='http']):after {
+		content: ' (' attr(href) ')';
+		font-family: var(--font-record);
+		font-size: var(--text-xs);
+		color: var(--color-ink-muted);
+	}
+
+	/* `board` is a screen ground; printers default to not rendering
+	 * background colors at all, and this makes that the explicit behavior
+	 * rather than an accident of browser defaults. Ink (near-black) still
+	 * prints — it was never a screen-only color. */
+	body {
+		background: none;
+	}
 }

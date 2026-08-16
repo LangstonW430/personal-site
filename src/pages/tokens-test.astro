@@ -15,10 +15,10 @@
  * A reference sheet that can disagree with its source of truth is worse than
  * no reference sheet.
  *
- * Spacing is written as Tailwind arbitrary values (`p-[2rem]`) throughout,
- * because `--spacing-*: initial` in the @theme block removed the spacing scale
- * and nothing replaced it. That is not a workaround — it is the wipe working,
- * shown rather than described. See the note in design-directions.md.
+ * Spacing uses the six named utilities. Three values here are NOT spacing and
+ * are deliberately left arbitrary — see the note above each: a swatch chip
+ * height, a 1px abutment, and prose measures in `ch`. Nothing else on this page
+ * uses an arbitrary length.
  */
 import themeSource from '../styles/global.css?raw';
 import '../styles/global.css';
@@ -29,7 +29,7 @@ const themeBlock = themeSource.match(/@theme\s*\{([\s\S]*?)\n\}/)?.[1] ?? '';
 
 const tokens: Token[] = [...themeBlock.matchAll(/^\s*(--[a-z0-9-]+):\s*([^;]+);/gim)]
 	.map((m) => ({ name: m[1] ?? '', value: (m[2] ?? '').trim() }))
-	// Drop the five `*: initial` wipes — they are instructions, not values.
+	// Drop the fourteen `*: initial` wipes — they are instructions, not values.
 	.filter((t) => t.value !== 'initial' && !t.name.endsWith('-*'));
 
 const pick = (prefix: string) => tokens.filter((t) => t.name.startsWith(prefix));
@@ -37,6 +37,7 @@ const pick = (prefix: string) => tokens.filter((t) => t.name.startsWith(prefix))
 const colors = pick('--color-');
 const typeSteps = pick('--text-');
 const leadings = pick('--leading-');
+const spacings = pick('--spacing-');
 
 const faces = [
 	{ cls: 'font-record', name: 'Commit Mono', role: 'Every record field, label, number, date, status, accession' },
@@ -56,6 +57,15 @@ const leadingRole: Record<string, string> = {
 	'--leading-prose': 'prose',
 	'--leading-record': 'record fields',
 };
+
+const spacingIntent: Record<string, string> = {
+	'--spacing-hair': 'optical nudge; label to the value under it',
+	'--spacing-tight': 'stacked lines inside one field',
+	'--spacing-field': 'field to field within a rail',
+	'--spacing-entry': 'padding inside a record; entry to entry',
+	'--spacing-record': 'record to record; subsection break',
+	'--spacing-section': 'one movement of the page to the next',
+};
 ---
 
 <!doctype html>
@@ -68,35 +78,40 @@ const leadingRole: Record<string, string> = {
 		<title>Token test sheet</title>
 	</head>
 	<body class="bg-board text-ink">
-		<main class="mx-auto max-w-[72rem] px-[1.5rem] py-[3rem]">
+		<!-- max-w is a container width, not spacing; the spacing scale has no
+		     opinion about how wide a page is. -->
+		<main class="mx-auto max-w-[72rem] px-entry py-record">
 			<header>
-				<p class="field-label">Phase 0 — foundation</p>
-				<h1 class="font-prose text-xl leading-display mt-[0.25rem]">Token test sheet</h1>
-				<p class="text-ink-muted max-w-[54ch] mt-[1rem]">
+				<p class="field-label">Phase 0.1 — foundation</p>
+				<h1 class="font-prose text-xl leading-display mt-hair">Token test sheet</h1>
+				<!-- Prose measures are set in ch, which is a function of the face, not
+				     of the spacing scale. -->
+				<p class="text-ink-muted max-w-[54ch] mt-field">
 					Every value below is parsed from <code class="font-record text-sm">src/styles/global.css</code>
 					at build time. If a token is missing here it does not exist.
-					{`${tokens.length} tokens, ${colors.length} inks, ${typeSteps.length} type steps.`}
+					{`${tokens.length} tokens, ${colors.length} inks, ${typeSteps.length} type steps, ${spacings.length} spacings.`}
 					Delete this page at the end of Phase 2.
 				</p>
 			</header>
 
 			<!-- ------------------------------------------------ card on board -->
-			<section class="mt-[4rem]">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">
+			<section class="mt-section">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">
 					The value step
 				</h2>
-				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
+				<p class="text-ink-muted max-w-[60ch] mt-field">
 					All depth in this system comes from <code class="font-record text-sm">card</code> sitting on
-					<code class="font-record text-sm">board</code>. There are no box-shadows anywhere, so if this
-					step is too subtle the record stops reading as a separate object and the whole
-					layout flattens. This is the single most important thing on this page to judge.
+					<code class="font-record text-sm">board</code>. There are no box-shadows anywhere — as of
+					Phase 0.1 there is no way to express one through Tailwind at all — so if this step
+					is too subtle the record stops reading as a separate object and the whole layout
+					flattens. This is the single most important thing on this page to judge.
 				</p>
 
-				<div class="bg-board p-[2rem] mt-[1.5rem] border border-rule">
-					<div class="bg-card p-[2rem] border border-rule">
+				<div class="bg-board p-entry mt-entry border border-rule">
+					<div class="bg-card p-entry border border-rule">
 						<p class="field-label">Acc.</p>
 						<p class="font-record text-md text-stamp">2026.04</p>
-						<p class="font-prose mt-[1rem] max-w-[60ch]">
+						<p class="font-prose mt-field max-w-[60ch]">
 							A record sitting on the board. Judge the edge: it should read as a distinct
 							surface without a shadow doing the work, and the hairline should support the
 							step rather than substitute for it.
@@ -104,46 +119,50 @@ const leadingRole: Record<string, string> = {
 					</div>
 				</div>
 
-				<div class="mt-[1rem] flex flex-wrap gap-[1rem]">
-					<div class="bg-card border border-rule p-[1rem] flex-1 min-w-[14rem]">
+				<div class="mt-field flex flex-wrap gap-entry">
+					<div class="bg-card border border-rule p-entry flex-1 min-w-[14rem]">
 						<p class="field-label">card on board</p>
-						<p class="font-record text-sm mt-[0.25rem]">#F7F7F4 on #E4E5E0</p>
+						<p class="font-record text-sm mt-hair">#F7F7F4 on #E4E5E0</p>
 					</div>
-					<div class="bg-board border border-rule p-[1rem] flex-1 min-w-[14rem]">
+					<div class="bg-board border border-rule p-entry flex-1 min-w-[14rem]">
 						<p class="field-label">board alone</p>
-						<p class="font-record text-sm mt-[0.25rem]">#E4E5E0</p>
+						<p class="font-record text-sm mt-hair">#E4E5E0</p>
 					</div>
 				</div>
 			</section>
 
 			<!-- ---------------------------------------------------------- ink -->
-			<section class="mt-[4rem]">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">Ink</h2>
-				<ul role="list" class="grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-[1.5rem] mt-[1.5rem]">
+			<section class="mt-section">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">Ink</h2>
+				<ul role="list" class="grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-entry mt-entry">
 					{colors.map((c) => (
 						<li>
+							{/* Chip height is a specimen dimension — how much ink you need to
+							    see to judge it. Nothing in the spacing scale is about that. */}
 							<div
 								class="h-[4.5rem] border border-rule"
 								style={`background-color: var(${c.name})`}
 							></div>
-							<p class="field-label mt-[0.5rem]">{c.name.replace('--color-', '')}</p>
+							<p class="field-label mt-tight">{c.name.replace('--color-', '')}</p>
 							<p class="font-record text-sm uppercase">{c.value}</p>
 						</li>
 					))}
 				</ul>
 
-				<h3 class="font-prose text-md leading-display mt-[2.5rem] border-b border-rule pb-[0.5rem]">
+				<h3 class="font-prose text-md leading-display mt-record border-b border-rule pb-tight">
 					Ink on both grounds
 				</h3>
-				<div class="grid grid-cols-[repeat(auto-fit,minmax(17rem,1fr))] gap-[1px] mt-[1.5rem]">
+				{/* gap-[1px] is a hairline abutment, not spacing — the two grounds have to
+				    nearly touch for the value step between them to be judgeable. */}
+				<div class="grid grid-cols-[repeat(auto-fit,minmax(17rem,1fr))] gap-[1px] mt-entry">
 					{colors
 						.filter((c) => !['--color-board', '--color-card'].includes(c.name))
 						.map((c) => (
 							<>
-								<p class="font-record text-sm p-[0.875rem] bg-board" style={`color: var(${c.name})`}>
+								<p class="font-record text-sm p-field bg-board" style={`color: var(${c.name})`}>
 									{c.name.replace('--color-', '')} on board — 2026.04 · 4,180 LOC
 								</p>
-								<p class="font-record text-sm p-[0.875rem] bg-card" style={`color: var(${c.name})`}>
+								<p class="font-record text-sm p-field bg-card" style={`color: var(${c.name})`}>
 									{c.name.replace('--color-', '')} on card — 2026.04 · 4,180 LOC
 								</p>
 							</>
@@ -151,10 +170,39 @@ const leadingRole: Record<string, string> = {
 				</div>
 			</section>
 
+			<!-- ------------------------------------------------------ spacing -->
+			<section class="mt-section">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">Spacing</h2>
+				<p class="text-ink-muted max-w-[60ch] mt-field">
+					Six values, named by intent. The numeric scale is dead — <code class="font-record text-sm">p-4</code>,
+					<code class="font-record text-sm">gap-2</code> and every sibling emit nothing, because the bare
+					<code class="font-record text-sm">--spacing</code> multiplier is deliberately not declared.
+					Each bar below is drawn at exactly its own token.
+				</p>
+
+				<dl class="mt-entry">
+					{spacings.map((s) => (
+						<div class="flex flex-wrap items-center gap-field mt-field">
+							<dt class="min-w-[9rem]">
+								<span class="field-label">{s.name.replace('--spacing-', '')}</span>
+								<span class="font-record text-xs text-ink-muted block">{s.value}</span>
+							</dt>
+							<dd class="flex items-center gap-field flex-1 min-w-[14rem]">
+								<div
+									class="h-tight bg-card border border-rule shrink-0"
+									style={`inline-size: var(${s.name})`}
+								></div>
+								<span class="text-sm text-ink-muted">{spacingIntent[s.name]}</span>
+							</dd>
+						</div>
+					))}
+				</dl>
+			</section>
+
 			<!-- --------------------------------------------------------- type -->
-			<section class="mt-[4rem]">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">Type</h2>
-				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
+			<section class="mt-section">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">Type</h2>
+				<p class="text-ink-muted max-w-[60ch] mt-field">
 					Six steps, both faces. There is no sans-serif in this system. If the Commit Mono
 					column renders in your platform's default monospace, the font is missing from
 					<code class="font-record text-sm">/public/fonts/</code> — it carries half the type
@@ -162,11 +210,11 @@ const leadingRole: Record<string, string> = {
 				</p>
 
 				{faces.map((face) => (
-					<div class="mt-[2rem] pt-[1rem] border-t border-rule">
+					<div class="mt-record pt-field border-t border-rule">
 						<p class="field-label">{face.name} — {face.role}</p>
-						<div class="mt-[1rem]">
+						<div class="mt-field">
 							{typeSteps.map((step) => (
-								<div class="mt-[1.25rem]">
+								<div class="mt-entry">
 									<p class="field-label">
 										{step.name.replace('--', '')} · {step.value}
 									</p>
@@ -179,20 +227,20 @@ const leadingRole: Record<string, string> = {
 					</div>
 				))}
 
-				<h3 class="font-prose text-md leading-display mt-[2.5rem] border-b border-rule pb-[0.5rem]">
+				<h3 class="font-prose text-md leading-display mt-record border-b border-rule pb-tight">
 					Leading
 				</h3>
-				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
+				<p class="text-ink-muted max-w-[60ch] mt-field">
 					Each value on the paragraph length and face it is actually for. Judging leading on
 					a single line tells you nothing.
 				</p>
 				{leadings.map((l) => (
-					<div class="mt-[2rem]">
+					<div class="mt-record">
 						<p class="field-label">
 							{l.name.replace('--', '')} · {l.value} · {leadingRole[l.name]}
 						</p>
 						<p
-							class={`${l.name === '--leading-record' ? 'font-record text-sm' : 'font-prose'} max-w-[68ch] mt-[0.5rem]`}
+							class={`${l.name === '--leading-record' ? 'font-record text-sm' : 'font-prose'} max-w-[68ch] mt-tight`}
 							style={`line-height: var(${l.name})`}
 						>
 							{specimen}
@@ -202,49 +250,49 @@ const leadingRole: Record<string, string> = {
 			</section>
 
 			<!-- -------------------------------------------------- field label -->
-			<section class="mt-[4rem]">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">
+			<section class="mt-section">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">
 					The field label
 				</h2>
-				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
-					Commit Mono, uppercase, 10px, 0.09em tracking, ink-muted. It sits above nearly
-					every value on the site. A field label names a field that has a value under it —
-					every label on this page is a real one.
+				<p class="text-ink-muted max-w-[60ch] mt-field">
+					Commit Mono, uppercase, 10px, <code class="font-record text-sm">tracking-label</code>,
+					ink-muted. It sits above nearly every value on the site. A field label names a
+					field that has a value under it — every label on this page is a real one.
 				</p>
 
-				<div class="bg-card border border-rule p-[1.5rem] mt-[1.5rem] grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-[1.5rem]">
+				<div class="bg-card border border-rule p-entry mt-entry grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-entry">
 					<div>
 						<p class="field-label">Acquired</p>
-						<p class="font-record text-base mt-[0.25rem]">2026-06-14</p>
+						<p class="font-record text-base mt-hair">2026-06-14</p>
 					</div>
 					<div>
 						<p class="field-label">Status</p>
-						<p class="font-record text-base mt-[0.25rem]">ACTIVE</p>
+						<p class="font-record text-base mt-hair">ACTIVE</p>
 					</div>
 					<div>
 						<p class="field-label">Extent</p>
-						<p class="font-record text-base mt-[0.25rem]">4,180 LOC · 118 commits · 7 weeks</p>
+						<p class="font-record text-base mt-hair">4,180 LOC · 118 commits · 7 weeks</p>
 					</div>
 					<div>
 						<p class="field-label">Medium</p>
-						<p class="font-record text-base mt-[0.25rem]">Astro · TypeScript · Postgres</p>
+						<p class="font-record text-base mt-hair">Astro · TypeScript · Postgres</p>
 					</div>
 				</div>
 			</section>
 
 			<!-- ------------------------------------------------- record split -->
-			<section class="mt-[4rem]">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">
+			<section class="mt-section">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">
 					Record split — rail against prose
 				</h2>
-				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
+				<p class="text-ink-muted max-w-[60ch] mt-field">
 					A narrow left rail of LABEL / value pairs against a wide prose column. Phase 2
 					builds the real thing; this is here so the proportion and the mono-against-serif
 					texture can be judged now. At 360px the split stacks and the rail goes first.
 				</p>
 
-				<article class="bg-card border border-rule p-[1.5rem] mt-[1.5rem] grid gap-[2rem] grid-cols-[1fr] md:grid-cols-[15rem_1fr]">
-					<div class="flex flex-col gap-[1rem]">
+				<article class="bg-card border border-rule p-entry mt-entry grid gap-entry grid-cols-[1fr] md:grid-cols-[15rem_1fr]">
+					<div class="flex flex-col gap-field">
 						<div>
 							<p class="field-label">Acc.</p>
 							<p class="font-record text-md text-stamp">2026.04</p>
@@ -275,8 +323,8 @@ const leadingRole: Record<string, string> = {
 
 					<div>
 						<h3 class="font-prose text-md leading-display">Availability service</h3>
-						<p class="font-prose leading-prose mt-[0.75rem] max-w-[62ch]">{specimen}</p>
-						<p class="font-prose leading-prose mt-[1rem] max-w-[62ch]">
+						<p class="font-prose leading-prose mt-field max-w-[62ch]">{specimen}</p>
+						<p class="font-prose leading-prose mt-field max-w-[62ch]">
 							The rail carries what can be measured; the column carries what has to be
 							explained. If a fact fits in the rail it does not get repeated here — that
 							duplication is what turns a record into a brochure.
@@ -286,33 +334,31 @@ const leadingRole: Record<string, string> = {
 			</section>
 
 			<!-- -------------------------------------------------------- stamp -->
-			<section class="mt-[4rem]">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">Stamp</h2>
-				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
+			<section class="mt-section">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">Stamp</h2>
+				<p class="text-ink-muted max-w-[60ch] mt-field">
 					Aniline violet, from library date stamps. The scarcest ink — accession numbers,
 					live-data indicators, and focus rings only. More than four uses on a page is
 					wrong. Both permitted static uses are below; the third arrives in Phase 4.
 				</p>
 
-				<div class="bg-card border border-rule p-[1.5rem] mt-[1.5rem]">
+				<div class="bg-card border border-rule p-entry mt-entry">
 					<p class="field-label">On an accession number</p>
-					<p class="font-record text-xl text-stamp mt-[0.25rem]">2026.04</p>
+					<p class="font-record text-xl text-stamp mt-hair">2026.04</p>
 
-					<p class="field-label mt-[2rem]">On a focus ring</p>
-					<p class="text-ink-muted text-sm mt-[0.25rem] max-w-[60ch]">
+					<p class="field-label mt-record">On a focus ring</p>
+					<p class="text-ink-muted text-sm mt-hair max-w-[60ch]">
 						Tab to the link below. The ring should read clearly against
 						<code class="font-record text-sm">card</code> at 2px offset — check it against
 						<code class="font-record text-sm">board</code> too, since the record sits on both.
 					</p>
-					<p class="mt-[0.75rem]">
+					<p class="mt-field">
 						<a href="#" class="font-record text-sm underline">Focusable link on card</a>
 					</p>
 				</div>
 
-				<div class="bg-board border border-rule p-[1.5rem] mt-[1rem]">
-					<p class="mt-0">
-						<a href="#" class="font-record text-sm underline">Focusable link on board</a>
-					</p>
+				<div class="bg-board border border-rule p-entry mt-field">
+					<a href="#" class="font-record text-sm underline">Focusable link on board</a>
 				</div>
 			</section>
 		</main>

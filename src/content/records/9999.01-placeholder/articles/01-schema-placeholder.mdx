@@ -1,0 +1,22 @@
+---
+note: 1
+title: Schema placeholder accrual
+summary: Exists only to prove the articles schema typechecks and that the parent accession is injected from the directory. Deleted in Phase 1.
+filed: 2026-08-15
+condition: draft
+provenance: Written to give the articles collection something to validate against in Phase 0.1.
+extent:
+  words: 90
+draft: true
+---
+
+Not content. This file exercises every field in the `articles` schema.
+
+There is no `record` key in the frontmatter above, and there should not be — it
+is injected from the parent directory name before validation, so
+`article.data.record` reads `9999.01` without any template re-parsing a path.
+
+The `01-` prefix on this filename is sort order for a directory listing and can
+be renamed freely. The identifier is `note: 1` in the frontmatter, which cannot.
+
+Delete this file in Phase 1.

@@ -21,6 +21,22 @@
 	--font-*: initial;
 	--text-*: initial;
 
+	/* The wipe finished. Phase 0 shipped with the five above, which left
+	 * shadow-lg, blur-sm, animate-spin, tracking-wide and leading-tight all
+	 * still emitting — a box-shadow was forbidden by CLAUDE.md but reachable in
+	 * one keystroke. No shadow token is declared below, in any of the four
+	 * shadow namespaces: the intent is that a box-shadow cannot be expressed
+	 * through Tailwind at all, not that it is discouraged. */
+	--shadow-*: initial;
+	--inset-shadow-*: initial;
+	--drop-shadow-*: initial;
+	--text-shadow-*: initial;
+	--blur-*: initial;
+	--animate-*: initial;
+	--ease-*: initial;
+	--tracking-*: initial;
+	--leading-*: initial;
+
 	--color-board:     #E4E5E0;
 	--color-card:      #F7F7F4;
 	--color-ink:       #22241F;
@@ -43,10 +59,30 @@
 
 	/* Leading. CLAUDE.md names three roles rather than a numeric scale, so they
 	 * are named for the role and not the number — `leading-record` has to stay
-	 * legible as "the value used on record fields" three phases from now. */
+	 * legible as "the value used on record fields" three phases from now.
+	 * These three are the only survivors of `--leading-*: initial`. */
 	--leading-display: 1.2;
 	--leading-prose:   1.65;
 	--leading-record:  1.5;
+
+	/* The only tracking value in the system. Promoted out of .field-label,
+	 * where it was hardcoded — the label's 0.09em and any future utility use
+	 * of it must be the same number, not two numbers that agree today. */
+	--tracking-label: 0.09em;
+
+	/* Spacing, named by intent. The numeric scale stays dead: the bare
+	 * `--spacing` multiplier is deliberately NOT declared, because declaring it
+	 * would restore p-4, gap-2, mt-8 and every sibling in one line.
+	 *
+	 * Six values. Asking "is this gap a field or an entry?" forces a real
+	 * answer, where `p-6` never would. A seventh is a conversation, not a
+	 * commit. */
+	--spacing-hair:    0.25rem; /* optical nudge; label to the value under it */
+	--spacing-tight:   0.5rem;  /* stacked lines inside one field */
+	--spacing-field:   0.75rem; /* field to field within a rail */
+	--spacing-entry:   1.5rem;  /* padding inside a record; entry to entry */
+	--spacing-record:  3rem;    /* record to record; subsection break */
+	--spacing-section: 6rem;    /* one movement of the page to the next */
 }
 
 /* ---------------------------------------------------------------------------
@@ -155,13 +191,14 @@
 		font-family: var(--font-record);
 		font-size: 0.625rem;
 		line-height: var(--leading-record);
-		letter-spacing: 0.09em;
+		letter-spacing: var(--tracking-label);
 		text-transform: uppercase;
 		color: var(--color-ink-muted);
 		font-variant-ligatures: none;
 
 		/* The tracking above adds space after the final letter too, which throws
-		 * the label out of alignment with the value beneath it. Pull it back. */
-		margin-inline-end: -0.09em;
+		 * the label out of alignment with the value beneath it. Pull it back —
+		 * derived from the token so the two can never drift apart. */
+		margin-inline-end: calc(var(--tracking-label) * -1);
 	}
 }

@@ -276,33 +276,70 @@ keep. That is the whole case for Catalog over nothing.
 
 ---
 
-## Findings from Phase 0
+## Findings from Phase 0 / 0.1
 
 Recorded here because they constrain Phase 2 and were discovered by testing, not
 by reading docs.
 
-**The `@theme` wipe works, but it does not error.** `--color-*: initial` and the
-other four wipes make `bg-slate-800`, `text-red-500`, `p-4`, `gap-2`,
-`rounded-lg`, `font-sans`, and `text-3xl` produce **zero CSS output**. The build
-does *not* fail — Tailwind silently emits nothing. So the wipe removes the
-convenience but not the footgun: a typo like `text-ink-mute` also silently
-produces nothing and ships as unstyled. Worth a lint rule in Phase 3.
+**The `@theme` wipe works, but it does not error.** The wiped namespaces make
+`bg-slate-800`, `text-red-500`, `p-4`, `gap-2`, `rounded-lg`, `font-sans` and
+`text-3xl` produce **zero CSS output**. The build does *not* fail — Tailwind
+silently emits nothing. So the wipe removes the convenience but not the footgun:
+a typo like `text-ink-mute` also silently produces nothing and ships as
+unstyled. Lint rule deferred to Phase 3.
 
-**Five namespaces are not covered by the wipe.** `--shadow-*`, `--blur-*`,
-`--animate-*`, `--tracking-*`, and `--leading-*` are not in the `@theme` block,
-so `shadow-lg`, `blur-sm`, `animate-spin`, `tracking-wide`, and `leading-tight`
-all remain reachable. `shadow-lg` being available matters: CLAUDE.md forbids
-box-shadows everywhere, and right now nothing mechanically prevents one. Adding
-`--shadow-*: initial` would close it. Not done in Phase 0 because the brief said
-to follow the block exactly.
+**The wipe was finished in Phase 0.1.** Phase 0 shipped with five namespaces
+wiped, which left `shadow-lg`, `blur-sm`, `animate-spin`, `tracking-wide` and
+`leading-tight` reachable — a box-shadow was forbidden by CLAUDE.md but one
+keystroke away. Nine more namespaces were added, including all four shadow
+namespaces, and no shadow token is declared in any of them. A box-shadow is now
+inexpressible through Tailwind rather than merely discouraged.
 
-**There is no spacing scale.** `--spacing-*: initial` removed it and nothing
-replaced it, so `p-4`, `gap-2`, `mt-8` and every other spacing utility resolve to
-nothing. Only arbitrary values (`p-[1.5rem]`) work, which is what the token test
-sheet uses throughout. **Phase 2 cannot lay anything out until this is decided.**
-The options are to declare a named-by-intent spacing scale in `@theme`, or to
-commit to arbitrary values everywhere as a deliberate anti-uniformity measure.
-This is a real decision and it belongs to whoever starts Phase 2, not to Phase 0.
+**Spacing is six tokens, named by intent, and the numeric scale stays dead.**
+`hair` `tight` `field` `entry` `record` `section`. The bare `--spacing`
+multiplier is deliberately not declared — declaring it would restore `p-4` and
+every sibling in one line. Verified dead: `p-4`, `gap-2`, `mt-8`, `space-y-4`,
+`w-64`, `m-2`, `px-6`, `h-96`.
+
+**`leading-*` falls back to the spacing namespace, and the wipe cannot reach
+it.** This one is a live hazard rather than a closed question. Tailwind resolves
+`leading-<name>` against `--spacing-*` when the leading namespace has no match,
+so declaring the six spacing tokens silently created six `leading-*` utilities
+whose line-height is a *length*:
+
+```
+leading-hair     -> line-height: 0.25rem
+leading-tight    -> line-height: 0.5rem
+leading-field    -> line-height: 0.75rem
+leading-entry    -> line-height: 1.5rem
+leading-section  -> line-height: 6rem
+leading-record   -> shadowed by the real --leading-record (1.5). Correct today.
+```
+
+`--leading-*: initial` does not prevent this; the fallback is structural in the
+utility, not a theme value. Two consequences. `leading-tight` is a name typed
+from muscle memory and now silently means `line-height: 0.5rem`. And
+`leading-record` is correct only because the real leading token shadows the
+spacing one — deleting `--leading-record` would silently change it to `3rem`
+instead of breaking loudly. Only `leading-display`, `leading-prose` and
+`leading-record` are intended. This is the strongest argument yet for the Phase 3
+lint rule, which should check against an allowlist of intended utilities rather
+than merely flagging unknown ones.
+
+**Three places on the token sheet are not spacing and stay arbitrary.** Reported
+rather than papered over, per the Phase 0.1 brief. None of them indicate the
+scale is wrong — they indicate they are not spacing:
+
+- Swatch chip height (`h-[4.5rem]`) — a specimen dimension. How much ink you need
+  to see to judge a colour is not a spacing question.
+- The ink-on-ink grid gap (`gap-[1px]`) — a hairline abutment. The two grounds
+  have to nearly touch for the value step between them to be judgeable.
+- Prose measures (`max-w-[54ch]`, `[60ch]`, `[62ch]`, `[68ch]`) and container
+  widths (`max-w-[72rem]`, `min-w-[14rem]`, `md:grid-cols-[15rem_1fr]`) — measure
+  is a function of the face, and track sizing is layout. Neither belongs to a
+  spacing scale.
+
+Everything that *is* spacing on the sheet now uses a named utility.
 
 ---
 

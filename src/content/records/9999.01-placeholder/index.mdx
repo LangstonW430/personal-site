@@ -1,0 +1,35 @@
+---
+acc: '9999.01'
+title: Schema placeholder
+summary: Exists only to prove the records schema and the nested articles collection typecheck against real MDX. Deleted in Phase 1.
+client: None
+role: None
+medium: ['Astro 7.2.2', 'TypeScript 5', 'Zod 4']
+acquired: 2026-08-14
+status: active
+extent:
+  loc: 1
+  commits: 1
+  duration: '1 day'
+condition: Not a record. Delete before Phase 1 ships.
+locality: Rochester, N.Y.
+history:
+  - date: 2026-08-14
+    note: Accessioned as a schema fixture.
+  - date: 2026-08-15
+    note: Rewritten as a directory when records became containers.
+links: {}
+featured: false
+order: 0
+---
+
+Not content. This directory exercises every field in the `records` schema —
+including both `refine` rules, by being `active` with no `completed` date — and
+proves the nesting works: the article under `articles/` is loaded by a separate
+collection and has this record's accession injected into it.
+
+`9999` is deliberately outside the assignable range. Real accession years are
+the year of entry into the register, so no real record can ever collide with
+this one or quietly consume a number a real work should have had.
+
+Delete this directory in Phase 1, when real records replace it.

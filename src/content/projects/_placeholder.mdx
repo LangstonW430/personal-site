@@ -1,0 +1,30 @@
+---
+acc: '2026.00'
+title: Schema placeholder
+summary: Exists only to prove the projects schema typechecks against a real MDX entry. Deleted in Phase 1.
+client: None
+role: None
+medium: ['Astro 7.2.2', 'TypeScript 5', 'Zod 4']
+acquired: 2026-08-14
+status: active
+extent:
+  loc: 1
+  commits: 1
+  duration: '1 day'
+condition: Not a record. Delete before Phase 1 ships.
+locality: Rochester, N.Y.
+links: {}
+featured: false
+order: 0
+---
+
+Not content. This file exercises every field in the `projects` schema —
+including all three `refine` rules, by being `active` with no `completed` date
+and by carrying an accession year that matches `acquired` — so that
+`astro check` is validating something real in Phase 0.
+
+`2026.00` is deliberately outside the assignable range: real records start at
+`2026.01`, so this placeholder cannot collide with one and cannot quietly
+consume a number that a real work should have had.
+
+Delete this file in Phase 1, when real records replace it.

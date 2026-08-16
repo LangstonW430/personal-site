@@ -1,0 +1,167 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+ * THEME
+ *
+ * Tailwind is a typed interface to the token system here, not a source of
+ * defaults. The five `*: initial` wipes are the mechanism: they delete
+ * Tailwind's built-in scales so that `bg-slate-800`, `p-4`, `rounded-lg`,
+ * `font-sans` and `text-3xl` resolve to nothing at all. A utility class that
+ * references a value not declared below is a bug, not a shortcut.
+ *
+ * Everything declared here is from CLAUDE.md. Nothing is invented. If a value
+ * is needed that is not here, the argument for adding it goes in the commit
+ * message.
+ * ------------------------------------------------------------------------- */
+
+@theme {
+	--color-*: initial;
+	--spacing-*: initial;
+	--radius-*: initial;
+	--font-*: initial;
+	--text-*: initial;
+
+	--color-board:     #E4E5E0;
+	--color-card:      #F7F7F4;
+	--color-ink:       #22241F;
+	--color-ink-muted: #6B6E66;
+	--color-rule:      #C9CBC3;
+	--color-stamp:     #6E4B7E;
+
+	--font-record: "Commit Mono", ui-monospace, monospace;
+	--font-prose:  "Source Serif 4 Variable", Georgia, serif;
+
+	/* Type scale — 1.25 ratio, six steps. Declared here because the wipe above
+	 * removes Tailwind's, and without these there is no `text-*` utility at all.
+	 * Values are CLAUDE.md's Type section verbatim. */
+	--text-xs:   0.66rem;
+	--text-sm:   0.75rem;
+	--text-base: 0.94rem;
+	--text-md:   1.06rem;
+	--text-lg:   1.56rem;
+	--text-xl:   2.1rem;
+
+	/* Leading. CLAUDE.md names three roles rather than a numeric scale, so they
+	 * are named for the role and not the number — `leading-record` has to stay
+	 * legible as "the value used on record fields" three phases from now. */
+	--leading-display: 1.2;
+	--leading-prose:   1.65;
+	--leading-record:  1.5;
+}
+
+/* ---------------------------------------------------------------------------
+ * FONT FACES
+ *
+ * Self-hosted from /public/fonts/, latin subset, explicit unicode-range. There
+ * is no request to fonts.googleapis.com, fonts.gstatic.com, or any other
+ * origin — the woff2 was fetched once, by hand, and committed.
+ *
+ * There is no sans-serif in this system. Two faces, and the assignment is a
+ * rule: Commit Mono for every record field, Source Serif 4 for every piece of
+ * prose including all headings.
+ * ------------------------------------------------------------------------- */
+
+/*
+ * Commit Mono is not on Google Fonts and is not fetchable programmatically. It
+ * must be downloaded from commitmono.com by hand and placed at the path below.
+ *
+ * Until that file exists, every label, number, date, status and accession on
+ * the site falls back to the platform monospace. That is deliberately obvious
+ * on the token test sheet rather than subtly off, because this face carries
+ * half the type system — it is not a detail that should be able to hide.
+ *
+ * The weight range assumes the variable release. If the static 400 lands here
+ * instead, narrow this to `font-weight: 400` so the browser stops synthesizing
+ * a bold that does not exist.
+ */
+@font-face {
+	font-family: "Commit Mono";
+	src: url("/fonts/commit-mono.woff2") format("woff2");
+	font-weight: 200 700;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+		U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+		U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+	font-family: "Source Serif 4 Variable";
+	src: url("/fonts/source-serif-4-variable-latin.woff2") format("woff2");
+	font-weight: 200 900;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+		U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+		U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@layer base {
+	body {
+		background-color: var(--color-board);
+		color: var(--color-ink);
+		font-family: var(--font-prose);
+		font-size: var(--text-base);
+		line-height: var(--leading-prose);
+		font-optical-sizing: auto;
+
+		/* Source Serif carries a real weight axis and Commit Mono carries its
+		 * own weights; nothing needs to be faked, and a synthesized bold on a
+		 * fine serif destroys the thin strokes. */
+		font-synthesis: none;
+	}
+
+	/* Tabular figures wherever numbers are compared down a column. An extent
+	 * reading `4,180 LOC` above one reading `118 commits` has to align. */
+	:where(table, pre, code, samp, kbd) {
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* Focus rings are one of only three permitted uses of `stamp`. */
+	:focus-visible {
+		outline: 1px solid var(--color-stamp);
+		outline-offset: 2px;
+	}
+
+	:focus:not(:focus-visible) {
+		outline: none;
+	}
+
+	::selection {
+		background-color: var(--color-rule);
+		color: var(--color-ink);
+	}
+}
+
+@layer components {
+	/*
+	 * .field-label — the defining type move.
+	 *
+	 * It sits above nearly every value on the site: ACC., ACQUIRED, MEDIUM,
+	 * EXTENT, CONDITION. Catalog cards were typed, which is the entire
+	 * justification for mono on metadata — it is not a developer-aesthetic
+	 * choice and must not drift into one.
+	 *
+	 * A field label names a field that has a value under it. If it is there for
+	 * texture, it is decoration and does not ship.
+	 *
+	 * Size note: CLAUDE.md specifies 10px. It is written as 0.625rem, which is
+	 * exactly 10px at the default root size and visually identical, but scales
+	 * for a reader who has raised their browser's default text size — a literal
+	 * `10px` would pin the smallest type on the site at 10px for everyone.
+	 * Change it to `10px` if you want the pin; the value is the same today.
+	 */
+	.field-label {
+		font-family: var(--font-record);
+		font-size: 0.625rem;
+		line-height: var(--leading-record);
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: var(--color-ink-muted);
+		font-variant-ligatures: none;
+
+		/* The tracking above adds space after the final letter too, which throws
+		 * the label out of alignment with the value beneath it. Pull it back. */
+		margin-inline-end: -0.09em;
+	}
+}

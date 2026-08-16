@@ -1,0 +1,320 @@
+---
+/*
+ * Token test sheet — scratch instrument, not design.
+ *
+ * Purpose: make the card-on-board value step judgeable by eye while changing
+ * the palette is still free, and prove every token and both faces load.
+ * Delete at the end of Phase 2.
+ *
+ * Filename note: the brief called for `_tokens-test.astro`. Astro excludes
+ * underscore-prefixed files in src/pages/ from routing, so that file would
+ * build to nothing and never be viewable. It is `tokens-test.astro` instead,
+ * with `noindex` below to keep it out of search results.
+ *
+ * Token tables are parsed out of global.css at build time rather than retyped.
+ * A reference sheet that can disagree with its source of truth is worse than
+ * no reference sheet.
+ *
+ * Spacing is written as Tailwind arbitrary values (`p-[2rem]`) throughout,
+ * because `--spacing-*: initial` in the @theme block removed the spacing scale
+ * and nothing replaced it. That is not a workaround — it is the wipe working,
+ * shown rather than described. See the note in design-directions.md.
+ */
+import themeSource from '../styles/global.css?raw';
+import '../styles/global.css';
+
+type Token = { name: string; value: string };
+
+const themeBlock = themeSource.match(/@theme\s*\{([\s\S]*?)\n\}/)?.[1] ?? '';
+
+const tokens: Token[] = [...themeBlock.matchAll(/^\s*(--[a-z0-9-]+):\s*([^;]+);/gim)]
+	.map((m) => ({ name: m[1] ?? '', value: (m[2] ?? '').trim() }))
+	// Drop the five `*: initial` wipes — they are instructions, not values.
+	.filter((t) => t.value !== 'initial' && !t.name.endsWith('-*'));
+
+const pick = (prefix: string) => tokens.filter((t) => t.name.startsWith(prefix));
+
+const colors = pick('--color-');
+const typeSteps = pick('--text-');
+const leadings = pick('--leading-');
+
+const faces = [
+	{ cls: 'font-record', name: 'Commit Mono', role: 'Every record field, label, number, date, status, accession' },
+	{ cls: 'font-prose', name: 'Source Serif 4 Variable', role: 'Every piece of prose, including all headings' },
+] as const;
+
+/* A real paragraph. Leading is unjudgeable on filler text — filler has no long
+ * words, no proper nouns, and no numerals to space around. */
+const specimen =
+	'Acquired 14 June 2026 from a dormant branch of the availability service, where the ' +
+	'query had been issued once per row since February. Replacing the N+1 reduced p99 from ' +
+	'840ms to 120ms across 11,400 daily requests. Condition stable; dependencies current as ' +
+	'of June 2026. Two known issues remain, both in Safari 17 file uploads, both documented.';
+
+const leadingRole: Record<string, string> = {
+	'--leading-display': 'display',
+	'--leading-prose': 'prose',
+	'--leading-record': 'record fields',
+};
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex, nofollow" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<title>Token test sheet</title>
+	</head>
+	<body class="bg-board text-ink">
+		<main class="mx-auto max-w-[72rem] px-[1.5rem] py-[3rem]">
+			<header>
+				<p class="field-label">Phase 0 — foundation</p>
+				<h1 class="font-prose text-xl leading-display mt-[0.25rem]">Token test sheet</h1>
+				<p class="text-ink-muted max-w-[54ch] mt-[1rem]">
+					Every value below is parsed from <code class="font-record text-sm">src/styles/global.css</code>
+					at build time. If a token is missing here it does not exist.
+					{`${tokens.length} tokens, ${colors.length} inks, ${typeSteps.length} type steps.`}
+					Delete this page at the end of Phase 2.
+				</p>
+			</header>
+
+			<!-- ------------------------------------------------ card on board -->
+			<section class="mt-[4rem]">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">
+					The value step
+				</h2>
+				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
+					All depth in this system comes from <code class="font-record text-sm">card</code> sitting on
+					<code class="font-record text-sm">board</code>. There are no box-shadows anywhere, so if this
+					step is too subtle the record stops reading as a separate object and the whole
+					layout flattens. This is the single most important thing on this page to judge.
+				</p>
+
+				<div class="bg-board p-[2rem] mt-[1.5rem] border border-rule">
+					<div class="bg-card p-[2rem] border border-rule">
+						<p class="field-label">Acc.</p>
+						<p class="font-record text-md text-stamp">2026.04</p>
+						<p class="font-prose mt-[1rem] max-w-[60ch]">
+							A record sitting on the board. Judge the edge: it should read as a distinct
+							surface without a shadow doing the work, and the hairline should support the
+							step rather than substitute for it.
+						</p>
+					</div>
+				</div>
+
+				<div class="mt-[1rem] flex flex-wrap gap-[1rem]">
+					<div class="bg-card border border-rule p-[1rem] flex-1 min-w-[14rem]">
+						<p class="field-label">card on board</p>
+						<p class="font-record text-sm mt-[0.25rem]">#F7F7F4 on #E4E5E0</p>
+					</div>
+					<div class="bg-board border border-rule p-[1rem] flex-1 min-w-[14rem]">
+						<p class="field-label">board alone</p>
+						<p class="font-record text-sm mt-[0.25rem]">#E4E5E0</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- ---------------------------------------------------------- ink -->
+			<section class="mt-[4rem]">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">Ink</h2>
+				<ul role="list" class="grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-[1.5rem] mt-[1.5rem]">
+					{colors.map((c) => (
+						<li>
+							<div
+								class="h-[4.5rem] border border-rule"
+								style={`background-color: var(${c.name})`}
+							></div>
+							<p class="field-label mt-[0.5rem]">{c.name.replace('--color-', '')}</p>
+							<p class="font-record text-sm uppercase">{c.value}</p>
+						</li>
+					))}
+				</ul>
+
+				<h3 class="font-prose text-md leading-display mt-[2.5rem] border-b border-rule pb-[0.5rem]">
+					Ink on both grounds
+				</h3>
+				<div class="grid grid-cols-[repeat(auto-fit,minmax(17rem,1fr))] gap-[1px] mt-[1.5rem]">
+					{colors
+						.filter((c) => !['--color-board', '--color-card'].includes(c.name))
+						.map((c) => (
+							<>
+								<p class="font-record text-sm p-[0.875rem] bg-board" style={`color: var(${c.name})`}>
+									{c.name.replace('--color-', '')} on board — 2026.04 · 4,180 LOC
+								</p>
+								<p class="font-record text-sm p-[0.875rem] bg-card" style={`color: var(${c.name})`}>
+									{c.name.replace('--color-', '')} on card — 2026.04 · 4,180 LOC
+								</p>
+							</>
+						))}
+				</div>
+			</section>
+
+			<!-- --------------------------------------------------------- type -->
+			<section class="mt-[4rem]">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">Type</h2>
+				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
+					Six steps, both faces. There is no sans-serif in this system. If the Commit Mono
+					column renders in your platform's default monospace, the font is missing from
+					<code class="font-record text-sm">/public/fonts/</code> — it carries half the type
+					system, so this is not a subtle failure.
+				</p>
+
+				{faces.map((face) => (
+					<div class="mt-[2rem] pt-[1rem] border-t border-rule">
+						<p class="field-label">{face.name} — {face.role}</p>
+						<div class="mt-[1rem]">
+							{typeSteps.map((step) => (
+								<div class="mt-[1.25rem]">
+									<p class="field-label">
+										{step.name.replace('--', '')} · {step.value}
+									</p>
+									<p class={`${face.cls} leading-display break-words`} style={`font-size: var(${step.name})`}>
+										Register of works — 2026.04
+									</p>
+								</div>
+							))}
+						</div>
+					</div>
+				))}
+
+				<h3 class="font-prose text-md leading-display mt-[2.5rem] border-b border-rule pb-[0.5rem]">
+					Leading
+				</h3>
+				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
+					Each value on the paragraph length and face it is actually for. Judging leading on
+					a single line tells you nothing.
+				</p>
+				{leadings.map((l) => (
+					<div class="mt-[2rem]">
+						<p class="field-label">
+							{l.name.replace('--', '')} · {l.value} · {leadingRole[l.name]}
+						</p>
+						<p
+							class={`${l.name === '--leading-record' ? 'font-record text-sm' : 'font-prose'} max-w-[68ch] mt-[0.5rem]`}
+							style={`line-height: var(${l.name})`}
+						>
+							{specimen}
+						</p>
+					</div>
+				))}
+			</section>
+
+			<!-- -------------------------------------------------- field label -->
+			<section class="mt-[4rem]">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">
+					The field label
+				</h2>
+				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
+					Commit Mono, uppercase, 10px, 0.09em tracking, ink-muted. It sits above nearly
+					every value on the site. A field label names a field that has a value under it —
+					every label on this page is a real one.
+				</p>
+
+				<div class="bg-card border border-rule p-[1.5rem] mt-[1.5rem] grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-[1.5rem]">
+					<div>
+						<p class="field-label">Acquired</p>
+						<p class="font-record text-base mt-[0.25rem]">2026-06-14</p>
+					</div>
+					<div>
+						<p class="field-label">Status</p>
+						<p class="font-record text-base mt-[0.25rem]">ACTIVE</p>
+					</div>
+					<div>
+						<p class="field-label">Extent</p>
+						<p class="font-record text-base mt-[0.25rem]">4,180 LOC · 118 commits · 7 weeks</p>
+					</div>
+					<div>
+						<p class="field-label">Medium</p>
+						<p class="font-record text-base mt-[0.25rem]">Astro · TypeScript · Postgres</p>
+					</div>
+				</div>
+			</section>
+
+			<!-- ------------------------------------------------- record split -->
+			<section class="mt-[4rem]">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">
+					Record split — rail against prose
+				</h2>
+				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
+					A narrow left rail of LABEL / value pairs against a wide prose column. Phase 2
+					builds the real thing; this is here so the proportion and the mono-against-serif
+					texture can be judged now. At 360px the split stacks and the rail goes first.
+				</p>
+
+				<article class="bg-card border border-rule p-[1.5rem] mt-[1.5rem] grid gap-[2rem] grid-cols-[1fr] md:grid-cols-[15rem_1fr]">
+					<div class="flex flex-col gap-[1rem]">
+						<div>
+							<p class="field-label">Acc.</p>
+							<p class="font-record text-md text-stamp">2026.04</p>
+						</div>
+						<div>
+							<p class="field-label">Role</p>
+							<p class="font-record text-sm leading-record">Sole developer</p>
+						</div>
+						<div>
+							<p class="field-label">Medium</p>
+							<p class="font-record text-sm leading-record">Astro · TypeScript · Postgres · Overpass API</p>
+						</div>
+						<div>
+							<p class="field-label">Acquired</p>
+							<p class="font-record text-sm leading-record">2026-06-14</p>
+						</div>
+						<div>
+							<p class="field-label">Extent</p>
+							<p class="font-record text-sm leading-record">4,180 LOC · 118 commits · 7 weeks</p>
+						</div>
+						<div>
+							<p class="field-label">Condition</p>
+							<p class="font-record text-sm leading-record">
+								Stable. Deps current as of Jun 2026. Two known issues in Safari 17 uploads.
+							</p>
+						</div>
+					</div>
+
+					<div>
+						<h3 class="font-prose text-md leading-display">Availability service</h3>
+						<p class="font-prose leading-prose mt-[0.75rem] max-w-[62ch]">{specimen}</p>
+						<p class="font-prose leading-prose mt-[1rem] max-w-[62ch]">
+							The rail carries what can be measured; the column carries what has to be
+							explained. If a fact fits in the rail it does not get repeated here — that
+							duplication is what turns a record into a brochure.
+						</p>
+					</div>
+				</article>
+			</section>
+
+			<!-- -------------------------------------------------------- stamp -->
+			<section class="mt-[4rem]">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-[0.5rem]">Stamp</h2>
+				<p class="text-ink-muted max-w-[60ch] mt-[1rem]">
+					Aniline violet, from library date stamps. The scarcest ink — accession numbers,
+					live-data indicators, and focus rings only. More than four uses on a page is
+					wrong. Both permitted static uses are below; the third arrives in Phase 4.
+				</p>
+
+				<div class="bg-card border border-rule p-[1.5rem] mt-[1.5rem]">
+					<p class="field-label">On an accession number</p>
+					<p class="font-record text-xl text-stamp mt-[0.25rem]">2026.04</p>
+
+					<p class="field-label mt-[2rem]">On a focus ring</p>
+					<p class="text-ink-muted text-sm mt-[0.25rem] max-w-[60ch]">
+						Tab to the link below. The ring should read clearly against
+						<code class="font-record text-sm">card</code> at 2px offset — check it against
+						<code class="font-record text-sm">board</code> too, since the record sits on both.
+					</p>
+					<p class="mt-[0.75rem]">
+						<a href="#" class="font-record text-sm underline">Focusable link on card</a>
+					</p>
+				</div>
+
+				<div class="bg-board border border-rule p-[1.5rem] mt-[1rem]">
+					<p class="mt-0">
+						<a href="#" class="font-record text-sm underline">Focusable link on board</a>
+					</p>
+				</div>
+			</section>
+		</main>
+	</body>
+</html>

@@ -1,14 +1,14 @@
 ---
 /*
  * An accrual. Parent is looked up through the injected `record` field
- * against the records collection, never by re-parsing this article's id —
- * the id's directory segment and a record's id happen to agree today, but
- * the field is the contract, not the coincidence.
+ * against the records collection, never by re-parsing this article's id.
+ * The return-to-parent link sits above the title, not below the body, so an
+ * accrual can never read as a standalone post before a reader knows what
+ * it's filed under.
  */
 import { getCollection, render, type CollectionEntry } from 'astro:content';
-import Head from '../../../components/Head.astro';
-import { formatDate } from '../../../lib/format';
-import '../../../styles/global.css';
+import Base from '../../../layouts/Base.astro';
+import Time from '../../../components/Time.astro';
 
 export async function getStaticPaths() {
 	const [records, articles] = await Promise.all([getCollection('records'), getCollection('articles')]);
@@ -41,42 +41,44 @@ const { article, record, slug } = Astro.props;
 const { Content } = await render(article);
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<Head
-			title={`ACC. ${record.data.acc} — ${article.data.title}`}
-			description={article.data.summary}
-			path={`/${record.id}/${slug}/`}
-		/>
-	</head>
-	<body class="bg-board text-ink">
-		<main class="px-entry py-register max-w-[62rem] mx-auto">
-			<p><a href={`/${record.id}/`}>&larr; {record.data.title}</a></p>
+<Base
+	title={`ACC. ${record.data.acc} — ${article.data.title}`}
+	description={article.data.summary}
+	path={`/${record.id}/${slug}/`}
+>
+	<main id="main" class="px-entry py-register max-w-[62rem] mx-auto">
+		<p>
+			<a href={`/${record.id}/`}>&larr; {record.data.acc} — {record.data.title}</a>
+		</p>
 
-			<p class="field-label mt-entry">Note</p>
-			<p class="font-record font-typed text-md text-stamp">{article.data.note}</p>
+		<article>
+			<header>
+				<p class="field-label mt-entry">Note</p>
+				<p class="font-record font-typed text-md text-stamp">{article.data.note}</p>
 
-			<h1 class="font-prose text-xl leading-display mt-hair">{article.data.title}</h1>
-			<p class="font-prose leading-prose mt-field max-w-[62ch]">{article.data.summary}</p>
+				<h1 class="font-prose text-xl leading-display mt-hair">{article.data.title}</h1>
+				<p class="font-prose leading-prose mt-field max-w-[62ch]">{article.data.summary}</p>
+			</header>
 
-			<article class="mt-register grid gap-entry grid-cols-1 md:grid-cols-[15rem_1fr]">
-				<div class="flex flex-col gap-field">
+			<div class="mt-register grid gap-entry grid-cols-1 md:grid-cols-[15rem_1fr]">
+				<dl class="bg-card border border-rule p-entry flex flex-col gap-field">
 					<div>
-						<p class="field-label">Filed</p>
-						<p class="font-record font-typed text-sm leading-record">{formatDate(article.data.filed)}</p>
+						<dt class="field-label">Filed</dt>
+						<dd class="font-record font-typed text-sm leading-record">
+							<Time date={article.data.filed} />
+						</dd>
 					</div>
 
 					<div>
-						<p class="field-label">Condition</p>
-						<p class="font-record font-typed text-sm leading-record">{article.data.condition}</p>
+						<dt class="field-label">Condition</dt>
+						<dd class="font-record font-typed text-sm leading-record">{article.data.condition}</dd>
 					</div>
 
 					{
 						article.data.provenance && (
 							<div>
-								<p class="field-label">Provenance</p>
-								<p class="font-record font-typed text-sm leading-record">{article.data.provenance}</p>
+								<dt class="field-label">Provenance</dt>
+								<dd class="font-record font-typed text-sm leading-record">{article.data.provenance}</dd>
 							</div>
 						)
 					}
@@ -84,19 +86,30 @@ const { Content } = await render(article);
 					{
 						article.data.extent?.words !== undefined && (
 							<div>
-								<p class="field-label">Extent</p>
-								<p class="font-record font-typed text-sm leading-record">
+								<dt class="field-label">Extent</dt>
+								<dd class="font-record font-typed text-sm leading-record">
 									{article.data.extent.words.toLocaleString('en-US')} words
-								</p>
+								</dd>
 							</div>
 						)
 					}
-				</div>
+
+					<div>
+						<dt class="field-label">Record</dt>
+						<dd class="font-record font-typed text-sm leading-record">
+							<a href={`/${record.id}/`}>{record.data.acc}</a>
+						</dd>
+					</div>
+				</dl>
 
 				<div class="font-prose leading-prose max-w-[62ch]">
 					<Content />
 				</div>
-			</article>
-		</main>
-	</body>
-</html>
+			</div>
+
+			<p class="mt-register no-print">
+				<a href={`/${record.id}/`}>&larr; Back to {record.data.acc} — {record.data.title}</a>
+			</p>
+		</article>
+	</main>
+</Base>

@@ -9,16 +9,20 @@ export interface Props {
 	description: string;
 	/** Root-relative pathname, e.g. "/2026.06-promptdesk/". Resolved against `site`. */
 	path: string;
+	/** Root-relative OG image path, e.g. "/og/2026.06-promptdesk.png". Optional — not every route has one. */
+	image?: string;
 }
 
-const { title, description, path } = Astro.props;
+const { title, description, path, image } = Astro.props;
 const canonical = new URL(path, Astro.site).toString();
+const ogImage = image ? new URL(image, Astro.site).toString() : undefined;
 ---
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="canonical" href={canonical} />
+<link rel="alternate" type="application/rss+xml" title="Langston — accruals" href="/rss.xml" />
 
 <!--
   Phase 2b only: the register now carries real client names next to invented
@@ -35,7 +39,11 @@ const canonical = new URL(path, Astro.site).toString();
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
+{ogImage && <meta property="og:image" content={ogImage} />}
+{ogImage && <meta property="og:image:width" content="1200" />}
+{ogImage && <meta property="og:image:height" content="630" />}
 
-<meta name="twitter:card" content="summary" />
+<meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
+{ogImage && <meta name="twitter:image" content={ogImage} />}

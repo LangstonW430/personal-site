@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -109,7 +110,15 @@ export default defineConfig({
 	output: 'static',
 	adapter: vercel(),
 
-	integrations: [mdx(), fontGuard()],
+	integrations: [
+		mdx(),
+		fontGuard(),
+		// Excludes /og/*.png — those are build artifacts (the OG image
+		// endpoint), not pages, and don't belong in a page sitemap.
+		sitemap({
+			filter: (page) => !page.includes('/og/'),
+		}),
+	],
 
 	vite: {
 		plugins: [tailwindcss()],

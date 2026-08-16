@@ -606,3 +606,57 @@ left to memory:
    public URL. **Remove the `noindex` meta tag and open up `robots.txt`** at
    the same time the content gate above goes live — not before, since the
    placeholder prose will still be there until Phase 1 actually finishes.
+   Phase 3 confirmed both stay: `noindex` is explicitly out of scope for that
+   phase, so RSS and the sitemap are built and valid but not linked from
+   anywhere and not worth much until it comes off.
+
+## Phase 3: static instances for the OG image build step
+
+The per-record OG images (`src/pages/og/[id].png.ts`) render through Satori,
+which — unlike a browser — only reads TTF, OTF, or WOFF, never WOFF2. The two
+faces this project ships are WOFF2 only, so the build step needs its own font
+files. Rather than add a font-conversion package to `package.json`, this is
+the same one-time, throwaway-venv pattern Phase 0.3 used to build the WOFF2s
+in the first place, run in reverse:
+
+```sh
+python -m venv /tmp/fontenv && source /tmp/fontenv/bin/activate
+pip install fonttools brotli
+```
+
+```python
+from fontTools.ttLib import TTFont
+from fontTools.varLib.instancer import instantiateVariableFont
+
+# Commit Mono: one axis, wght.
+font = TTFont("public/fonts/commit-mono-variable-latin.woff2")
+instantiateVariableFont(font, {"wght": 450}, inplace=True)
+font.flavor = None
+font.save("scripts/og-fonts/CommitMono-450.ttf")
+
+# Source Serif 4: TWO axes, wght and opsz. Pinning only wght leaves opsz
+# variable, which leaves a truncated `fvar` table in the output — Satori's
+# font parser (opentype.js) throws on it ("Cannot read properties of
+# undefined (reading '279')") rather than reading it as static. Both axes
+# have to be pinned for the font to actually stop being variable.
+font = TTFont("public/fonts/source-serif-4-variable-latin.woff2")
+instantiateVariableFont(font, {"wght": 600, "opsz": 60}, inplace=True)
+font.flavor = None
+font.save("scripts/og-fonts/SourceSerif4-600.ttf")
+```
+
+`opsz: 60` (the axis maximum, its "Display" end) rather than the default 20 —
+every string this card sets is large (40–58px), and optical size exists
+precisely to add contrast at that scale rather than reuse text-sized
+proportions blown up.
+
+**Committed, not generated at build time.** `scripts/og-fonts/*.ttf` are
+checked in, same as the WOFF2s in `public/fonts/` — two small static
+instances derived from files already in the repo, not a new upstream
+dependency. Rebuild them only if the source WOFF2s change.
+
+**New `package.json` dependencies, both build-time only:** `satori` (layout →
+SVG, using these two fonts) and `@resvg/resvg-js` (SVG → PNG). Neither is
+imported by anything that ships to the browser — `output: 'static'`
+prerenders `/og/[id].png` at build time like every other route, so nothing
+renders an image at request time.

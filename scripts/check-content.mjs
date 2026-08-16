@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// Lists every content file still carrying the [[UNWRITTEN]] sentinel and
-// exits non-zero if any remain. Deliberately not wired into `npm run build`
-// — Phase 2b needs to deploy and be looked at while everything is still
+// Lists every file still carrying the [[UNWRITTEN]] sentinel — content
+// records and page-level placeholder prose (colophon, contact) alike — and
+// exits non-zero if any remain. Deliberately not wired into `npm run build`:
+// the site needs to deploy and be looked at while parts are still
 // placeholder. It becomes a build gate at the end of Phase 1 (see
 // design-directions.md).
 
@@ -9,7 +10,8 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const ROOT = new URL('..', import.meta.url).pathname;
-const CONTENT_DIR = join(ROOT, 'src/content/records');
+const SEARCH_DIRS = ['src/content/records', 'src/pages'];
+const EXTENSIONS = ['.mdx', '.astro'];
 const SENTINEL = '[[UNWRITTEN]]';
 
 function* walk(dir) {
@@ -17,13 +19,13 @@ function* walk(dir) {
 		const path = join(dir, entry);
 		if (statSync(path).isDirectory()) {
 			yield* walk(path);
-		} else if (path.endsWith('.mdx')) {
+		} else if (EXTENSIONS.some((ext) => path.endsWith(ext))) {
 			yield path;
 		}
 	}
 }
 
-const flagged = [...walk(CONTENT_DIR)]
+const flagged = SEARCH_DIRS.flatMap((dir) => [...walk(join(ROOT, dir))])
 	.filter((path) => readFileSync(path, 'utf8').includes(SENTINEL))
 	.map((path) => relative(ROOT, path))
 	.sort();

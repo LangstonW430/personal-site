@@ -1,9 +1,10 @@
 ---
 /*
- * A record. Asymmetric split: a narrow left rail of LABEL / value pairs
- * against a wide prose column, per CLAUDE.md's layout principle — the two
- * columns carry different kinds of information and must not share a grid
- * with the register's tabular list.
+ * A record. `<article>` wraps the whole entry; fields render as a real `<dl>`
+ * inside a `bg-card` panel — the rail — against a wide prose column, per
+ * CLAUDE.md's layout principle. The panel is deliberate: see the note above
+ * the rail markup for why it holds at every viewport width instead of
+ * collapsing into plain stacked text on mobile.
  *
  * Every schema field that carries display meaning is rendered and labelled;
  * an absent optional field skips its label rather than rendering empty.
@@ -12,9 +13,9 @@
  * printed here.
  */
 import { getCollection, render, type CollectionEntry } from 'astro:content';
-import Head from '../../components/Head.astro';
-import { formatDate, formatExtent } from '../../lib/format';
-import '../../styles/global.css';
+import Base from '../../layouts/Base.astro';
+import Time from '../../components/Time.astro';
+import { formatExtent } from '../../lib/format';
 
 export async function getStaticPaths() {
 	const [records, articles] = await Promise.all([getCollection('records'), getCollection('articles')]);
@@ -44,84 +45,96 @@ const extent = formatExtent(record.data.extent);
 const hasLinks = Boolean(record.data.links.live || record.data.links.source || record.data.links.writeup);
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<Head
-			title={`ACC. ${record.data.acc} — ${record.data.title}`}
-			description={record.data.summary}
-			path={`/${record.id}/`}
-		/>
-	</head>
-	<body class="bg-board text-ink">
-		<main class="px-entry py-register max-w-[62rem] mx-auto">
-			<p><a href="/">&larr; Register</a></p>
+<Base
+	title={`ACC. ${record.data.acc} — ${record.data.title}`}
+	description={record.data.summary}
+	path={`/${record.id}/`}
+	image={`/og/${record.id}.png`}
+>
+	<main id="main" class="px-entry py-register max-w-[62rem] mx-auto">
+		<p class="no-print"><a href="/">&larr; Register</a></p>
 
-			<p class="field-label mt-entry">Acc.</p>
-			<p class="font-record font-typed text-md text-stamp">{record.data.acc}</p>
+		<article>
+			<header>
+				<p class="field-label mt-entry">Acc.</p>
+				<p class="font-record font-typed text-md text-stamp">{record.data.acc}</p>
 
-			<h1 class="font-prose text-xl leading-display mt-hair">{record.data.title}</h1>
-			<p class="font-prose leading-prose mt-field max-w-[62ch]">{record.data.summary}</p>
+				<h1 class="font-prose text-xl leading-display mt-hair">{record.data.title}</h1>
+				<p class="font-prose leading-prose mt-field max-w-[62ch]">{record.data.summary}</p>
+			</header>
 
-			<article class="mt-register grid gap-entry grid-cols-1 md:grid-cols-[15rem_1fr]">
-				<div class="flex flex-col gap-field">
+			<div class="mt-register grid gap-entry grid-cols-1 md:grid-cols-[15rem_1fr]">
+				<!--
+					The rail. `bg-card` on `board` is the same value step the rest of
+					the site uses for depth — here it also solves the mobile problem:
+					stacked full-width, this panel still reads as a mounted specimen
+					tag distinct from the page ground, not as paragraphs of running
+					text. The dt/dd pairing (label above value) doesn't change between
+					breakpoints — only the panel's position relative to the prose
+					column does, beside it at md: and above it below that.
+				-->
+				<dl class="bg-card border border-rule p-entry flex flex-col gap-field">
 					{
 						record.data.client && (
 							<div>
-								<p class="field-label">Client</p>
-								<p class="font-record font-typed text-sm leading-record">{record.data.client}</p>
+								<dt class="field-label">Client</dt>
+								<dd class="font-record font-typed text-sm leading-record">{record.data.client}</dd>
 							</div>
 						)
 					}
 
 					<div>
-						<p class="field-label">Role</p>
-						<p class="font-record font-typed text-sm leading-record">{record.data.role}</p>
+						<dt class="field-label">Role</dt>
+						<dd class="font-record font-typed text-sm leading-record">{record.data.role}</dd>
 					</div>
 
 					<div>
-						<p class="field-label">Medium</p>
-						<p class="font-record font-typed text-sm leading-record">{record.data.medium.join(' · ')}</p>
+						<dt class="field-label">Medium</dt>
+						<dd class="font-record font-typed text-sm leading-record">{record.data.medium.join(' · ')}</dd>
 					</div>
 
 					<div>
-						<p class="field-label">Acquired</p>
-						<p class="font-record font-typed text-sm leading-record">{formatDate(record.data.acquired)}</p>
+						<dt class="field-label">Acquired</dt>
+						<dd class="font-record font-typed text-sm leading-record">
+							<Time date={record.data.acquired} />
+						</dd>
 					</div>
 
 					{
 						record.data.completed && (
 							<div>
-								<p class="field-label">Completed</p>
-								<p class="font-record font-typed text-sm leading-record">{formatDate(record.data.completed)}</p>
+								<dt class="field-label">Completed</dt>
+								<dd class="font-record font-typed text-sm leading-record">
+									<Time date={record.data.completed} />
+								</dd>
 							</div>
 						)
 					}
 
 					<div>
-						<p class="field-label">Status</p>
-						<p class="font-record font-typed text-sm leading-record">{record.data.status.toUpperCase()}</p>
+						<dt class="field-label">Status</dt>
+						<dd class="font-record font-typed text-sm leading-record">{record.data.status.toUpperCase()}</dd>
 					</div>
 
 					{
 						extent && (
 							<div>
-								<p class="field-label">Extent</p>
-								<p class="font-record font-typed text-sm leading-record">{extent}</p>
+								<dt class="field-label">Extent</dt>
+								<dd class="font-record font-typed text-sm leading-record">{extent}</dd>
 							</div>
 						)
 					}
 
 					<div>
-						<p class="field-label">Condition</p>
-						<p class="font-record font-typed text-sm leading-record whitespace-pre-line">{record.data.condition}</p>
+						<dt class="field-label">Condition</dt>
+						<dd class="font-record font-typed text-sm leading-record whitespace-pre-line">{record.data.condition}</dd>
 					</div>
 
 					{
 						record.data.locality && (
 							<div>
-								<p class="field-label">Locality</p>
-								<p class="font-record font-typed text-sm leading-record">{record.data.locality}</p>
+								<dt class="field-label">Locality</dt>
+								<dd class="font-record font-typed text-sm leading-record">{record.data.locality}</dd>
 							</div>
 						)
 					}
@@ -129,14 +142,16 @@ const hasLinks = Boolean(record.data.links.live || record.data.links.source || r
 					{
 						record.data.history && record.data.history.length > 0 && (
 							<div>
-								<p class="field-label">History</p>
-								<ul role="list" class="flex flex-col gap-hair mt-hair">
-									{record.data.history.map((entry) => (
-										<li class="font-record font-typed text-sm leading-record">
-											{formatDate(entry.date)} — {entry.note}
-										</li>
-									))}
-								</ul>
+								<dt class="field-label">History</dt>
+								<dd>
+									<ul role="list" class="flex flex-col gap-hair mt-hair">
+										{record.data.history.map((entry) => (
+											<li class="font-record font-typed text-sm leading-record">
+												<Time date={entry.date} /> — {entry.note}
+											</li>
+										))}
+									</ul>
+								</dd>
 							</div>
 						)
 					}
@@ -144,33 +159,35 @@ const hasLinks = Boolean(record.data.links.live || record.data.links.source || r
 					{
 						hasLinks && (
 							<div>
-								<p class="field-label">Links</p>
-								<ul role="list" class="flex flex-col gap-hair mt-hair font-record font-typed text-sm">
-									{record.data.links.live && (
-										<li>
-											<a href={record.data.links.live}>Live</a>
-										</li>
-									)}
-									{record.data.links.source && (
-										<li>
-											<a href={record.data.links.source}>Source</a>
-										</li>
-									)}
-									{record.data.links.writeup && (
-										<li>
-											<a href={record.data.links.writeup}>Writeup</a>
-										</li>
-									)}
-								</ul>
+								<dt class="field-label">Links</dt>
+								<dd>
+									<ul role="list" class="flex flex-col gap-hair mt-hair font-record font-typed text-sm">
+										{record.data.links.live && (
+											<li>
+												<a href={record.data.links.live}>Live</a>
+											</li>
+										)}
+										{record.data.links.source && (
+											<li>
+												<a href={record.data.links.source}>Source</a>
+											</li>
+										)}
+										{record.data.links.writeup && (
+											<li>
+												<a href={record.data.links.writeup}>Writeup</a>
+											</li>
+										)}
+									</ul>
+								</dd>
 							</div>
 						)
 					}
-				</div>
+				</dl>
 
 				<div class="font-prose leading-prose max-w-[62ch]">
 					<Content />
 				</div>
-			</article>
+			</div>
 
 			{
 				accruals.length > 0 && (
@@ -186,8 +203,8 @@ const hasLinks = Boolean(record.data.links.live || record.data.links.source || r
 									</a>
 									<p class="field-label">Note {article.data.note}</p>
 									<p class="font-prose text-md leading-display mt-hair">{article.data.title}</p>
-									<p class="font-record font-typed text-sm text-ink-muted mt-pair">
-										{formatDate(article.data.filed)} · {article.data.condition}
+									<p class="font-record font-typed text-sm mt-pair">
+										<Time date={article.data.filed} /> · {article.data.condition}
 									</p>
 								</li>
 							))}
@@ -195,6 +212,6 @@ const hasLinks = Boolean(record.data.links.live || record.data.links.source || r
 					</section>
 				)
 			}
-		</main>
-	</body>
-</html>
+		</article>
+	</main>
+</Base>

@@ -1,82 +1,156 @@
 ---
 /*
- * The register. A tabular list, not a card grid — every record in accession
- * order with ACC., title, medium, extent, and status aligned as columns. At
- * narrow widths the columns collapse to labelled stacked fields per record;
- * the column header row hides there instead of wrapping badly.
+ * The register. Two panels: Recent Changes (a union of accessions, accrual
+ * filings, and history entries — what keeps this from reading as an archive
+ * nobody maintains) above the full list, in accession order.
+ *
+ * The list is tabular at md: and up (ACC. fixed left, content to the right,
+ * hairline between entries), collapsing to labelled stacked fields below
+ * that — a standard responsive-table reflow, not "the rail," so it doesn't
+ * carry the same identity risk the record page's rail does. Each per-field
+ * label/value pair is real `<dl>`/`<dt>`/`<dd>` markup: the `dt` is
+ * `md:hidden` and its wrapper is `md:contents`, so at md: only the `dd`
+ * participates in the row's grid — same value, same position, without two
+ * different templates to maintain.
  */
 import { getCollection } from 'astro:content';
-import Head from '../components/Head.astro';
+import Base from '../layouts/Base.astro';
+import Time from '../components/Time.astro';
 import { formatExtent } from '../lib/format';
-import '../styles/global.css';
 
 const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
+const articles = await getCollection('articles');
 
 const COLUMNS = 'md:grid-cols-[5rem_2fr_1.4fr_1.4fr_5.5rem]';
+
+type Change = {
+	date: Date;
+	kind: 'Accessioned' | 'Filed' | 'Revised';
+	label: string;
+	href: string;
+};
+
+const recordByAcc = new Map(records.map((record) => [record.data.acc, record]));
+
+const changes: Change[] = [
+	...records.map(
+		(record): Change => ({
+			date: record.data.acquired,
+			kind: 'Accessioned',
+			label: `${record.data.acc} — ${record.data.title}`,
+			href: `/${record.id}/`,
+		}),
+	),
+	...records.flatMap((record) =>
+		(record.data.history ?? []).map(
+			(entry): Change => ({
+				date: entry.date,
+				kind: 'Revised',
+				label: `${record.data.acc} — ${entry.note}`,
+				href: `/${record.id}/`,
+			}),
+		),
+	),
+	...articles.flatMap((article): Change[] => {
+		const parent = recordByAcc.get(article.data.record);
+		if (!parent) return [];
+		const slug = article.id.slice(article.id.indexOf('/') + 1);
+		return [
+			{
+				date: article.data.filed,
+				kind: 'Filed',
+				label: `${parent.data.acc}, note ${article.data.note} — ${article.data.title}`,
+				href: `/${parent.id}/${slug}/`,
+			},
+		];
+	}),
+];
+
+changes.sort((a, b) => b.date.getTime() - a.date.getTime());
+const RECENT_CHANGES_LIMIT = 8;
+const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<Head
-			title="Langston — register of works"
-			description="A register of software and web development work: accession number, medium, extent, and condition for each entry."
-			path="/"
-		/>
-	</head>
-	<body class="bg-board text-ink">
-		<main class="px-entry py-register max-w-[75rem] mx-auto">
-			<h1 class="font-prose text-xl leading-display">Register</h1>
+<Base
+	title="Langston — register of works"
+	description="A register of software and web development work: accession number, medium, extent, and condition for each entry."
+	path="/"
+>
+	<main id="main" class="px-entry py-register max-w-[75rem] mx-auto">
+		<h1 class="font-prose text-xl leading-display">Register</h1>
 
-			<div class={`hidden md:grid ${COLUMNS} gap-field border-b border-rule pb-pair mt-register`}>
-				<p class="field-label">Acc.</p>
-				<p class="field-label">Title</p>
-				<p class="field-label">Medium</p>
-				<p class="field-label">Extent</p>
-				<p class="field-label">Status</p>
-			</div>
+		{
+			recentChanges.length > 0 && (
+				<section class="mt-register bg-card border border-rule p-entry">
+					<h2 class="field-label">Recent changes</h2>
+					<ul role="list" class="flex flex-col gap-pair mt-field">
+						{recentChanges.map((change) => (
+							<li class="flex flex-wrap items-baseline gap-pair">
+								<Time date={change.date} class="font-record font-typed text-xs text-ink-muted shrink-0" />
+								<span class="field-label shrink-0">{change.kind}</span>
+								<a href={change.href} class="font-record font-typed text-sm">
+									{change.label}
+								</a>
+							</li>
+						))}
+					</ul>
+				</section>
+			)
+		}
 
-			<ul role="list" class="mt-register md:mt-0">
-				{
-					records.map((record) => {
-						const extent = formatExtent(record.data.extent);
-						return (
-							<li class={`relative border-b border-rule py-entry md:py-field md:grid ${COLUMNS} md:gap-field md:items-baseline`}>
+		<div class={`hidden md:grid ${COLUMNS} gap-field border-b border-rule pb-pair mt-register`}>
+			<p class="field-label">Acc.</p>
+			<p class="field-label">Title</p>
+			<p class="field-label">Medium</p>
+			<p class="field-label">Extent</p>
+			<p class="field-label">Status</p>
+		</div>
+
+		<ul role="list" class="mt-register md:mt-0">
+			{
+				records.map((record) => {
+					const extent = formatExtent(record.data.extent);
+					return (
+						<li>
+							<article
+								class={`relative border-b border-rule py-entry md:py-field md:grid ${COLUMNS} md:gap-field md:items-baseline`}
+							>
 								<a href={`/${record.id}/`} class="absolute inset-0">
 									<span class="sr-only">
 										{record.data.acc} — {record.data.title}
 									</span>
 								</a>
 
-								<div>
-									<p class="field-label md:hidden">Acc.</p>
-									<p class="font-record font-typed text-md text-stamp">{record.data.acc}</p>
-								</div>
+								<dl class="contents">
+									<div class="md:contents">
+										<dt class="field-label md:hidden">Acc.</dt>
+										<dd class="font-record font-typed text-md text-stamp">{record.data.acc}</dd>
+									</div>
+								</dl>
 
-								<div class="mt-field md:mt-0">
-									<p class="field-label md:hidden">Title</p>
-									<p class="font-prose text-lg leading-display md:text-base md:leading-record">{record.data.title}</p>
-								</div>
+								<h2 class="mt-field md:mt-0 font-prose text-lg leading-display md:text-base md:leading-record font-body">
+									{record.data.title}
+								</h2>
 
-								<div class="mt-field md:mt-0">
-									<p class="field-label md:hidden">Medium</p>
-									<p class="font-record font-typed text-sm leading-record">{record.data.medium.join(' · ')}</p>
-								</div>
-
-								<div class="mt-field md:mt-0">
-									<p class="field-label md:hidden">Extent</p>
-									<p class="font-record font-typed text-sm leading-record">{extent ?? '—'}</p>
-								</div>
-
-								<div class="mt-field md:mt-0">
-									<p class="field-label md:hidden">Status</p>
-									<p class="font-record font-typed text-sm">{record.data.status.toUpperCase()}</p>
-								</div>
-							</li>
-						);
-					})
-				}
-			</ul>
-		</main>
-	</body>
-</html>
+								<dl class="contents">
+									<div class="mt-field md:mt-0 md:contents">
+										<dt class="field-label md:hidden">Medium</dt>
+										<dd class="font-record font-typed text-sm leading-record">{record.data.medium.join(' · ')}</dd>
+									</div>
+									<div class="mt-field md:mt-0 md:contents">
+										<dt class="field-label md:hidden">Extent</dt>
+										<dd class="font-record font-typed text-sm leading-record">{extent ?? '—'}</dd>
+									</div>
+									<div class="mt-field md:mt-0 md:contents">
+										<dt class="field-label md:hidden">Status</dt>
+										<dd class="font-record font-typed text-sm">{record.data.status.toUpperCase()}</dd>
+									</div>
+								</dl>
+							</article>
+						</li>
+					);
+				})
+			}
+		</ul>
+	</main>
+</Base>

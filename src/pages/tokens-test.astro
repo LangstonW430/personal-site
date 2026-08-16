@@ -60,10 +60,10 @@ const leadingRole: Record<string, string> = {
 
 const spacingIntent: Record<string, string> = {
 	'--spacing-hair': 'optical nudge; label to the value under it',
-	'--spacing-tight': 'stacked lines inside one field',
+	'--spacing-pair': 'stacked lines inside one field',
 	'--spacing-field': 'field to field within a rail',
 	'--spacing-entry': 'padding inside a record; entry to entry',
-	'--spacing-record': 'record to record; subsection break',
+	'--spacing-register': 'record to record; subsection break',
 	'--spacing-section': 'one movement of the page to the next',
 };
 ---
@@ -80,7 +80,7 @@ const spacingIntent: Record<string, string> = {
 	<body class="bg-board text-ink">
 		<!-- max-w is a container width, not spacing; the spacing scale has no
 		     opinion about how wide a page is. -->
-		<main class="mx-auto max-w-[72rem] px-entry py-record">
+		<main class="mx-auto max-w-[72rem] px-entry py-register">
 			<header>
 				<p class="field-label">Phase 0.1 — foundation</p>
 				<h1 class="font-prose text-xl leading-display mt-hair">Token test sheet</h1>
@@ -96,7 +96,7 @@ const spacingIntent: Record<string, string> = {
 
 			<!-- ------------------------------------------------ card on board -->
 			<section class="mt-section">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-pair">
 					The value step
 				</h2>
 				<p class="text-ink-muted max-w-[60ch] mt-field">
@@ -133,7 +133,7 @@ const spacingIntent: Record<string, string> = {
 
 			<!-- ---------------------------------------------------------- ink -->
 			<section class="mt-section">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">Ink</h2>
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-pair">Ink</h2>
 				<ul role="list" class="grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-entry mt-entry">
 					{colors.map((c) => (
 						<li>
@@ -143,13 +143,13 @@ const spacingIntent: Record<string, string> = {
 								class="h-[4.5rem] border border-rule"
 								style={`background-color: var(${c.name})`}
 							></div>
-							<p class="field-label mt-tight">{c.name.replace('--color-', '')}</p>
+							<p class="field-label mt-pair">{c.name.replace('--color-', '')}</p>
 							<p class="font-record text-sm uppercase">{c.value}</p>
 						</li>
 					))}
 				</ul>
 
-				<h3 class="font-prose text-md leading-display mt-record border-b border-rule pb-tight">
+				<h3 class="font-prose text-md leading-display mt-register border-b border-rule pb-pair">
 					Ink on both grounds
 				</h3>
 				{/* gap-[1px] is a hairline abutment, not spacing — the two grounds have to
@@ -172,7 +172,7 @@ const spacingIntent: Record<string, string> = {
 
 			<!-- ------------------------------------------------------ spacing -->
 			<section class="mt-section">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">Spacing</h2>
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-pair">Spacing</h2>
 				<p class="text-ink-muted max-w-[60ch] mt-field">
 					Six values, named by intent. The numeric scale is dead — <code class="font-record text-sm">p-4</code>,
 					<code class="font-record text-sm">gap-2</code> and every sibling emit nothing, because the bare
@@ -189,7 +189,7 @@ const spacingIntent: Record<string, string> = {
 							</dt>
 							<dd class="flex items-center gap-field flex-1 min-w-[14rem]">
 								<div
-									class="h-tight bg-card border border-rule shrink-0"
+									class="h-pair bg-card border border-rule shrink-0"
 									style={`inline-size: var(${s.name})`}
 								></div>
 								<span class="text-sm text-ink-muted">{spacingIntent[s.name]}</span>
@@ -201,7 +201,7 @@ const spacingIntent: Record<string, string> = {
 
 			<!-- --------------------------------------------------------- type -->
 			<section class="mt-section">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">Type</h2>
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-pair">Type</h2>
 				<p class="text-ink-muted max-w-[60ch] mt-field">
 					Six steps, both faces. There is no sans-serif in this system. If the Commit Mono
 					column renders in your platform's default monospace, the font is missing from
@@ -210,7 +210,7 @@ const spacingIntent: Record<string, string> = {
 				</p>
 
 				{faces.map((face) => (
-					<div class="mt-record pt-field border-t border-rule">
+					<div class="mt-register pt-field border-t border-rule">
 						<p class="field-label">{face.name} — {face.role}</p>
 						<div class="mt-field">
 							{typeSteps.map((step) => (
@@ -227,7 +227,7 @@ const spacingIntent: Record<string, string> = {
 					</div>
 				))}
 
-				<h3 class="font-prose text-md leading-display mt-record border-b border-rule pb-tight">
+				<h3 class="font-prose text-md leading-display mt-register border-b border-rule pb-pair">
 					Leading
 				</h3>
 				<p class="text-ink-muted max-w-[60ch] mt-field">
@@ -235,12 +235,12 @@ const spacingIntent: Record<string, string> = {
 					a single line tells you nothing.
 				</p>
 				{leadings.map((l) => (
-					<div class="mt-record">
+					<div class="mt-register">
 						<p class="field-label">
 							{l.name.replace('--', '')} · {l.value} · {leadingRole[l.name]}
 						</p>
 						<p
-							class={`${l.name === '--leading-record' ? 'font-record text-sm' : 'font-prose'} max-w-[68ch] mt-tight`}
+							class={`${l.name === '--leading-record' ? 'font-record text-sm' : 'font-prose'} max-w-[68ch] mt-pair`}
 							style={`line-height: var(${l.name})`}
 						>
 							{specimen}
@@ -251,7 +251,7 @@ const spacingIntent: Record<string, string> = {
 
 			<!-- -------------------------------------------------- field label -->
 			<section class="mt-section">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-pair">
 					The field label
 				</h2>
 				<p class="text-ink-muted max-w-[60ch] mt-field">
@@ -282,7 +282,7 @@ const spacingIntent: Record<string, string> = {
 
 			<!-- ------------------------------------------------- record split -->
 			<section class="mt-section">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-pair">
 					Record split — rail against prose
 				</h2>
 				<p class="text-ink-muted max-w-[60ch] mt-field">
@@ -335,7 +335,7 @@ const spacingIntent: Record<string, string> = {
 
 			<!-- -------------------------------------------------------- stamp -->
 			<section class="mt-section">
-				<h2 class="font-prose text-lg leading-display border-b border-rule pb-tight">Stamp</h2>
+				<h2 class="font-prose text-lg leading-display border-b border-rule pb-pair">Stamp</h2>
 				<p class="text-ink-muted max-w-[60ch] mt-field">
 					Aniline violet, from library date stamps. The scarcest ink — accession numbers,
 					live-data indicators, and focus rings only. More than four uses on a page is
@@ -346,7 +346,7 @@ const spacingIntent: Record<string, string> = {
 					<p class="field-label">On an accession number</p>
 					<p class="font-record text-xl text-stamp mt-hair">2026.04</p>
 
-					<p class="field-label mt-record">On a focus ring</p>
+					<p class="field-label mt-register">On a focus ring</p>
 					<p class="text-ink-muted text-sm mt-hair max-w-[60ch]">
 						Tab to the link below. The ring should read clearly against
 						<code class="font-record text-sm">card</code> at 2px offset — check it against

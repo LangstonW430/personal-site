@@ -301,30 +301,84 @@ multiplier is deliberately not declared — declaring it would restore `p-4` and
 every sibling in one line. Verified dead: `p-4`, `gap-2`, `mt-8`, `space-y-4`,
 `w-64`, `m-2`, `px-6`, `h-96`.
 
-**`leading-*` falls back to the spacing namespace, and the wipe cannot reach
-it.** This one is a live hazard rather than a closed question. Tailwind resolves
-`leading-<name>` against `--spacing-*` when the leading namespace has no match,
-so declaring the six spacing tokens silently created six `leading-*` utilities
-whose line-height is a *length*:
+### The `leading-*` collision, and why two tokens are named oddly
+
+This is the finding most likely to be rediscovered the hard way, so it is
+written out in full.
+
+**What Tailwind does.** `leading-<name>` resolves against `--leading-*` first
+and falls back to `--spacing-*` when there is no match. The fallback is
+structural in the utility, not a theme value, so **`--leading-*: initial` cannot
+prevent it.** Declaring a spacing token therefore also declares a line-height
+utility of the same name, whose value is a *length* — and in this system
+line-height is unitless (1.2 / 1.65 / 1.5), so a length is a category error that
+still renders plausibly.
+
+Phase 0.1 shipped six spacing tokens and got six of these for free. Two were
+dangerous:
+
+- **`leading-tight` meant `line-height: 0.5rem`.** `tight` is a name typed from
+  muscle memory, from every other Tailwind project in existence. It would have
+  been written by accident and looked merely "off" rather than broken.
+- **`leading-record` was correct for the wrong reason.** `--leading-record: 1.5`
+  shadowed `--spacing-record: 3rem`, so it worked — but deleting the leading
+  token would have silently changed the value to `3rem` rather than breaking the
+  class. A value that is right by coincidence is not right.
+
+**The fix, and the two that were rejected.** Phase 0.2 renamed
+`--spacing-tight` → `--spacing-pair` and `--spacing-record` → `--spacing-register`.
+
+- *Rejected: a `@utility` override* re-declaring `leading-tight` as something
+  sane. That adds surface to fight a collision, and leaves the trap in place for
+  the next name that collides.
+- *Rejected: declaring `--leading-tight` explicitly* to shadow the spacing value.
+  That is the `leading-record` situation deliberately — correct by shadowing, one
+  deletion away from silently wrong.
+- **Renaming costs nothing and removes the collision rather than covering it.**
+  `pair` and `register` are names nobody reaches for by accident, and they are
+  better intent names anyway: `pair` is two lines that belong together, and
+  `register` is the thing the site is.
+
+**The surviving four are known-and-wrong, deliberately.** `leading-hair`,
+`leading-field`, `leading-entry` and `leading-section` still exist and still mean
+lengths. They were left because nobody types them by accident, and chasing every
+one would mean naming the whole spacing scale around a Tailwind implementation
+detail. Only `leading-display`, `leading-prose` and `leading-record` are
+intended.
+
+**This is the input to the Phase 3 lint.** The rule must check against an
+**allowlist of intended utilities**, not merely flag unknown ones — these four
+are known to Tailwind and wrong for this project, so an unknown-class check would
+pass them.
+
+### The rest of the collision surface
+
+Phase 0.2 probed 94 utility families against all six spacing names. 49 families
+resolve them. Only `leading-*` is a category error; the other 48 take a genuine
+length, so the CSS is valid and the risk is different — they quietly widen the
+API surface with utilities nobody designed:
 
 ```
-leading-hair     -> line-height: 0.25rem
-leading-tight    -> line-height: 0.5rem
-leading-field    -> line-height: 0.75rem
-leading-entry    -> line-height: 1.5rem
-leading-section  -> line-height: 6rem
-leading-record   -> shadowed by the real --leading-record (1.5). Correct today.
+padding      p px py pt pr pb pl ps pe
+margin       m mx my mt mr mb ml ms me
+gap          gap gap-x gap-y
+size         w min-w max-w h min-h max-h size basis
+position     inset inset-x inset-y top right bottom left start end
+transform    translate translate-x translate-y translate-z
+scroll       scroll-m scroll-mt scroll-p scroll-pt
+misc         indent border-spacing
 ```
 
-`--leading-*: initial` does not prevent this; the fallback is structural in the
-utility, not a theme value. Two consequences. `leading-tight` is a name typed
-from muscle memory and now silently means `line-height: 0.5rem`. And
-`leading-record` is correct only because the real leading token shadows the
-spacing one — deleting `--leading-record` would silently change it to `3rem`
-instead of breaking loudly. Only `leading-display`, `leading-prose` and
-`leading-record` are intended. This is the strongest argument yet for the Phase 3
-lint rule, which should check against an allowlist of intended utilities rather
-than merely flagging unknown ones.
+Nothing here was fixed, per the Phase 0.2 brief — the inventory is the
+deliverable. The ones worth a decision later are the *size* families:
+`max-w-section` (6rem) and `w-register` (3rem) read plausibly but were never
+designed as widths, and the token sheet already treats container width and prose
+measure as explicitly not-spacing.
+
+Confirmed clean, for the record: `tracking-*`, `text-*`, `font-*`, `rounded-*`,
+`blur-*`, `shadow-*`, `duration-*`, `opacity-*`, `z-*`, `columns-*`, `aspect-*`,
+`border-*`, `outline-offset-*`, `ring-offset-*`, `underline-offset-*`,
+`decoration-*` and `stroke-*` do **not** fall back to the spacing namespace.
 
 **Three places on the token sheet are not spacing and stay arbitrary.** Reported
 rather than papered over, per the Phase 0.1 brief. None of them indicate the

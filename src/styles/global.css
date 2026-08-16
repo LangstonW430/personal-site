@@ -4,10 +4,10 @@
  * THEME
  *
  * Tailwind is a typed interface to the token system here, not a source of
- * defaults. The five `*: initial` wipes are the mechanism: they delete
+ * defaults. The fourteen `*: initial` wipes are the mechanism: they delete
  * Tailwind's built-in scales so that `bg-slate-800`, `p-4`, `rounded-lg`,
- * `font-sans` and `text-3xl` resolve to nothing at all. A utility class that
- * references a value not declared below is a bug, not a shortcut.
+ * `font-sans`, `text-3xl` and `shadow-lg` resolve to nothing at all. A utility
+ * class that references a value not declared below is a bug, not a shortcut.
  *
  * Everything declared here is from CLAUDE.md. Nothing is invented. If a value
  * is needed that is not here, the argument for adding it goes in the commit
@@ -76,13 +76,21 @@
 	 *
 	 * Six values. Asking "is this gap a field or an entry?" forces a real
 	 * answer, where `p-6` never would. A seventh is a conversation, not a
-	 * commit. */
-	--spacing-hair:    0.25rem; /* optical nudge; label to the value under it */
-	--spacing-tight:   0.5rem;  /* stacked lines inside one field */
-	--spacing-field:   0.75rem; /* field to field within a rail */
-	--spacing-entry:   1.5rem;  /* padding inside a record; entry to entry */
-	--spacing-record:  3rem;    /* record to record; subsection break */
-	--spacing-section: 6rem;    /* one movement of the page to the next */
+	 * commit.
+	 *
+	 * Two of these are named to dodge a Tailwind collision rather than for
+	 * taste: `leading-*` falls back to this namespace, so --spacing-tight would
+	 * make `leading-tight` mean `line-height: 0.5rem`, and --spacing-record
+	 * would leave `leading-record` correct only by being shadowed. `pair` and
+	 * `register` are names nobody reaches for by accident. The other four still
+	 * generate leading-* utilities and those are still wrong — see
+	 * design-directions.md; the Phase 3 lint catches what is left. */
+	--spacing-hair:     0.25rem; /* optical nudge; label to the value under it */
+	--spacing-pair:     0.5rem;  /* stacked lines inside one field */
+	--spacing-field:    0.75rem; /* field to field within a rail */
+	--spacing-entry:    1.5rem;  /* padding inside a record; entry to entry */
+	--spacing-register: 3rem;    /* record to record; subsection break */
+	--spacing-section:  6rem;    /* one movement of the page to the next */
 }
 
 /* ---------------------------------------------------------------------------

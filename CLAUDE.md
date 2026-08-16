@@ -58,6 +58,15 @@ Tailwind is used **as a typed interface to the token system, not as a source of 
   --radius-*: initial;
   --font-*: initial;
   --text-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+  --blur-*: initial;
+  --animate-*: initial;
+  --ease-*: initial;
+  --tracking-*: initial;
+  --leading-*: initial;
 
   --color-board:     #E4E5E0;
   --color-card:      #F7F7F4;
@@ -68,10 +77,49 @@ Tailwind is used **as a typed interface to the token system, not as a source of 
 
   --font-record: "Commit Mono", ui-monospace, monospace;
   --font-prose:  "Source Serif 4 Variable", Georgia, serif;
+
+  --text-xs:   0.66rem;
+  --text-sm:   0.75rem;
+  --text-base: 0.94rem;
+  --text-md:   1.06rem;
+  --text-lg:   1.56rem;
+  --text-xl:   2.1rem;
+
+  --leading-display: 1.2;
+  --leading-prose:   1.65;
+  --leading-record:  1.5;
+
+  --tracking-label: 0.09em;
+
+  --spacing-hair:     0.25rem;
+  --spacing-pair:     0.5rem;
+  --spacing-field:    0.75rem;
+  --spacing-entry:    1.5rem;
+  --spacing-register: 3rem;
+  --spacing-section:  6rem;
 }
 ```
 
 `--color-*: initial` is load-bearing. It makes `bg-slate-800` a build error rather than a convenient shortcut. Same for spacing, radius, and type scale. **If a utility class references a value not declared in `@theme`, that is a bug, not a shortcut.**
+
+No shadow token is declared in any of the four shadow namespaces. A box-shadow is not discouraged; it is inexpressible through Tailwind.
+
+### Spacing
+
+Six values, named by intent, never by number. The bare `--spacing` multiplier is **not** declared — declaring it restores `p-4`, `gap-2` and every sibling in one line.
+
+| Token | Value | Intent |
+|---|---|---|
+| `hair` | `0.25rem` | Optical nudge; label to the value under it |
+| `pair` | `0.5rem` | Stacked lines inside one field |
+| `field` | `0.75rem` | Field to field within a rail |
+| `entry` | `1.5rem` | Padding inside a record; entry to entry |
+| `register` | `3rem` | Record to record; subsection break |
+| `section` | `6rem` | One movement of the page to the next |
+
+`pair` and `register` are named to dodge a Tailwind collision, not for taste. Tailwind resolves `leading-<name>` against the spacing namespace when the leading namespace has no match, so `--spacing-tight` made `leading-tight` mean `line-height: 0.5rem`, and `--spacing-record` left `leading-record` correct only by being shadowed. Do not rename them back. Full reasoning in `design-directions.md`.
+
+A seventh spacing value is a conversation, not a commit.
 
 ## Color
 

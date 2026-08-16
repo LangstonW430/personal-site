@@ -46,7 +46,7 @@ Fourteen namespaces are wiped. Verified against build output: `bg-slate-800`,
 all produce **zero CSS**. No shadow token is declared in any of the four shadow
 namespaces, so a box-shadow cannot be expressed through Tailwind at all.
 
-Spacing is six named tokens — `hair` `tight` `field` `entry` `record` `section`
+Spacing is six named tokens — `hair` `pair` `field` `entry` `register` `section`
 — and the bare `--spacing` multiplier is deliberately not declared, which is what
 keeps `p-4` and every sibling dead. A seventh value is a conversation, not a
 commit.
@@ -56,14 +56,17 @@ Two things to know before writing layout:
 1. **A wiped class is silent, not an error.** Tailwind emits nothing and the
    build passes, so a misspelled token class like `text-ink-mute` ships unstyled.
    Lint rule is Phase 3.
-2. **`leading-*` falls back to the spacing namespace.** This is a Tailwind
-   behaviour the wipe cannot reach: every `--spacing-<name>` token silently
-   creates a `leading-<name>` utility whose line-height is a *length*.
-   `leading-tight` currently resolves to `line-height: 0.5rem`, and it is a name
-   people type from muscle memory. `leading-record` is shadowed by the real
-   `--leading-record`, so it is correct today — but deleting that token would
-   silently turn it into `3rem` rather than breaking loudly. Only
-   `leading-display`, `leading-prose`, and `leading-record` are intended.
+2. **`leading-*` falls back to the spacing namespace**, and `--leading-*: initial`
+   cannot prevent it — the fallback is structural in the utility. So every
+   spacing token also creates a `leading-*` utility whose line-height is a
+   *length*. `pair` and `register` are named the way they are specifically to
+   keep `leading-tight` and `leading-record` out of that trap; **do not rename
+   them back.** `leading-hair`, `leading-field`, `leading-entry` and
+   `leading-section` still exist and are still wrong — left deliberately, since
+   nobody types them by accident. Only `leading-display`, `leading-prose` and
+   `leading-record` are intended. Full reasoning and the 49-family collision
+   inventory are in `design-directions.md`; that inventory is the input to the
+   Phase 3 lint, which must work from an allowlist rather than flagging unknowns.
 
 Responsive variants (`md:`) and layout utilities (`flex`, `grid`) are unaffected;
 they do not depend on any wiped namespace.
@@ -79,9 +82,16 @@ any other origin — verified against the build output.
 | Source Serif 4 Variable | `source-serif-4-variable-latin.woff2` | `wght` 200–900, `opsz` 8–60 | OFL, included |
 | Commit Mono | `commit-mono.woff2` | — | **not present** |
 
-**Commit Mono is missing.** It is not on Google Fonts and is not fetchable
-programmatically; download it from [commitmono.com](https://commitmono.com),
-convert to woff2 if needed, and place it at `public/fonts/commit-mono.woff2`.
+**Commit Mono is missing, and the build fails because of it.** As of Phase 0.2 a
+`font-guard` integration in `astro.config.mjs` reads every `@font-face` rule in
+`global.css` and fails the build if a referenced file is not in `public/fonts/`.
+A missing font has no runtime error — the browser falls back and the page simply
+renders in the wrong face — so it is caught at build time or not at all. The
+guard runs at `astro:config:done`, which means dev catches it too.
+
+Download it from [commitmono.com](https://commitmono.com), convert to woff2 if
+needed, and place it at `public/fonts/commit-mono.woff2`. The build goes green
+the moment it lands.
 
 This is not a minor gap. There is no sans-serif in this system — Commit Mono
 carries every record field, label, number, date, status, and accession, and it is

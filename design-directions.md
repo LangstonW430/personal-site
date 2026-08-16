@@ -296,7 +296,9 @@ namespaces, and no shadow token is declared in any of them. A box-shadow is now
 inexpressible through Tailwind rather than merely discouraged.
 
 **Spacing is six tokens, named by intent, and the numeric scale stays dead.**
-`hair` `tight` `field` `entry` `record` `section`. The bare `--spacing`
+`hair` `pair` `field` `entry` `register` `section` — shipped in 0.1 as `hair`
+`tight` `field` `entry` `record` `section` and renamed in 0.2, for the reason in
+the next section. The bare `--spacing`
 multiplier is deliberately not declared — declaring it would restore `p-4` and
 every sibling in one line. Verified dead: `p-4`, `gap-2`, `mt-8`, `space-y-4`,
 `w-64`, `m-2`, `px-6`, `h-96`.
@@ -394,6 +396,182 @@ scale is wrong — they indicate they are not spacing:
   spacing scale.
 
 Everything that *is* spacing on the sheet now uses a named utility.
+
+---
+
+## Findings from Phase 0.3
+
+### Building Commit Mono
+
+An earlier phase recorded that Commit Mono "is not fetchable programmatically."
+That was wrong. The *customizer* on commitmono.com bakes settings in-browser and
+cannot be scripted, but the source repo publishes the built variable font
+directly, and the defaults are what this system wants anyway. The face was
+built, not hand-downloaded, and the commands below reproduce the exact artifact
+in `public/fonts/`.
+
+**Source, and the checksum that gates it.**
+
+```
+https://raw.githubusercontent.com/eigilnikolajsen/commit-mono/main/src/fonts/fontlab/CommitMonoV143-VF.woff2
+https://raw.githubusercontent.com/eigilnikolajsen/commit-mono/main/LICENSE-FONT
+
+86,768 bytes
+sha256  f342ca6c3f2597e6c0fcd84b3f3ed64d3ce5bdb6d0af19d190d645a558b1cf29
+```
+
+Verify the checksum before building. A mismatch means upstream changed the
+release, and the correct response is to stop and look at it, not to ship a face
+nobody has seen. Upstream axes are `wght` 200–700 and `ital` 0–1.
+
+**The two build steps.** `fontTools` and `brotli` are build-time only and are
+deliberately **not** in `package.json` — the repo ships the built font, not the
+pipeline. Run them in a throwaway venv and delete it afterwards.
+
+```sh
+python -m fontTools.varLib.instancer \
+  CommitMonoV143-VF.woff2 ital=0 -o CommitMono-ital0.ttf
+
+python -m fontTools.subset CommitMono-ital0.ttf \
+  --unicodes=U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD \
+  --flavor=woff2 --name-IDs='*' \
+  --output-file=commit-mono-variable-latin.woff2
+```
+
+Step 1 pins the italic axis out: prose italics come from Source Serif, nothing
+in this system sets a slanted field value, and the axis is not free. Step 2
+subsets to latin **without** pinning `wght` — the whole point of the variable
+release is that 450 costs nothing, so instancing the weight would throw away the
+reason for using it.
+
+**Result: 16,544 bytes.** The brief predicted 26–27 KB, so the gap was treated
+as a symptom and checked rather than accepted. It is real: `fvar` carries `wght`
+200–700 and no `ital`, `gvar` is present, and the outlines genuinely move —
+`A` is `(31, 0, 569, 700)` at wght 200 and `(23, 0, 577, 700)` at wght 700. 246
+glyphs, 238 mapped codepoints, nothing above U+206F that is not on the
+allowlist. The saving is the dropped italic masters plus the `cv01–cv11` /
+`ss01–ss05` feature sets, which this project does not use.
+
+Naming follows `source-serif-4-variable-latin.woff2` rather than the
+`commit-mono.woff2` the old `@font-face` guessed at:
+`commit-mono-variable-latin.woff2`, with `CommitMono-OFL.txt` beside it — the
+face is SIL OFL 1.1, same as Source Serif.
+
+**Coverage note.** The requested range is the standard Google latin superset and
+both faces are missing some of it — Commit Mono has no `U+02BB`/`U+02BC` okina,
+neither face has the full `U+2000-206F` block. The `unicode-range` is left as
+specified because the two faces are then declared identically and the gaps are
+in characters this site does not set. This is not drift; it is the same
+superset Source Serif already shipped with.
+
+### `--font-weight-*` was missed by both wipes
+
+Phase 0 wiped five namespaces, Phase 0.2 added nine more, and `--font-weight-*`
+survived both — `font-bold`, `font-medium` and the other seven were still
+emitting. Same class of hole as the shadows: a system with two variable faces
+and a small set of intended weights does not want Tailwind's nine.
+
+**Three weights are declared, and the names are constrained rather than
+chosen.** `font-<name>` resolves against the family namespace *and* the weight
+namespace, so a weight named `record` or `prose` would shadow the family of the
+same name — precisely the collision that cost Phase 0.2 a session. `display`,
+`prose` and `record` are additionally taken by `--leading-*`. And no name may
+reuse a Tailwind default weight name, because resurrecting `medium` with a
+different number is worse than leaving it dead.
+
+| Token | Value | Utility resolves to | For |
+|---|---|---|---|
+| `--font-weight-body` | `400` | `font-body` → `font-weight: 400` | Running prose, Source Serif |
+| `--font-weight-typed` | `450` | `font-typed` → `font-weight: 450` | Every Commit Mono record field |
+| `--font-weight-strong` | `600` | `font-strong` → `font-weight: 600` | Headings, `strong`, `b`, `th` |
+
+`typed` is 450 **by decision, not by default** — the designer's recommendation is
+400 on dark grounds and 450 on light, and this site is light throughout. The
+name is CLAUDE.md's own justification for mono on metadata: catalog cards were
+typed.
+
+`strong` at 600 is the one genuinely new design decision in this phase. The UA
+stylesheet sets `bold` on all six headings and on `strong`/`b`/`th`, and `bold`
+is a keyword that means 700 regardless of what this system thinks — so the
+choice was between 700 by accident and a number on purpose. It is restated in
+the base layer and lives in one place. Revisit it in Phase 2 against real
+headings.
+
+Verified: all nine of `font-thin` `font-extralight` `font-light` `font-normal`
+`font-medium` `font-semibold` `font-bold` `font-extrabold` `font-black` emit
+nothing. `font-record` and `font-prose` still emit `font-family`; the three
+above emit `font-weight`. No shadowing in either direction — `font-record
+font-typed` sets family and weight independently.
+
+**The arbitrary escape hatch is still open.** `font-[750]` emits
+`font-weight: 750`, exactly as `p-[3px]` and `bg-[#fff]` do. That is the general
+arbitrary-value hole, not specific to weight, and it belongs to the Phase 3
+lint.
+
+### Nothing may rely on the default instance
+
+Commit Mono's `fvar` default is **200**, not 400, and its `OS/2.usWeightClass`
+is 200. CSS still resolves an unstated `font-weight` to `normal`/400 rather than
+to the font's default instance, so this is not the live bug it might look like —
+but the margin for error is one missed declaration and the failure mode is
+extra-light, not slightly-off. Every weight in the system is therefore stated:
+`body` sets `--font-weight-body`, the heading/`strong` rule sets
+`--font-weight-strong`, and `.field-label` sets `--font-weight-typed`. Record
+fields on the token sheet carry `font-typed` alongside `font-record`.
+
+`font-synthesis: none` on `body` remains correct and is now also unnecessary:
+both faces carry real weight axes across the declared ranges, so there is
+nothing left to synthesize.
+
+**Ligatures.** This build carries no `liga`, `clig`, `dlig` or `calt` feature at
+all — GSUB holds only `cv01–cv11` and `ss01–ss05`, which the subset drops. `!=`
+cannot silently render as `≠`. `font-variant-ligatures: none` is kept on
+`.field-label` anyway: it costs one line and it is the declaration that has to
+survive a future font swap.
+
+### The spacing allowlist — decided
+
+Spacing tokens are legal on **padding, margin, gap and `space-*`. Nothing
+else.** Size, `max-w-*`, inset, translate, scroll and indent are off-list even
+though they take a length and read plausibly. `max-w-section: 6rem` is the case
+that proves the rule: container width and track sizing were already settled as
+explicitly not-spacing, and this is the same boundary.
+
+This is the allowlist the Phase 3 lint enforces. It is a list of **legal (family
+× token) pairs**, not a list of unknown names to flag — the utilities that will
+actually bite are known to Tailwind and wrong for this project, so an
+unknown-class check passes every one of them.
+
+**Legal families.** Each combines with any of the six spacing tokens (`hair`,
+`pair`, `field`, `entry`, `register`, `section`):
+
+```
+padding    p   px  py  pt  pr  pb  pl  ps  pe
+margin     m   mx  my  mt  mr  mb  ml  ms  me
+gap        gap gap-x   gap-y
+space      space-x     space-y
+```
+
+Negative margins (`-mt-entry`, `-mx-register`) resolve and are legal — they are
+the margin family.
+
+**Everything else is a violation**, including every family in the Phase 0.2
+inventory that is not listed above:
+
+```
+leading    leading-hair  leading-field  leading-entry  leading-section
+size       w  min-w  max-w  h  min-h  max-h  size  basis
+position   inset  inset-x  inset-y  top  right  bottom  left  start  end
+transform  translate  translate-x  translate-y  translate-z
+scroll     scroll-m  scroll-mt  scroll-p  scroll-pt
+misc       indent  border-spacing
+```
+
+The four `leading-*` entries are the category error documented above; the rest
+are valid CSS built from a token that was never designed for the job.
+
+Nothing was fixed in code — per the brief, the decision is the deliverable, and
+no off-list utility is in use today.
 
 ---
 

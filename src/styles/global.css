@@ -4,10 +4,11 @@
  * THEME
  *
  * Tailwind is a typed interface to the token system here, not a source of
- * defaults. The fourteen `*: initial` wipes are the mechanism: they delete
+ * defaults. The fifteen `*: initial` wipes are the mechanism: they delete
  * Tailwind's built-in scales so that `bg-slate-800`, `p-4`, `rounded-lg`,
- * `font-sans`, `text-3xl` and `shadow-lg` resolve to nothing at all. A utility
- * class that references a value not declared below is a bug, not a shortcut.
+ * `font-sans`, `text-3xl`, `font-bold` and `shadow-lg` resolve to nothing at
+ * all. A utility class that references a value not declared below is a bug,
+ * not a shortcut.
  *
  * Everything declared here is from CLAUDE.md. Nothing is invented. If a value
  * is needed that is not here, the argument for adding it goes in the commit
@@ -46,6 +47,33 @@
 
 	--font-record: "Commit Mono", ui-monospace, monospace;
 	--font-prose:  "Source Serif 4 Variable", Georgia, serif;
+
+	/* Weight. Missed by both earlier wipes, so `font-bold`, `font-medium` and
+	 * every sibling were still emitting — same class of hole as the shadows.
+	 * This system has two variable faces and three intended weights, and
+	 * Tailwind's nine are not them.
+	 *
+	 * The three names below are constrained, not chosen freely. `font-<name>`
+	 * resolves against the family namespace as well as this one, so a weight
+	 * named `record` or `prose` would shadow the family of the same name — the
+	 * exact bug the leading/spacing collision cost a session. `display`,
+	 * `prose` and `record` are also taken by --leading-*. And none of these may
+	 * reuse a Tailwind default weight name (thin, extralight, light, normal,
+	 * medium, semibold, bold, extrabold, black), because resurrecting `medium`
+	 * with a different number is worse than leaving it dead.
+	 *
+	 * Both faces are variable across this whole range, so none of these three
+	 * costs a byte or a request.
+	 *
+	 * `typed` is 450 by decision, not by default: the designer's recommendation
+	 * is 400 on dark grounds and 450 on light, and this site is light
+	 * throughout. The name is CLAUDE.md's own justification for mono on
+	 * metadata — catalog cards were typed. */
+	--font-weight-*: initial;
+
+	--font-weight-body:   400; /* running prose, Source Serif */
+	--font-weight-typed:  450; /* every Commit Mono record field */
+	--font-weight-strong: 600; /* headings, strong, b, th */
 
 	/* Type scale — 1.25 ratio, six steps. Declared here because the wipe above
 	 * removes Tailwind's, and without these there is no `text-*` utility at all.
@@ -106,27 +134,34 @@
  * ------------------------------------------------------------------------- */
 
 /*
- * Commit Mono is not on Google Fonts and is not fetchable programmatically. It
- * must be downloaded from commitmono.com by hand and placed at the path below.
+ * Commit Mono is not on Google Fonts, but it is not hand-download-only either:
+ * the customizer at commitmono.com bakes settings in-browser and cannot be
+ * fetched, while the source repo ships the built variable font directly, and
+ * the defaults are what this system wants. The file below was built from that
+ * release — italic axis pinned out, subset to latin, `wght` left variable. The
+ * exact commands are in design-directions.md so the artifact is reproducible;
+ * fontTools is not a dependency of this project and is not in package.json.
  *
- * Until that file exists, every label, number, date, status and accession on
- * the site falls back to the platform monospace. That is deliberately obvious
- * on the token test sheet rather than subtly off, because this face carries
- * half the type system — it is not a detail that should be able to hide.
+ * `wght` spans 200–700 with a default instance of 200, NOT 400. Every weight in
+ * this system is therefore stated explicitly — see --font-weight-* above and
+ * the base layer below. Nothing is allowed to inherit a UA default here,
+ * because on this face the consequence of a missed declaration is not a small
+ * shift, it is extra-light.
  *
- * The weight range assumes the variable release. If the static 400 lands here
- * instead, narrow this to `font-weight: 400` so the browser stops synthesizing
- * a bold that does not exist.
+ * Ligatures: this build carries no `liga`, `clig`, `dlig` or `calt` feature at
+ * all — only cv01–cv11 and ss01–ss05, which the subset drops. There is nothing
+ * to turn off. `!=` cannot silently become `≠`, which is the property a record
+ * field needs.
  */
 @font-face {
 	font-family: "Commit Mono";
-	src: url("/fonts/commit-mono.woff2") format("woff2");
+	src: url("/fonts/commit-mono-variable-latin.woff2") format("woff2");
 	font-weight: 200 700;
 	font-style: normal;
 	font-display: swap;
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
-		U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
-		U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+		U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122,
+		U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -146,6 +181,7 @@
 		color: var(--color-ink);
 		font-family: var(--font-prose);
 		font-size: var(--text-base);
+		font-weight: var(--font-weight-body);
 		line-height: var(--leading-prose);
 		font-optical-sizing: auto;
 
@@ -153,6 +189,15 @@
 		 * own weights; nothing needs to be faked, and a synthesized bold on a
 		 * fine serif destroys the thin strokes. */
 		font-synthesis: none;
+	}
+
+	/* The UA stylesheet sets `bold` on all six headings and on strong/b/th, and
+	 * `bold` is a keyword, not a number — it resolves to 700 regardless of what
+	 * this system thinks. Restating it as a token is the point: 600 is a
+	 * decision about Source Serif on a light ground, and it now lives in one
+	 * place instead of being whatever the browser happened to mean. */
+	:where(h1, h2, h3, h4, h5, h6, strong, b, th) {
+		font-weight: var(--font-weight-strong);
 	}
 
 	/* Tabular figures wherever numbers are compared down a column. An extent
@@ -198,10 +243,16 @@
 	.field-label {
 		font-family: var(--font-record);
 		font-size: 0.625rem;
+		font-weight: var(--font-weight-typed);
 		line-height: var(--leading-record);
 		letter-spacing: var(--tracking-label);
 		text-transform: uppercase;
 		color: var(--color-ink-muted);
+
+		/* Kept although the shipped Commit Mono build carries no ligature
+		 * feature to disable — see the @font-face note. It costs one line and
+		 * it is the declaration that has to survive a future font swap: a field
+		 * value that renders `!=` as `≠` is a record lying about its contents. */
 		font-variant-ligatures: none;
 
 		/* The tracking above adds space after the final letter too, which throws

@@ -39,12 +39,19 @@ Tailwind is a **typed interface to the token system, not a source of defaults.**
 `src/styles/global.css` wipes five namespaces with `--color-*: initial` and
 friends, then declares only the tokens from `CLAUDE.md`.
 
-Fourteen namespaces are wiped. Verified against build output: `bg-slate-800`,
+Fifteen namespaces are wiped. Verified against build output: `bg-slate-800`,
 `text-red-500`, `p-4`, `gap-2`, `mt-8`, `space-y-4`, `w-64`, `rounded-lg`,
 `font-sans`, `text-3xl`, `shadow-lg`, `inset-shadow-sm`, `drop-shadow-md`,
-`text-shadow-lg`, `blur-sm`, `animate-spin`, `ease-in-out`, and `tracking-wide`
-all produce **zero CSS**. No shadow token is declared in any of the four shadow
-namespaces, so a box-shadow cannot be expressed through Tailwind at all.
+`text-shadow-lg`, `blur-sm`, `animate-spin`, `ease-in-out`, `tracking-wide`,
+`font-bold`, `font-medium` and `font-semibold` all produce **zero CSS**. No
+shadow token is declared in any of the four shadow namespaces, so a box-shadow
+cannot be expressed through Tailwind at all.
+
+Weight is three named tokens — `font-body` (400, prose), `font-typed` (450,
+record fields) and `font-strong` (600, headings and `strong`). The names avoid
+`record`, `prose` and `display` on purpose: `font-<name>` resolves against the
+family namespace as well as the weight namespace, so a weight named after a
+family would shadow it.
 
 Spacing is six named tokens — `hair` `pair` `field` `entry` `register` `section`
 — and the bare `--spacing` multiplier is deliberately not declared, which is what
@@ -77,28 +84,35 @@ Self-hosted from `public/fonts/`, latin subset, `font-display: swap`, explicit
 `unicode-range`. No requests to `fonts.googleapis.com`, `fonts.gstatic.com`, or
 any other origin — verified against the build output.
 
-| Face | File | Axes | License |
-|---|---|---|---|
-| Source Serif 4 Variable | `source-serif-4-variable-latin.woff2` | `wght` 200–900, `opsz` 8–60 | OFL, included |
-| Commit Mono | `commit-mono.woff2` | — | **not present** |
+| Face | File | Axes | Size | License |
+|---|---|---|---|---|
+| Source Serif 4 Variable | `source-serif-4-variable-latin.woff2` | `wght` 200–900, `opsz` 8–60 | 122,360 B | OFL, included |
+| Commit Mono | `commit-mono-variable-latin.woff2` | `wght` 200–700 | 16,544 B | OFL, included |
 
-**Commit Mono is missing, and the build fails because of it.** As of Phase 0.2 a
-`font-guard` integration in `astro.config.mjs` reads every `@font-face` rule in
-`global.css` and fails the build if a referenced file is not in `public/fonts/`.
-A missing font has no runtime error — the browser falls back and the page simply
-renders in the wrong face — so it is caught at build time or not at all. The
-guard runs at `astro:config:done`, which means dev catches it too.
+Both faces are present and the build is green. A `font-guard` integration in
+`astro.config.mjs` reads every `@font-face` rule in `global.css` and fails the
+build if a referenced file is not in `public/fonts/`. A missing font has no
+runtime error — the browser falls back and the page renders in the wrong face —
+so it is caught at build time or not at all. It throws at `astro:build:start`
+and only warns at `astro:server:start`, so nothing deploys with a missing font
+but `dev` still runs.
 
-Download it from [commitmono.com](https://commitmono.com), convert to woff2 if
-needed, and place it at `public/fonts/commit-mono.woff2`. The build goes green
-the moment it lands.
+Commit Mono is **built, not downloaded.** The customizer on commitmono.com bakes
+settings in-browser and cannot be scripted, but the source repo ships the built
+variable font, and this project wants the defaults. The upstream file is
+checksum-gated, the italic axis is pinned out, and the subset keeps `wght`
+variable — 450 is free, so instancing the weight would discard the reason for
+using a variable face. Exact commands, checksum and verification are in
+`design-directions.md`.
 
-This is not a minor gap. There is no sans-serif in this system — Commit Mono
-carries every record field, label, number, date, status, and accession, and it is
-`.field-label` itself. Until the file lands, all of that falls back to the
-platform monospace, the build prints a warning naming the file, and `/tokens-test`
-shows it plainly. If what you have is the static 400 rather than the variable
-release, narrow `font-weight: 200 700` to `400` in `src/styles/global.css`.
+`fontTools` and `brotli` are build-time only and are **not** in `package.json`.
+The repo ships the artifact, not the pipeline. Rebuilding the font needs a
+throwaway venv; nothing in `npm install` touches it.
+
+Commit Mono's `fvar` default instance is **200**, not 400, so every weight in the
+system is stated explicitly rather than inherited. The build carries no `liga`,
+`clig`, `dlig` or `calt` feature at all, so a field value cannot silently render
+`!=` as `≠`.
 
 ## Content
 
@@ -156,6 +170,7 @@ when real records — written by hand, not generated — replace it.
 
 ## Status
 
-Phase 0 complete: tokens, theme wipe, fonts, schemas, green build.
+Phase 0 complete: tokens, theme wipe, both faces built and self-hosted, schemas,
+green build.
 `/tokens-test` is a scratch instrument for tuning the palette; delete it at the
 end of Phase 2. `/` is a holding page, not a design — Phase 2 owns it.

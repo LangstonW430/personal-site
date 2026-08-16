@@ -40,8 +40,8 @@ const leadings = pick('--leading-');
 const spacings = pick('--spacing-');
 
 const faces = [
-	{ cls: 'font-record', name: 'Commit Mono', role: 'Every record field, label, number, date, status, accession' },
-	{ cls: 'font-prose', name: 'Source Serif 4 Variable', role: 'Every piece of prose, including all headings' },
+	{ cls: 'font-record font-typed', name: 'Commit Mono', role: 'Every record field, label, number, date, status, accession' },
+	{ cls: 'font-prose font-body', name: 'Source Serif 4 Variable', role: 'Every piece of prose, including all headings' },
 ] as const;
 
 /* A real paragraph. Leading is unjudgeable on filler text — filler has no long
@@ -87,7 +87,7 @@ const spacingIntent: Record<string, string> = {
 				<!-- Prose measures are set in ch, which is a function of the face, not
 				     of the spacing scale. -->
 				<p class="text-ink-muted max-w-[54ch] mt-field">
-					Every value below is parsed from <code class="font-record text-sm">src/styles/global.css</code>
+					Every value below is parsed from <code class="font-record font-typed text-sm">src/styles/global.css</code>
 					at build time. If a token is missing here it does not exist.
 					{`${tokens.length} tokens, ${colors.length} inks, ${typeSteps.length} type steps, ${spacings.length} spacings.`}
 					Delete this page at the end of Phase 2.
@@ -100,8 +100,8 @@ const spacingIntent: Record<string, string> = {
 					The value step
 				</h2>
 				<p class="text-ink-muted max-w-[60ch] mt-field">
-					All depth in this system comes from <code class="font-record text-sm">card</code> sitting on
-					<code class="font-record text-sm">board</code>. There are no box-shadows anywhere — as of
+					All depth in this system comes from <code class="font-record font-typed text-sm">card</code> sitting on
+					<code class="font-record font-typed text-sm">board</code>. There are no box-shadows anywhere — as of
 					Phase 0.1 there is no way to express one through Tailwind at all — so if this step
 					is too subtle the record stops reading as a separate object and the whole layout
 					flattens. This is the single most important thing on this page to judge.
@@ -110,7 +110,7 @@ const spacingIntent: Record<string, string> = {
 				<div class="bg-board p-entry mt-entry border border-rule">
 					<div class="bg-card p-entry border border-rule">
 						<p class="field-label">Acc.</p>
-						<p class="font-record text-md text-stamp">2026.04</p>
+						<p class="font-record font-typed text-md text-stamp">2026.04</p>
 						<p class="font-prose mt-field max-w-[60ch]">
 							A record sitting on the board. Judge the edge: it should read as a distinct
 							surface without a shadow doing the work, and the hairline should support the
@@ -122,11 +122,11 @@ const spacingIntent: Record<string, string> = {
 				<div class="mt-field flex flex-wrap gap-entry">
 					<div class="bg-card border border-rule p-entry flex-1 min-w-[14rem]">
 						<p class="field-label">card on board</p>
-						<p class="font-record text-sm mt-hair">#F7F7F4 on #E4E5E0</p>
+						<p class="font-record font-typed text-sm mt-hair">#F7F7F4 on #E4E5E0</p>
 					</div>
 					<div class="bg-board border border-rule p-entry flex-1 min-w-[14rem]">
 						<p class="field-label">board alone</p>
-						<p class="font-record text-sm mt-hair">#E4E5E0</p>
+						<p class="font-record font-typed text-sm mt-hair">#E4E5E0</p>
 					</div>
 				</div>
 			</section>
@@ -144,7 +144,7 @@ const spacingIntent: Record<string, string> = {
 								style={`background-color: var(${c.name})`}
 							></div>
 							<p class="field-label mt-pair">{c.name.replace('--color-', '')}</p>
-							<p class="font-record text-sm uppercase">{c.value}</p>
+							<p class="font-record font-typed text-sm uppercase">{c.value}</p>
 						</li>
 					))}
 				</ul>
@@ -159,10 +159,10 @@ const spacingIntent: Record<string, string> = {
 						.filter((c) => !['--color-board', '--color-card'].includes(c.name))
 						.map((c) => (
 							<>
-								<p class="font-record text-sm p-field bg-board" style={`color: var(${c.name})`}>
+								<p class="font-record font-typed text-sm p-field bg-board" style={`color: var(${c.name})`}>
 									{c.name.replace('--color-', '')} on board — 2026.04 · 4,180 LOC
 								</p>
-								<p class="font-record text-sm p-field bg-card" style={`color: var(${c.name})`}>
+								<p class="font-record font-typed text-sm p-field bg-card" style={`color: var(${c.name})`}>
 									{c.name.replace('--color-', '')} on card — 2026.04 · 4,180 LOC
 								</p>
 							</>
@@ -174,9 +174,9 @@ const spacingIntent: Record<string, string> = {
 			<section class="mt-section">
 				<h2 class="font-prose text-lg leading-display border-b border-rule pb-pair">Spacing</h2>
 				<p class="text-ink-muted max-w-[60ch] mt-field">
-					Six values, named by intent. The numeric scale is dead — <code class="font-record text-sm">p-4</code>,
-					<code class="font-record text-sm">gap-2</code> and every sibling emit nothing, because the bare
-					<code class="font-record text-sm">--spacing</code> multiplier is deliberately not declared.
+					Six values, named by intent. The numeric scale is dead — <code class="font-record font-typed text-sm">p-4</code>,
+					<code class="font-record font-typed text-sm">gap-2</code> and every sibling emit nothing, because the bare
+					<code class="font-record font-typed text-sm">--spacing</code> multiplier is deliberately not declared.
 					Each bar below is drawn at exactly its own token.
 				</p>
 
@@ -185,7 +185,7 @@ const spacingIntent: Record<string, string> = {
 						<div class="flex flex-wrap items-center gap-field mt-field">
 							<dt class="min-w-[9rem]">
 								<span class="field-label">{s.name.replace('--spacing-', '')}</span>
-								<span class="font-record text-xs text-ink-muted block">{s.value}</span>
+								<span class="font-record font-typed text-xs text-ink-muted block">{s.value}</span>
 							</dt>
 							<dd class="flex items-center gap-field flex-1 min-w-[14rem]">
 								<div
@@ -205,7 +205,7 @@ const spacingIntent: Record<string, string> = {
 				<p class="text-ink-muted max-w-[60ch] mt-field">
 					Six steps, both faces. There is no sans-serif in this system. If the Commit Mono
 					column renders in your platform's default monospace, the font is missing from
-					<code class="font-record text-sm">/public/fonts/</code> — it carries half the type
+					<code class="font-record font-typed text-sm">/public/fonts/</code> — it carries half the type
 					system, so this is not a subtle failure.
 				</p>
 
@@ -240,7 +240,7 @@ const spacingIntent: Record<string, string> = {
 							{l.name.replace('--', '')} · {l.value} · {leadingRole[l.name]}
 						</p>
 						<p
-							class={`${l.name === '--leading-record' ? 'font-record text-sm' : 'font-prose'} max-w-[68ch] mt-pair`}
+							class={`${l.name === '--leading-record' ? 'font-record font-typed text-sm' : 'font-prose'} max-w-[68ch] mt-pair`}
 							style={`line-height: var(${l.name})`}
 						>
 							{specimen}
@@ -255,7 +255,7 @@ const spacingIntent: Record<string, string> = {
 					The field label
 				</h2>
 				<p class="text-ink-muted max-w-[60ch] mt-field">
-					Commit Mono, uppercase, 10px, <code class="font-record text-sm">tracking-label</code>,
+					Commit Mono, uppercase, 10px, <code class="font-record font-typed text-sm">tracking-label</code>,
 					ink-muted. It sits above nearly every value on the site. A field label names a
 					field that has a value under it — every label on this page is a real one.
 				</p>
@@ -263,19 +263,19 @@ const spacingIntent: Record<string, string> = {
 				<div class="bg-card border border-rule p-entry mt-entry grid grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] gap-entry">
 					<div>
 						<p class="field-label">Acquired</p>
-						<p class="font-record text-base mt-hair">2026-06-14</p>
+						<p class="font-record font-typed text-base mt-hair">2026-06-14</p>
 					</div>
 					<div>
 						<p class="field-label">Status</p>
-						<p class="font-record text-base mt-hair">ACTIVE</p>
+						<p class="font-record font-typed text-base mt-hair">ACTIVE</p>
 					</div>
 					<div>
 						<p class="field-label">Extent</p>
-						<p class="font-record text-base mt-hair">4,180 LOC · 118 commits · 7 weeks</p>
+						<p class="font-record font-typed text-base mt-hair">4,180 LOC · 118 commits · 7 weeks</p>
 					</div>
 					<div>
 						<p class="field-label">Medium</p>
-						<p class="font-record text-base mt-hair">Astro · TypeScript · Postgres</p>
+						<p class="font-record font-typed text-base mt-hair">Astro · TypeScript · Postgres</p>
 					</div>
 				</div>
 			</section>
@@ -295,27 +295,27 @@ const spacingIntent: Record<string, string> = {
 					<div class="flex flex-col gap-field">
 						<div>
 							<p class="field-label">Acc.</p>
-							<p class="font-record text-md text-stamp">2026.04</p>
+							<p class="font-record font-typed text-md text-stamp">2026.04</p>
 						</div>
 						<div>
 							<p class="field-label">Role</p>
-							<p class="font-record text-sm leading-record">Sole developer</p>
+							<p class="font-record font-typed text-sm leading-record">Sole developer</p>
 						</div>
 						<div>
 							<p class="field-label">Medium</p>
-							<p class="font-record text-sm leading-record">Astro · TypeScript · Postgres · Overpass API</p>
+							<p class="font-record font-typed text-sm leading-record">Astro · TypeScript · Postgres · Overpass API</p>
 						</div>
 						<div>
 							<p class="field-label">Acquired</p>
-							<p class="font-record text-sm leading-record">2026-06-14</p>
+							<p class="font-record font-typed text-sm leading-record">2026-06-14</p>
 						</div>
 						<div>
 							<p class="field-label">Extent</p>
-							<p class="font-record text-sm leading-record">4,180 LOC · 118 commits · 7 weeks</p>
+							<p class="font-record font-typed text-sm leading-record">4,180 LOC · 118 commits · 7 weeks</p>
 						</div>
 						<div>
 							<p class="field-label">Condition</p>
-							<p class="font-record text-sm leading-record">
+							<p class="font-record font-typed text-sm leading-record">
 								Stable. Deps current as of Jun 2026. Two known issues in Safari 17 uploads.
 							</p>
 						</div>
@@ -344,21 +344,21 @@ const spacingIntent: Record<string, string> = {
 
 				<div class="bg-card border border-rule p-entry mt-entry">
 					<p class="field-label">On an accession number</p>
-					<p class="font-record text-xl text-stamp mt-hair">2026.04</p>
+					<p class="font-record font-typed text-xl text-stamp mt-hair">2026.04</p>
 
 					<p class="field-label mt-register">On a focus ring</p>
 					<p class="text-ink-muted text-sm mt-hair max-w-[60ch]">
 						Tab to the link below. The ring should read clearly against
-						<code class="font-record text-sm">card</code> at 2px offset — check it against
-						<code class="font-record text-sm">board</code> too, since the record sits on both.
+						<code class="font-record font-typed text-sm">card</code> at 2px offset — check it against
+						<code class="font-record font-typed text-sm">board</code> too, since the record sits on both.
 					</p>
 					<p class="mt-field">
-						<a href="#" class="font-record text-sm underline">Focusable link on card</a>
+						<a href="#" class="font-record font-typed text-sm underline">Focusable link on card</a>
 					</p>
 				</div>
 
 				<div class="bg-board border border-rule p-entry mt-field">
-					<a href="#" class="font-record text-sm underline">Focusable link on board</a>
+					<a href="#" class="font-record font-typed text-sm underline">Focusable link on board</a>
 				</div>
 			</section>
 		</main>

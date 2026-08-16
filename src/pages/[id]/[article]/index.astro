@@ -51,7 +51,7 @@ const { Content } = await render(article);
 		/>
 	</head>
 	<body class="bg-board text-ink">
-		<main class="px-entry py-register">
+		<main class="px-entry py-register max-w-[62rem] mx-auto">
 			<p><a href={`/${record.id}/`}>&larr; {record.data.title}</a></p>
 
 			<p class="field-label mt-entry">Note</p>
@@ -60,39 +60,43 @@ const { Content } = await render(article);
 			<h1 class="font-prose text-xl leading-display mt-hair">{article.data.title}</h1>
 			<p class="font-prose leading-prose mt-field max-w-[62ch]">{article.data.summary}</p>
 
-			<div class="mt-register">
-				<div class="mt-field">
-					<p class="field-label">Filed</p>
-					<p class="font-record font-typed text-sm">{formatDate(article.data.filed)}</p>
+			<article class="mt-register grid gap-entry grid-cols-1 md:grid-cols-[15rem_1fr]">
+				<div class="flex flex-col gap-field">
+					<div>
+						<p class="field-label">Filed</p>
+						<p class="font-record font-typed text-sm leading-record">{formatDate(article.data.filed)}</p>
+					</div>
+
+					<div>
+						<p class="field-label">Condition</p>
+						<p class="font-record font-typed text-sm leading-record">{article.data.condition}</p>
+					</div>
+
+					{
+						article.data.provenance && (
+							<div>
+								<p class="field-label">Provenance</p>
+								<p class="font-record font-typed text-sm leading-record">{article.data.provenance}</p>
+							</div>
+						)
+					}
+
+					{
+						article.data.extent?.words !== undefined && (
+							<div>
+								<p class="field-label">Extent</p>
+								<p class="font-record font-typed text-sm leading-record">
+									{article.data.extent.words.toLocaleString('en-US')} words
+								</p>
+							</div>
+						)
+					}
 				</div>
 
-				<div class="mt-field">
-					<p class="field-label">Condition</p>
-					<p class="font-record font-typed text-sm">{article.data.condition}</p>
+				<div class="font-prose leading-prose max-w-[62ch]">
+					<Content />
 				</div>
-
-				{
-					article.data.provenance && (
-						<div class="mt-field">
-							<p class="field-label">Provenance</p>
-							<p class="font-record font-typed text-sm">{article.data.provenance}</p>
-						</div>
-					)
-				}
-
-				{
-					article.data.extent?.words !== undefined && (
-						<div class="mt-field">
-							<p class="field-label">Extent</p>
-							<p class="font-record font-typed text-sm">{article.data.extent.words.toLocaleString('en-US')} words</p>
-						</div>
-					)
-				}
-			</div>
-
-			<div class="font-prose leading-prose mt-register max-w-[62ch]">
-				<Content />
-			</div>
+			</article>
 		</main>
 	</body>
 </html>

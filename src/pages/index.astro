@@ -1,8 +1,9 @@
 ---
 /*
- * The register. No marketing page in front of it — a catalogue's front page
- * is the catalogue. Plain list: ACC., title, MEDIUM, EXTENT, STATUS. The
- * asymmetric rail and any other layout craft belong to 2b, not here.
+ * The register. A tabular list, not a card grid — every record in accession
+ * order with ACC., title, medium, extent, and status aligned as columns. At
+ * narrow widths the columns collapse to labelled stacked fields per record;
+ * the column header row hides there instead of wrapping badly.
  */
 import { getCollection } from 'astro:content';
 import Head from '../components/Head.astro';
@@ -10,6 +11,8 @@ import { formatExtent } from '../lib/format';
 import '../styles/global.css';
 
 const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
+
+const COLUMNS = 'md:grid-cols-[5rem_2fr_1.4fr_1.4fr_5.5rem]';
 ---
 
 <!doctype html>
@@ -22,34 +25,53 @@ const records = (await getCollection('records')).sort((a, b) => a.data.acc.local
 		/>
 	</head>
 	<body class="bg-board text-ink">
-		<main class="px-entry py-register">
+		<main class="px-entry py-register max-w-[75rem] mx-auto">
 			<h1 class="font-prose text-xl leading-display">Register</h1>
 
-			<ul role="list" class="mt-register">
+			<div class={`hidden md:grid ${COLUMNS} gap-field border-b border-rule pb-pair mt-register`}>
+				<p class="field-label">Acc.</p>
+				<p class="field-label">Title</p>
+				<p class="field-label">Medium</p>
+				<p class="field-label">Extent</p>
+				<p class="field-label">Status</p>
+			</div>
+
+			<ul role="list" class="mt-register md:mt-0">
 				{
 					records.map((record) => {
 						const extent = formatExtent(record.data.extent);
 						return (
-							<li class="mt-entry">
-								<a href={`/${record.id}/`}>
-									<p class="field-label">Acc.</p>
-									<p class="font-record font-typed text-md text-stamp">{record.data.acc}</p>
-
-									<p class="font-prose text-lg leading-display mt-hair">{record.data.title}</p>
-
-									<p class="field-label mt-field">Medium</p>
-									<p class="font-record font-typed text-sm">{record.data.medium.join(' · ')}</p>
-
-									{extent && (
-										<>
-											<p class="field-label mt-field">Extent</p>
-											<p class="font-record font-typed text-sm">{extent}</p>
-										</>
-									)}
-
-									<p class="field-label mt-field">Status</p>
-									<p class="font-record font-typed text-sm">{record.data.status.toUpperCase()}</p>
+							<li class={`relative border-b border-rule py-entry md:py-field md:grid ${COLUMNS} md:gap-field md:items-baseline`}>
+								<a href={`/${record.id}/`} class="absolute inset-0">
+									<span class="sr-only">
+										{record.data.acc} — {record.data.title}
+									</span>
 								</a>
+
+								<div>
+									<p class="field-label md:hidden">Acc.</p>
+									<p class="font-record font-typed text-md text-stamp">{record.data.acc}</p>
+								</div>
+
+								<div class="mt-field md:mt-0">
+									<p class="field-label md:hidden">Title</p>
+									<p class="font-prose text-lg leading-display md:text-base md:leading-record">{record.data.title}</p>
+								</div>
+
+								<div class="mt-field md:mt-0">
+									<p class="field-label md:hidden">Medium</p>
+									<p class="font-record font-typed text-sm leading-record">{record.data.medium.join(' · ')}</p>
+								</div>
+
+								<div class="mt-field md:mt-0">
+									<p class="field-label md:hidden">Extent</p>
+									<p class="font-record font-typed text-sm leading-record">{extent ?? '—'}</p>
+								</div>
+
+								<div class="mt-field md:mt-0">
+									<p class="field-label md:hidden">Status</p>
+									<p class="font-record font-typed text-sm">{record.data.status.toUpperCase()}</p>
+								</div>
 							</li>
 						);
 					})

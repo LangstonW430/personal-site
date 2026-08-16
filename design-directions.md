@@ -586,3 +586,23 @@ no off-list utility is in use today.
 - Accession numbers are never reused and never renumbered. The build enforces it.
 - Never "collection," "curated," "showcase," "portfolio," or "journey."
 - Structural devices encode information or they do not ship.
+
+## Phase 2b scaffolding — comes off at the end of Phase 1
+
+Two things were added in Phase 2b specifically because the site is public with
+placeholder prose and real client names in it. Both are temporary and both are
+easy to forget once the real content lands, so they're logged here rather than
+left to memory:
+
+1. **`npm run check:content`** (`scripts/check-content.mjs`) lists every
+   content file still carrying the `[[UNWRITTEN]]` sentinel and exits non-zero
+   if any remain. It is deliberately **not** wired into `npm run build` —
+   Phase 2b needs to deploy and be looked at while it's still placeholder.
+   **Wire it into the build as a gate at the end of Phase 1**, once every
+   sentinel is gone for good.
+2. **Site-wide `noindex, nofollow`** (in `src/components/Head.astro`) and
+   **`public/robots.txt`** disallowing everything. Both exist only because
+   there is invented placeholder prose sitting next to real client names on a
+   public URL. **Remove the `noindex` meta tag and open up `robots.txt`** at
+   the same time the content gate above goes live — not before, since the
+   placeholder prose will still be there until Phase 1 actually finishes.

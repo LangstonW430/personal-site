@@ -20,6 +20,14 @@ const canonical = new URL(path, Astro.site).toString();
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="canonical" href={canonical} />
 
+<!--
+  Phase 2b only: the register now carries real client names next to invented
+  placeholder prose. Remove this tag — and public/robots.txt's Disallow — at
+  the end of Phase 1, once every [[UNWRITTEN]] sentinel is gone. Logged in
+  design-directions.md so it isn't forgotten.
+-->
+<meta name="robots" content="noindex, nofollow" />
+
 <title>{title}</title>
 <meta name="description" content={description} />
 

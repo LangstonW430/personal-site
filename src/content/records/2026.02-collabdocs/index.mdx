@@ -1,0 +1,23 @@
+---
+acc: '2026.02'
+title: CollabDocs
+summary: A real-time collaborative document editor — multi-cursor editing on a TipTap canvas with comments, formatting, and presence, backed by Convex for sync and auth.
+role: Sole developer
+medium: ['Next.js', 'TypeScript', 'Convex', 'TipTap', 'Tailwind CSS']
+acquired: 2026-04-20
+status: active
+condition: |-
+  [[UNWRITTEN]]
+  Active. Core editing and auth work; a few TipTap extensions (tables, task lists) are wired but under-tested against concurrent edits.
+links:
+  source: https://github.com/LangstonW430/collaboration-app
+order: 2
+---
+
+[[UNWRITTEN]]
+
+CollabDocs starts from the assumption that "real-time" is the whole feature, not a nice-to-have bolted onto a normal document editor. Every keystroke goes through Convex's reactive queries, which is what makes two cursors in the same paragraph feel like the same document instead of two documents politely diffing against each other.
+
+The editor itself is TipTap, extended with the pieces a working doc tool actually needs: tables, task lists, an image extension, text alignment, a character count that doesn't lag behind typing. Auth runs through a password provider, which was the boring, correct choice over rolling anything custom.
+
+The harder problem, still being worked through, is less about the editor and more about what happens when two people's changes land in the same sentence at once — that's where most of the remaining engineering effort actually is.

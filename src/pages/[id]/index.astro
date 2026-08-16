@@ -1,13 +1,15 @@
 ---
 /*
- * A record. Every schema field that carries display meaning is rendered and
- * labelled; an absent optional field skips its label rather than rendering
- * empty. `order` and `featured` are sort/promotion mechanics with no field
- * label in CLAUDE.md's vocabulary, so they drive behavior elsewhere and are
- * not printed here.
+ * A record. Asymmetric split: a narrow left rail of LABEL / value pairs
+ * against a wide prose column, per CLAUDE.md's layout principle — the two
+ * columns carry different kinds of information and must not share a grid
+ * with the register's tabular list.
  *
- * The asymmetric rail is 2b. This is a flat, labelled list of what a record
- * contains, styled no further than the tokens that already exist.
+ * Every schema field that carries display meaning is rendered and labelled;
+ * an absent optional field skips its label rather than rendering empty.
+ * `order` and `featured` are sort/promotion mechanics with no field label in
+ * CLAUDE.md's vocabulary, so they drive behavior elsewhere and are not
+ * printed here.
  */
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Head from '../../components/Head.astro';
@@ -39,6 +41,7 @@ const { record, accruals } = Astro.props;
 const { Content } = await render(record);
 
 const extent = formatExtent(record.data.extent);
+const hasLinks = Boolean(record.data.links.live || record.data.links.source || record.data.links.writeup);
 ---
 
 <!doctype html>
@@ -51,7 +54,7 @@ const extent = formatExtent(record.data.extent);
 		/>
 	</head>
 	<body class="bg-board text-ink">
-		<main class="px-entry py-register">
+		<main class="px-entry py-register max-w-[62rem] mx-auto">
 			<p><a href="/">&larr; Register</a></p>
 
 			<p class="field-label mt-entry">Acc.</p>
@@ -60,127 +63,132 @@ const extent = formatExtent(record.data.extent);
 			<h1 class="font-prose text-xl leading-display mt-hair">{record.data.title}</h1>
 			<p class="font-prose leading-prose mt-field max-w-[62ch]">{record.data.summary}</p>
 
-			<div class="mt-register">
-				{
-					record.data.client && (
-						<div class="mt-field">
-							<p class="field-label">Client</p>
-							<p class="font-record font-typed text-sm">{record.data.client}</p>
-						</div>
-					)
-				}
+			<article class="mt-register grid gap-entry grid-cols-1 md:grid-cols-[15rem_1fr]">
+				<div class="flex flex-col gap-field">
+					{
+						record.data.client && (
+							<div>
+								<p class="field-label">Client</p>
+								<p class="font-record font-typed text-sm leading-record">{record.data.client}</p>
+							</div>
+						)
+					}
 
-				<div class="mt-field">
-					<p class="field-label">Role</p>
-					<p class="font-record font-typed text-sm">{record.data.role}</p>
+					<div>
+						<p class="field-label">Role</p>
+						<p class="font-record font-typed text-sm leading-record">{record.data.role}</p>
+					</div>
+
+					<div>
+						<p class="field-label">Medium</p>
+						<p class="font-record font-typed text-sm leading-record">{record.data.medium.join(' · ')}</p>
+					</div>
+
+					<div>
+						<p class="field-label">Acquired</p>
+						<p class="font-record font-typed text-sm leading-record">{formatDate(record.data.acquired)}</p>
+					</div>
+
+					{
+						record.data.completed && (
+							<div>
+								<p class="field-label">Completed</p>
+								<p class="font-record font-typed text-sm leading-record">{formatDate(record.data.completed)}</p>
+							</div>
+						)
+					}
+
+					<div>
+						<p class="field-label">Status</p>
+						<p class="font-record font-typed text-sm leading-record">{record.data.status.toUpperCase()}</p>
+					</div>
+
+					{
+						extent && (
+							<div>
+								<p class="field-label">Extent</p>
+								<p class="font-record font-typed text-sm leading-record">{extent}</p>
+							</div>
+						)
+					}
+
+					<div>
+						<p class="field-label">Condition</p>
+						<p class="font-record font-typed text-sm leading-record whitespace-pre-line">{record.data.condition}</p>
+					</div>
+
+					{
+						record.data.locality && (
+							<div>
+								<p class="field-label">Locality</p>
+								<p class="font-record font-typed text-sm leading-record">{record.data.locality}</p>
+							</div>
+						)
+					}
+
+					{
+						record.data.history && record.data.history.length > 0 && (
+							<div>
+								<p class="field-label">History</p>
+								<ul role="list" class="flex flex-col gap-hair mt-hair">
+									{record.data.history.map((entry) => (
+										<li class="font-record font-typed text-sm leading-record">
+											{formatDate(entry.date)} — {entry.note}
+										</li>
+									))}
+								</ul>
+							</div>
+						)
+					}
+
+					{
+						hasLinks && (
+							<div>
+								<p class="field-label">Links</p>
+								<ul role="list" class="flex flex-col gap-hair mt-hair font-record font-typed text-sm">
+									{record.data.links.live && (
+										<li>
+											<a href={record.data.links.live}>Live</a>
+										</li>
+									)}
+									{record.data.links.source && (
+										<li>
+											<a href={record.data.links.source}>Source</a>
+										</li>
+									)}
+									{record.data.links.writeup && (
+										<li>
+											<a href={record.data.links.writeup}>Writeup</a>
+										</li>
+									)}
+								</ul>
+							</div>
+						)
+					}
 				</div>
 
-				<div class="mt-field">
-					<p class="field-label">Medium</p>
-					<p class="font-record font-typed text-sm">{record.data.medium.join(' · ')}</p>
+				<div class="font-prose leading-prose max-w-[62ch]">
+					<Content />
 				</div>
-
-				<div class="mt-field">
-					<p class="field-label">Acquired</p>
-					<p class="font-record font-typed text-sm">{formatDate(record.data.acquired)}</p>
-				</div>
-
-				{
-					record.data.completed && (
-						<div class="mt-field">
-							<p class="field-label">Completed</p>
-							<p class="font-record font-typed text-sm">{formatDate(record.data.completed)}</p>
-						</div>
-					)
-				}
-
-				<div class="mt-field">
-					<p class="field-label">Status</p>
-					<p class="font-record font-typed text-sm">{record.data.status.toUpperCase()}</p>
-				</div>
-
-				{
-					extent && (
-						<div class="mt-field">
-							<p class="field-label">Extent</p>
-							<p class="font-record font-typed text-sm">{extent}</p>
-						</div>
-					)
-				}
-
-				<div class="mt-field">
-					<p class="field-label">Condition</p>
-					<p class="font-record font-typed text-sm">{record.data.condition}</p>
-				</div>
-
-				{
-					record.data.locality && (
-						<div class="mt-field">
-							<p class="field-label">Locality</p>
-							<p class="font-record font-typed text-sm">{record.data.locality}</p>
-						</div>
-					)
-				}
-
-				{
-					record.data.history && record.data.history.length > 0 && (
-						<div class="mt-field">
-							<p class="field-label">History</p>
-							<ul role="list">
-								{record.data.history.map((entry) => (
-									<li class="font-record font-typed text-sm">
-										{formatDate(entry.date)} — {entry.note}
-									</li>
-								))}
-							</ul>
-						</div>
-					)
-				}
-
-				{
-					(record.data.links.live || record.data.links.source || record.data.links.writeup) && (
-						<div class="mt-field">
-							<p class="field-label">Links</p>
-							<ul role="list" class="font-record font-typed text-sm">
-								{record.data.links.live && (
-									<li>
-										<a href={record.data.links.live}>Live</a>
-									</li>
-								)}
-								{record.data.links.source && (
-									<li>
-										<a href={record.data.links.source}>Source</a>
-									</li>
-								)}
-								{record.data.links.writeup && (
-									<li>
-										<a href={record.data.links.writeup}>Writeup</a>
-									</li>
-								)}
-							</ul>
-						</div>
-					)
-				}
-			</div>
-
-			<div class="font-prose leading-prose mt-register max-w-[62ch]">
-				<Content />
-			</div>
+			</article>
 
 			{
 				accruals.length > 0 && (
-					<section class="mt-register">
-						<h2 class="font-prose text-lg leading-display">Accruals</h2>
-						<ul role="list" class="mt-entry">
+					<section class="mt-register grid gap-entry grid-cols-1 md:grid-cols-[15rem_1fr]">
+						<h2 class="field-label">Accruals</h2>
+						<ul role="list" class="flex flex-col gap-entry">
 							{accruals.map(({ article, slug }) => (
-								<li class="mt-field">
-									<a href={`/${record.id}/${slug}/`}>
-										<p class="field-label">Note {article.data.note}</p>
-										<p class="font-prose">{article.data.title}</p>
-										<p class="font-record font-typed text-sm text-ink-muted">
-											{formatDate(article.data.filed)} · {article.data.condition}
-										</p>
+								<li class="relative border-b border-rule pb-field">
+									<a href={`/${record.id}/${slug}/`} class="absolute inset-0">
+										<span class="sr-only">
+											Note {article.data.note} — {article.data.title}
+										</span>
 									</a>
+									<p class="field-label">Note {article.data.note}</p>
+									<p class="font-prose text-md leading-display mt-hair">{article.data.title}</p>
+									<p class="font-record font-typed text-sm text-ink-muted mt-pair">
+										{formatDate(article.data.filed)} · {article.data.condition}
+									</p>
 								</li>
 							))}
 						</ul>

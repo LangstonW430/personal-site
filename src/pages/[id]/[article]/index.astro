@@ -1,0 +1,98 @@
+---
+/*
+ * An accrual. Parent is looked up through the injected `record` field
+ * against the records collection, never by re-parsing this article's id —
+ * the id's directory segment and a record's id happen to agree today, but
+ * the field is the contract, not the coincidence.
+ */
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Head from '../../../components/Head.astro';
+import { formatDate } from '../../../lib/format';
+import '../../../styles/global.css';
+
+export async function getStaticPaths() {
+	const [records, articles] = await Promise.all([getCollection('records'), getCollection('articles')]);
+	const recordByAcc = new Map(records.map((record) => [record.data.acc, record]));
+
+	return articles.map((article) => {
+		const record = recordByAcc.get(article.data.record);
+		if (!record) {
+			throw new Error(
+				`Accrual "${article.id}" references record "${article.data.record}", which does not exist.`,
+			);
+		}
+
+		const slug = article.id.slice(article.id.indexOf('/') + 1);
+
+		return {
+			params: { id: record.id, article: slug },
+			props: { article, record, slug },
+		};
+	});
+}
+
+interface Props {
+	article: CollectionEntry<'articles'>;
+	record: CollectionEntry<'records'>;
+	slug: string;
+}
+
+const { article, record, slug } = Astro.props;
+const { Content } = await render(article);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<Head
+			title={`ACC. ${record.data.acc} — ${article.data.title}`}
+			description={article.data.summary}
+			path={`/${record.id}/${slug}/`}
+		/>
+	</head>
+	<body class="bg-board text-ink">
+		<main class="px-entry py-register">
+			<p><a href={`/${record.id}/`}>&larr; {record.data.title}</a></p>
+
+			<p class="field-label mt-entry">Note</p>
+			<p class="font-record font-typed text-md text-stamp">{article.data.note}</p>
+
+			<h1 class="font-prose text-xl leading-display mt-hair">{article.data.title}</h1>
+			<p class="font-prose leading-prose mt-field max-w-[62ch]">{article.data.summary}</p>
+
+			<div class="mt-register">
+				<div class="mt-field">
+					<p class="field-label">Filed</p>
+					<p class="font-record font-typed text-sm">{formatDate(article.data.filed)}</p>
+				</div>
+
+				<div class="mt-field">
+					<p class="field-label">Condition</p>
+					<p class="font-record font-typed text-sm">{article.data.condition}</p>
+				</div>
+
+				{
+					article.data.provenance && (
+						<div class="mt-field">
+							<p class="field-label">Provenance</p>
+							<p class="font-record font-typed text-sm">{article.data.provenance}</p>
+						</div>
+					)
+				}
+
+				{
+					article.data.extent?.words !== undefined && (
+						<div class="mt-field">
+							<p class="field-label">Extent</p>
+							<p class="font-record font-typed text-sm">{article.data.extent.words.toLocaleString('en-US')} words</p>
+						</div>
+					)
+				}
+			</div>
+
+			<div class="font-prose leading-prose mt-register max-w-[62ch]">
+				<Content />
+			</div>
+		</main>
+	</body>
+</html>

@@ -101,7 +101,7 @@ function fontGuard({ stylesheet = 'src/styles/global.css' } = {}) {
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://personal-site.vercel.app',
+	site: 'https://personal-site-sigma-bay.vercel.app',
 
 	// Static by default. The Vercel adapter is wired now only so the Phase 4
 	// GitHub instrument panel can become a server island without a config

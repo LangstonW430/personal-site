@@ -1,0 +1,33 @@
+---
+/**
+ * The one place `<title>`, description, canonical, and OG/Twitter tags are
+ * assembled, so every route states them the same way instead of five pages
+ * agreeing by coincidence.
+ */
+export interface Props {
+	title: string;
+	description: string;
+	/** Root-relative pathname, e.g. "/2026.06-promptdesk/". Resolved against `site`. */
+	path: string;
+}
+
+const { title, description, path } = Astro.props;
+const canonical = new URL(path, Astro.site).toString();
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="canonical" href={canonical} />
+
+<title>{title}</title>
+<meta name="description" content={description} />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />

@@ -1,30 +1,60 @@
 ---
 /*
- * Holding page. Not a design — Phase 2 owns `/`.
- *
- * It exists for two reasons: something has to answer at the root for the
- * Vercel deploy to be meaningfully green, and it is the only place the font
- * pipeline gets exercised over a real CDN rather than localhost.
- *
- * Every word on it is true. Nothing here is placeholder copy waiting to be
- * swapped for real copy; the whole file is deleted and rewritten in Phase 2.
+ * The register. No marketing page in front of it — a catalogue's front page
+ * is the catalogue. Plain list: ACC., title, MEDIUM, EXTENT, STATUS. The
+ * asymmetric rail and any other layout craft belong to 2b, not here.
  */
+import { getCollection } from 'astro:content';
+import Head from '../components/Head.astro';
+import { formatExtent } from '../lib/format';
 import '../styles/global.css';
+
+const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="robots" content="noindex" />
-		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-		<title>Langston</title>
+		<Head
+			title="Langston — register of works"
+			description="A register of software and web development work: accession number, medium, extent, and condition for each entry."
+			path="/"
+		/>
 	</head>
 	<body class="bg-board text-ink">
 		<main class="px-entry py-register">
-			<p class="field-label">Phase 0 — foundation</p>
-			<h1 class="font-prose text-xl leading-display mt-hair">Langston</h1>
+			<h1 class="font-prose text-xl leading-display">Register</h1>
+
+			<ul role="list" class="mt-register">
+				{
+					records.map((record) => {
+						const extent = formatExtent(record.data.extent);
+						return (
+							<li class="mt-entry">
+								<a href={`/${record.id}/`}>
+									<p class="field-label">Acc.</p>
+									<p class="font-record font-typed text-md text-stamp">{record.data.acc}</p>
+
+									<p class="font-prose text-lg leading-display mt-hair">{record.data.title}</p>
+
+									<p class="field-label mt-field">Medium</p>
+									<p class="font-record font-typed text-sm">{record.data.medium.join(' · ')}</p>
+
+									{extent && (
+										<>
+											<p class="field-label mt-field">Extent</p>
+											<p class="font-record font-typed text-sm">{extent}</p>
+										</>
+									)}
+
+									<p class="field-label mt-field">Status</p>
+									<p class="font-record font-typed text-sm">{record.data.status.toUpperCase()}</p>
+								</a>
+							</li>
+						);
+					})
+				}
+			</ul>
 		</main>
 	</body>
 </html>

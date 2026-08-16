@@ -1,0 +1,21 @@
+---
+/* A real page, not a redirect — Astro serves this for any unmatched route. */
+import Head from '../components/Head.astro';
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<Head title="404 — Langston" description="No record at this address." path="/404/" />
+	</head>
+	<body class="bg-board text-ink">
+		<main class="px-entry py-register">
+			<p class="field-label">404</p>
+			<h1 class="font-prose text-xl leading-display mt-hair">No record at this address</h1>
+			<p class="font-prose leading-prose mt-field max-w-[62ch]">
+				<a href="/">Return to the register</a>.
+			</p>
+		</main>
+	</body>
+</html>

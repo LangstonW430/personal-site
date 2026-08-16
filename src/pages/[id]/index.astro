@@ -1,0 +1,192 @@
+---
+/*
+ * A record. Every schema field that carries display meaning is rendered and
+ * labelled; an absent optional field skips its label rather than rendering
+ * empty. `order` and `featured` are sort/promotion mechanics with no field
+ * label in CLAUDE.md's vocabulary, so they drive behavior elsewhere and are
+ * not printed here.
+ *
+ * The asymmetric rail is 2b. This is a flat, labelled list of what a record
+ * contains, styled no further than the tokens that already exist.
+ */
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Head from '../../components/Head.astro';
+import { formatDate, formatExtent } from '../../lib/format';
+import '../../styles/global.css';
+
+export async function getStaticPaths() {
+	const [records, articles] = await Promise.all([getCollection('records'), getCollection('articles')]);
+
+	return records.map((record) => {
+		const accruals = articles
+			.filter((article) => article.data.record === record.data.acc)
+			.map((article) => ({ article, slug: article.id.slice(article.id.indexOf('/') + 1) }))
+			.sort((a, b) => a.article.data.note - b.article.data.note);
+
+		return {
+			params: { id: record.id },
+			props: { record, accruals },
+		};
+	});
+}
+
+interface Props {
+	record: CollectionEntry<'records'>;
+	accruals: { article: CollectionEntry<'articles'>; slug: string }[];
+}
+
+const { record, accruals } = Astro.props;
+const { Content } = await render(record);
+
+const extent = formatExtent(record.data.extent);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<Head
+			title={`ACC. ${record.data.acc} — ${record.data.title}`}
+			description={record.data.summary}
+			path={`/${record.id}/`}
+		/>
+	</head>
+	<body class="bg-board text-ink">
+		<main class="px-entry py-register">
+			<p><a href="/">&larr; Register</a></p>
+
+			<p class="field-label mt-entry">Acc.</p>
+			<p class="font-record font-typed text-md text-stamp">{record.data.acc}</p>
+
+			<h1 class="font-prose text-xl leading-display mt-hair">{record.data.title}</h1>
+			<p class="font-prose leading-prose mt-field max-w-[62ch]">{record.data.summary}</p>
+
+			<div class="mt-register">
+				{
+					record.data.client && (
+						<div class="mt-field">
+							<p class="field-label">Client</p>
+							<p class="font-record font-typed text-sm">{record.data.client}</p>
+						</div>
+					)
+				}
+
+				<div class="mt-field">
+					<p class="field-label">Role</p>
+					<p class="font-record font-typed text-sm">{record.data.role}</p>
+				</div>
+
+				<div class="mt-field">
+					<p class="field-label">Medium</p>
+					<p class="font-record font-typed text-sm">{record.data.medium.join(' · ')}</p>
+				</div>
+
+				<div class="mt-field">
+					<p class="field-label">Acquired</p>
+					<p class="font-record font-typed text-sm">{formatDate(record.data.acquired)}</p>
+				</div>
+
+				{
+					record.data.completed && (
+						<div class="mt-field">
+							<p class="field-label">Completed</p>
+							<p class="font-record font-typed text-sm">{formatDate(record.data.completed)}</p>
+						</div>
+					)
+				}
+
+				<div class="mt-field">
+					<p class="field-label">Status</p>
+					<p class="font-record font-typed text-sm">{record.data.status.toUpperCase()}</p>
+				</div>
+
+				{
+					extent && (
+						<div class="mt-field">
+							<p class="field-label">Extent</p>
+							<p class="font-record font-typed text-sm">{extent}</p>
+						</div>
+					)
+				}
+
+				<div class="mt-field">
+					<p class="field-label">Condition</p>
+					<p class="font-record font-typed text-sm">{record.data.condition}</p>
+				</div>
+
+				{
+					record.data.locality && (
+						<div class="mt-field">
+							<p class="field-label">Locality</p>
+							<p class="font-record font-typed text-sm">{record.data.locality}</p>
+						</div>
+					)
+				}
+
+				{
+					record.data.history && record.data.history.length > 0 && (
+						<div class="mt-field">
+							<p class="field-label">History</p>
+							<ul role="list">
+								{record.data.history.map((entry) => (
+									<li class="font-record font-typed text-sm">
+										{formatDate(entry.date)} — {entry.note}
+									</li>
+								))}
+							</ul>
+						</div>
+					)
+				}
+
+				{
+					(record.data.links.live || record.data.links.source || record.data.links.writeup) && (
+						<div class="mt-field">
+							<p class="field-label">Links</p>
+							<ul role="list" class="font-record font-typed text-sm">
+								{record.data.links.live && (
+									<li>
+										<a href={record.data.links.live}>Live</a>
+									</li>
+								)}
+								{record.data.links.source && (
+									<li>
+										<a href={record.data.links.source}>Source</a>
+									</li>
+								)}
+								{record.data.links.writeup && (
+									<li>
+										<a href={record.data.links.writeup}>Writeup</a>
+									</li>
+								)}
+							</ul>
+						</div>
+					)
+				}
+			</div>
+
+			<div class="font-prose leading-prose mt-register max-w-[62ch]">
+				<Content />
+			</div>
+
+			{
+				accruals.length > 0 && (
+					<section class="mt-register">
+						<h2 class="font-prose text-lg leading-display">Accruals</h2>
+						<ul role="list" class="mt-entry">
+							{accruals.map(({ article, slug }) => (
+								<li class="mt-field">
+									<a href={`/${record.id}/${slug}/`}>
+										<p class="field-label">Note {article.data.note}</p>
+										<p class="font-prose">{article.data.title}</p>
+										<p class="font-record font-typed text-sm text-ink-muted">
+											{formatDate(article.data.filed)} · {article.data.condition}
+										</p>
+									</a>
+								</li>
+							))}
+						</ul>
+					</section>
+				)
+			}
+		</main>
+	</body>
+</html>

@@ -30,6 +30,7 @@ import NotFoundRecord from '../../components/NotFoundRecord.astro';
 import Time from '../../components/Time.astro';
 import { formatExtent } from '../../lib/format';
 import { fetchReadme, parseGithubSource, type ReadmeData } from '../../lib/github';
+import { publishedArticles } from '../../lib/content';
 
 export const prerender = false;
 
@@ -52,7 +53,7 @@ let readme: ReadmeData | null = null;
 
 if (record) {
 	const articles = await getCollection('articles');
-	accruals = articles
+	accruals = publishedArticles(articles)
 		.filter((article) => article.data.record === record.data.acc)
 		.map((article) => ({ article, slug: article.id.slice(article.id.indexOf('/') + 1) }))
 		.sort((a, b) => a.article.data.note - b.article.data.note);

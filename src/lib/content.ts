@@ -1,3 +1,5 @@
+import type { CollectionEntry } from 'astro:content';
+
 // The [[UNWRITTEN]] sentinel marks placeholder content in the repo so
 // check:content can find it — it was never meant to be something a visitor
 // reads. Any field that might hold the literal sentinel string checks it
@@ -38,4 +40,15 @@ export function sortedChronology(entries: ChronologyEntry[]): ChronologyEntry[] 
 			if (!b.date) return 1;
 			return b.date.getTime() - a.date.getTime();
 		});
+}
+
+// `draft: true` (the schema default) means not published — the article
+// schema's own comment already claimed this ("publishing is an explicit
+// act"), but until this helper existed only rss.xml.ts actually checked it;
+// every other consumer of getCollection('articles') rendered drafts anyway.
+// One filter, called everywhere an article list feeds a route, a listing,
+// or a feed, so a half-written accrual can't leak out through whichever
+// call site forgets to check the field by hand.
+export function publishedArticles(articles: CollectionEntry<'articles'>[]): CollectionEntry<'articles'>[] {
+	return articles.filter((article) => !article.data.draft);
 }

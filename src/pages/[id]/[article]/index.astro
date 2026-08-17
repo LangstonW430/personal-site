@@ -9,12 +9,16 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import Time from '../../../components/Time.astro';
+import { publishedArticles } from '../../../lib/content';
 
 export async function getStaticPaths() {
 	const [records, articles] = await Promise.all([getCollection('records'), getCollection('articles')]);
 	const recordByAcc = new Map(records.map((record) => [record.data.acc, record]));
 
-	return articles.map((article) => {
+	// A draft article gets no route at all — not a page that exists but 404s
+	// on purpose, simply never built. "Publishing is an explicit act" (the
+	// schema's own words) means the URL doesn't exist until it is one.
+	return publishedArticles(articles).map((article) => {
 		const record = recordByAcc.get(article.data.record);
 		if (!record) {
 			throw new Error(

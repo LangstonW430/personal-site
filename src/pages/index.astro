@@ -29,7 +29,7 @@ import GithubPanel from '../components/GithubPanel.astro';
 import RegisterTable from '../components/RegisterTable.astro';
 import Time from '../components/Time.astro';
 import { fetchGithubPanel, repoAllowlist, type GithubPanelData } from '../lib/github';
-import { CHRONOLOGY_KIND_LABEL, isUnwritten, sortedChronology } from '../lib/content';
+import { CHRONOLOGY_KIND_LABEL, isUnwritten, publishedArticles, sortedChronology } from '../lib/content';
 
 export const prerender = false;
 
@@ -39,7 +39,7 @@ const RESUME_PATH = '/resume.pdf';
 const TRANSCRIPT_PATH = '/transcript.pdf';
 
 const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
-const articles = await getCollection('articles');
+const articles = publishedArticles(await getCollection('articles'));
 const profile = await getEntry('profile', 'profile');
 if (!profile) throw new Error('src/content/profile.yaml is missing or failed to load — the masthead has nothing to read.');
 

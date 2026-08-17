@@ -106,6 +106,20 @@ export type ReadmeData = {
 	html: string;
 };
 
+// GitHub renders each heading's permalink icon (and every Table-of-Contents
+// entry) as href="#slug" pointing at id="user-content-slug" — deliberately
+// mismatched, because the prefix exists precisely so an embedded README
+// doesn't collide with the host page's own ids. On github.com itself,
+// their client-side router remaps the click; embedded here with zero
+// client JS by design, an unresolved hash just does nothing; confirmed by
+// hand against a real README (the on-page evidence: icons that render but
+// don't navigate). Stripping the prefix once, server-side, at fetch time,
+// makes href and id agree without shipping a line of JS to fix it in the
+// browser instead.
+function fixAnchorIds(html: string): string {
+	return html.replace(/\bid="user-content-/g, 'id="');
+}
+
 /**
  * Fetches a repo's README pre-rendered to HTML by GitHub's own markdown
  * pipeline (`Accept: application/vnd.github.html+json`), rather than
@@ -144,7 +158,7 @@ export async function fetchReadme(
 		});
 		if (!response.ok) return null;
 
-		const html = (await response.text()).trim();
+		const html = fixAnchorIds((await response.text()).trim());
 		return html ? { html } : null;
 	} catch {
 		return null;

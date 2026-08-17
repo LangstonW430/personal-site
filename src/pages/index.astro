@@ -36,8 +36,9 @@ export const prerender = false;
 
 const GITHUB_USERNAME = 'LangstonW430';
 // Kept in sync with astro.config.mjs's linkedFileGuard calls by convention.
+// Transcript isn't linked from the homepage — /biographical-note/'s
+// Documents section carries both it and the résumé.
 const RESUME_PATH = '/resume.pdf';
-const TRANSCRIPT_PATH = '/transcript.pdf';
 
 const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
 const articles = publishedArticles(await getCollection('articles'));
@@ -205,15 +206,6 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 				</div>
 
 				{
-					!isUnwritten(profile.data.availability) && (
-						<div>
-							<dt class="field-label">Availability</dt>
-							<dd class="font-record font-typed text-md mt-hair text-stamp">{profile.data.availability}</dd>
-						</div>
-					)
-				}
-
-				{
 					!isUnwritten(profile.data.email) && (
 						<div>
 							<dt class="field-label">Email</dt>
@@ -230,44 +222,36 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 						<a href={RESUME_PATH} {...EXTERNAL_LINK_ATTRS}>Download (PDF)</a>
 					</dd>
 				</div>
-
-				<div>
-					<dt class="field-label">Transcript</dt>
-					<dd class="font-record font-typed text-md mt-hair">
-						<a href={TRANSCRIPT_PATH} {...EXTERNAL_LINK_ATTRS}>Download (PDF)</a>
-					</dd>
-				</div>
-
-				<div>
-					<dt class="field-label">GitHub</dt>
-					<dd class="font-record font-typed text-md mt-hair break-all">
-						<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS}>
-							{profile.data.githubProfile.replace('https://', '')}
-						</a>
-					</dd>
-				</div>
-
-				<div>
-					<dt class="field-label">Contact</dt>
-					<dd class="font-record font-typed text-md mt-hair">
-						<a href="/contact/">Get in touch</a>
-					</dd>
-				</div>
-
-				{
-					!isUnwritten(profile.data.services) && (
-						<div>
-							<dt class="field-label">Services</dt>
-							<dd class="font-record font-typed text-md mt-hair break-all">
-								<a href={profile.data.services} {...EXTERNAL_LINK_ATTRS}>
-									{profile.data.services.replace('https://', '')}
-								</a>
-							</dd>
-						</div>
-					)
-				}
 			</dl>
 		</section>
+
+		<!--
+			A second, smaller bar under the masthead card — not a fifth column
+			bolted onto the dl above it. These four are outbound destinations
+			(three genuinely external, Contact one page over) rather than facts
+			about Langston, which is the actual distinction the split draws: the
+			card states things, this bar sends a visitor somewhere.
+		-->
+		<nav aria-label="Elsewhere" class="mt-field bg-card border border-rule px-entry py-field">
+			<ul role="list" class="flex flex-wrap gap-x-entry gap-y-hair font-record font-typed text-sm">
+				<li>
+					<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS}>GitHub</a>
+				</li>
+				<li>
+					<a href={profile.data.linkedinProfile} {...EXTERNAL_LINK_ATTRS}>LinkedIn</a>
+				</li>
+				<li>
+					<a href="/contact/">Contact</a>
+				</li>
+				{
+					!isUnwritten(profile.data.services) && (
+						<li>
+							<a href={profile.data.services} {...EXTERNAL_LINK_ATTRS}>Freelance</a>
+						</li>
+					)
+				}
+			</ul>
+		</nav>
 
 		{
 			chronology.length > 0 && (

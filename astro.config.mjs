@@ -104,9 +104,14 @@ function fontGuard({ stylesheet = 'src/styles/global.css' } = {}) {
 export default defineConfig({
 	site: 'https://personal-site-sigma-bay.vercel.app',
 
-	// Static by default. The Vercel adapter is wired now only so the Phase 4
-	// GitHub instrument panel can become a server island without a config
-	// change. Nothing renders on demand today; every route is prerendered.
+	// Static by default. Every route prerenders except the register (`/`),
+	// which opts into on-demand rendering itself via `export const prerender
+	// = false` — the Vercel adapter below is what makes that legal. That one
+	// route renders the GitHub instrument panel server-side per request
+	// (cached at the edge for 5 minutes via a Cache-Control header, not via
+	// Astro's server islands — see src/pages/index.astro for why: server
+	// islands inject a client-side fetch to swap themselves in, which fails
+	// zero-client-JS, the more load-bearing constraint of the two).
 	output: 'static',
 	adapter: vercel(),
 

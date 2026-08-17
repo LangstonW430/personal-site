@@ -660,3 +660,50 @@ SVG, using these two fonts) and `@resvg/resvg-js` (SVG → PNG). Neither is
 imported by anything that ships to the browser — `output: 'static'`
 prerenders `/og/[id].png` at build time like every other route, so nothing
 renders an image at request time.
+
+## Phase 4: the register became one server route, on purpose
+
+The GitHub instrument panel brief specified `server:defer` — Astro server
+islands. They don't do what the brief assumed. Read straight from Astro
+7.2.2's own source
+(`node_modules/astro/dist/runtime/server/render/server-islands.js`): a
+`server:defer` component renders a placeholder, then Astro injects `<script
+type="module">` containing a literal `fetch('/_server-islands/{id}')` call
+that swaps the real content in once the response arrives. That's not
+configurable away — it's the mechanism. It directly contradicts zero-client-
+JS, which every phase of this project has treated as more load-bearing than
+any single implementation detail, so server islands were dropped rather than
+used as specified. (Confirmed with Langston before writing any panel code —
+see that conversation for the three options weighed.)
+
+**What replaced it:** `src/pages/index.astro` carries `export const
+prerender = false`. GitHub data is fetched in that page's own frontmatter —
+genuine server-side code, no hydration directive, so no island runtime and no
+script. A `Cache-Control: public, s-maxage=300, stale-while-revalidate=300`
+response header does the 5-minute caching at Vercel's edge instead of in an
+island's own cache layer — a visitor mid-window gets the cached HTML with no
+round trip to GitHub at all, and `stale-while-revalidate` means even the
+visitor who lands exactly as the cache expires gets the previous render
+instantly while the next one refreshes behind them, rather than blocking on
+a live fetch.
+
+**The cost, named plainly:** `/` is no longer a static file in `dist/`. It's
+the one Vercel serverless function in an otherwise fully static site. Every
+other route — every record, every accrual, the OG images, RSS, the sitemap,
+colophon, contact, 404 — is untouched and still prerendered exactly as
+before. This is a real, load-bearing deviation from "output stays 'static'"
+for one route, not a nuance; it's recorded here rather than left implicit in
+a commit message because a future phase re-reading "output: 'static'" in
+`astro.config.mjs` needs to know that line is no longer describing the whole
+site.
+
+**A real bug this surfaced, worth remembering:** the first implementation
+read the token via `import.meta.env.GITHUB_TOKEN`. Verified by building with
+a fake token value set — it got baked into the deployed function bundle as a
+literal string. Vite statically inlines `import.meta.env.*` at build time
+regardless of the `PUBLIC_` prefix convention suggesting otherwise; only
+`process.env.GITHUB_TOKEN` (bypassing `import.meta.env` entirely) reads the
+value fresh from Vercel's runtime on every invocation, verified the same
+way — build with a fake token, confirm it does *not* appear in the output.
+Anything server-only in this codebase that reads a secret should use
+`process.env`, not `import.meta.env`, on this evidence.

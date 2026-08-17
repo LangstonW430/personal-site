@@ -1,8 +1,8 @@
 ---
 /*
- * The register. Two panels: Recent Changes (a union of accessions, accrual
- * filings, and history entries — what keeps this from reading as an archive
- * nobody maintains) above the full list, in accession order.
+ * The register. Three panels above the list: the GitHub instrument panel,
+ * Recent Changes (a union of accessions, accrual filings, and history
+ * entries), then the full list in accession order.
  *
  * The list is tabular at md: and up (ACC. fixed left, content to the right,
  * hairline between entries), collapsing to labelled stacked fields below
@@ -12,14 +12,55 @@
  * `md:hidden` and its wrapper is `md:contents`, so at md: only the `dd`
  * participates in the row's grid — same value, same position, without two
  * different templates to maintain.
+ *
+ * `prerender = false`: this is the one route on the site that isn't static.
+ * `server:defer` was the brief's first idea, but Astro's actual server-island
+ * implementation injects a client-side `fetch` to swap the island in — that
+ * directly violates zero-client-JS, which is the more load-bearing
+ * constraint (see the commit message / conversation this phase was built
+ * in). SSR-ing this one route instead, with an HTTP cache-control header
+ * doing the 5-minute caching at the edge, gets a live GitHub readout with
+ * genuinely zero client JS, at the cost of `/` no longer being a static file
+ * in `dist/` — every other route is untouched.
  */
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import GithubPanel from '../components/GithubPanel.astro';
 import Time from '../components/Time.astro';
 import { formatExtent } from '../lib/format';
+import { fetchGithubPanel, repoAllowlist, type GithubPanelData } from '../lib/github';
+
+export const prerender = false;
+
+const GITHUB_USERNAME = 'LangstonW430';
 
 const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
 const articles = await getCollection('articles');
+
+const allowlist = repoAllowlist(records.map((record) => record.data.links.source));
+
+let githubData: GithubPanelData | null = null;
+try {
+	// `process.env`, not `import.meta.env` — Vite statically inlines
+	// `import.meta.env.X` at build time (verified: building with a fake
+	// GITHUB_TOKEN baked its literal value into the deployed function bundle),
+	// which is exactly wrong for a secret that has to be read fresh from
+	// Vercel's runtime environment on every invocation, rotatable without a
+	// rebuild. `process.env.GITHUB_TOKEN` is a genuine runtime lookup.
+	githubData = await fetchGithubPanel(GITHUB_USERNAME, allowlist, process.env.GITHUB_TOKEN);
+} catch {
+	// Unavailable — GithubPanel renders the honest "unavailable" state. The
+	// rest of the register is unaffected; nothing here re-throws.
+	githubData = null;
+}
+const githubCheckedAt = new Date();
+
+// 5-minute edge cache: a reload within the window is served from Vercel's
+// cache, not a fresh round trip to the GitHub API. `stale-while-revalidate`
+// means a visitor who lands right as the cache expires still gets the
+// previous (briefly stale) render instantly while the next one refreshes in
+// the background, rather than blocking on a live fetch.
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=300');
 
 const COLUMNS = 'md:grid-cols-[5rem_2fr_1.4fr_1.4fr_5.5rem]';
 
@@ -78,6 +119,8 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 >
 	<main id="main" class="px-entry py-register max-w-[75rem] mx-auto">
 		<h1 class="font-prose text-xl leading-display">Register</h1>
+
+		<GithubPanel data={githubData} checkedAt={githubCheckedAt} />
 
 		{
 			recentChanges.length > 0 && (

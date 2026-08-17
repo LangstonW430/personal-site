@@ -12,6 +12,7 @@ import { getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Time from '../../components/Time.astro';
 import { CHRONOLOGY_KIND_LABEL, sortedChronology } from '../../lib/content';
+import { EXTERNAL_LINK_ATTRS } from '../../lib/links';
 
 const profile = await getEntry('profile', 'profile');
 if (!profile) throw new Error('src/content/profile.yaml is missing or failed to load.');
@@ -79,10 +80,10 @@ const chronology = sortedChronology(profile.data.chronology);
 			<section class="mt-register">
 				<h2 class="field-label">Documents</h2>
 				<p class="font-record font-typed text-sm mt-field">
-					<a href={RESUME_PATH}>Download résumé (PDF)</a>
+					<a href={RESUME_PATH} {...EXTERNAL_LINK_ATTRS}>Download résumé (PDF)</a>
 				</p>
 				<p class="font-record font-typed text-sm mt-pair">
-					<a href={TRANSCRIPT_PATH}>Download transcript (PDF)</a>
+					<a href={TRANSCRIPT_PATH} {...EXTERNAL_LINK_ATTRS}>Download transcript (PDF)</a>
 				</p>
 			</section>
 		</article>

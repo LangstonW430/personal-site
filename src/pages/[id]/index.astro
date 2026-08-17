@@ -31,6 +31,7 @@ import Time from '../../components/Time.astro';
 import { formatExtent } from '../../lib/format';
 import { fetchReadme, parseGithubSource, type ReadmeData } from '../../lib/github';
 import { publishedArticles } from '../../lib/content';
+import { EXTERNAL_LINK_ATTRS } from '../../lib/links';
 
 export const prerender = false;
 
@@ -198,17 +199,22 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
 									<ul role="list" class="flex flex-col gap-hair mt-hair font-record font-typed text-sm">
 										{record.data.links.live && (
 											<li>
-												<a href={record.data.links.live}>Live</a>
+												<a href={record.data.links.live} {...EXTERNAL_LINK_ATTRS}>Live</a>
 											</li>
 										)}
 										{record.data.links.source && (
 											<li>
-												<a href={record.data.links.source}>Source</a>
+												<a href={record.data.links.source} {...EXTERNAL_LINK_ATTRS}>Source</a>
 											</li>
 										)}
 										{record.data.links.writeup && (
 											<li>
-												<a href={record.data.links.writeup}>Writeup</a>
+												<a
+													href={record.data.links.writeup}
+													{...(record.data.links.writeup.startsWith('/') ? {} : EXTERNAL_LINK_ATTRS)}
+												>
+													Writeup
+												</a>
 											</li>
 										)}
 									</ul>

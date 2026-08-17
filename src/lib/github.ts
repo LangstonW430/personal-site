@@ -120,6 +120,16 @@ function fixAnchorIds(html: string): string {
 	return html.replace(/\bid="user-content-/g, 'id="');
 }
 
+// Every genuine external link in a README (not the heading permalinks —
+// those are same-page hash jumps, href="#slug", which this pattern doesn't
+// match) opens in a new tab, same as every other external link on the
+// site. GitHub's own anchors put href first and consistently quote it with
+// ", so matching `<a href="http...` catches the real case without needing
+// a full HTML parser for content this well-structured.
+function externalizeLinks(html: string): string {
+	return html.replace(/<a href="(https?:\/\/[^"]+)"/g, '<a href="$1" target="_blank" rel="noopener noreferrer"');
+}
+
 /**
  * Fetches a repo's README pre-rendered to HTML by GitHub's own markdown
  * pipeline (`Accept: application/vnd.github.html+json`), rather than
@@ -158,7 +168,7 @@ export async function fetchReadme(
 		});
 		if (!response.ok) return null;
 
-		const html = fixAnchorIds((await response.text()).trim());
+		const html = externalizeLinks(fixAnchorIds((await response.text()).trim()));
 		return html ? { html } : null;
 	} catch {
 		return null;

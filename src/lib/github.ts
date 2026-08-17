@@ -28,19 +28,26 @@ export type GithubPanelData = {
 
 const GITHUB_SOURCE = /^https:\/\/github\.com\/([^/]+)\/([^/]+?)\/?$/;
 
+/** Parses a single `links.source` URL into (owner, repo), or null if it isn't a github.com repo URL. */
+export function parseGithubSource(source: string | undefined): { owner: string; repo: string } | null {
+	if (!source) return null;
+	const match = GITHUB_SOURCE.exec(source);
+	if (!match) return null;
+	const [, owner, repo] = match;
+	return { owner, repo };
+}
+
 /** Extracts (owner, repo) pairs from every record's `links.source`, in order, deduplicated. */
 export function repoAllowlist(sources: (string | undefined)[]): { owner: string; repo: string }[] {
 	const seen = new Set<string>();
 	const list: { owner: string; repo: string }[] = [];
 	for (const source of sources) {
-		if (!source) continue;
-		const match = GITHUB_SOURCE.exec(source);
-		if (!match) continue;
-		const [, owner, repo] = match;
-		const key = `${owner}/${repo}`;
+		const parsed = parseGithubSource(source);
+		if (!parsed) continue;
+		const key = `${parsed.owner}/${parsed.repo}`;
 		if (seen.has(key)) continue;
 		seen.add(key);
-		list.push({ owner, repo });
+		list.push(parsed);
 	}
 	return list;
 }
@@ -90,6 +97,57 @@ export async function fetchGithubPanel(
 				openIssues: r.open_issues_count,
 			})),
 		};
+	} finally {
+		clearTimeout(timer);
+	}
+}
+
+export type ReadmeData = {
+	html: string;
+};
+
+/**
+ * Fetches a repo's README pre-rendered to HTML by GitHub's own markdown
+ * pipeline (`Accept: application/vnd.github.html+json`), rather than
+ * bringing in a markdown parser as a dependency for something GitHub
+ * already renders correctly — GFM tables, task lists, and relative
+ * image/link resolution against the repo's default branch all come for
+ * free. This is the same HTML GitHub shows on the repo's own homepage, so
+ * embedding it via `set:html` carries no more trust risk than that already
+ * does — these are Langston's own repos, not arbitrary user content.
+ *
+ * Returns null rather than throwing on any failure (404, no README,
+ * private repo, rate limit, timeout) — the caller renders an honest
+ * "unavailable" state the same way the instrument panel does, not a crash.
+ */
+export async function fetchReadme(
+	owner: string,
+	repo: string,
+	token: string | undefined,
+): Promise<ReadmeData | null> {
+	const controller = new AbortController();
+	const timer = setTimeout(
+		() => controller.abort(new Error(`README fetch for ${owner}/${repo} timed out after ${TIMEOUT_MS}ms`)),
+		TIMEOUT_MS,
+	);
+
+	try {
+		const headers: Record<string, string> = {
+			Accept: 'application/vnd.github.html+json',
+			'X-GitHub-Api-Version': '2022-11-28',
+		};
+		if (token) headers.Authorization = `Bearer ${token}`;
+
+		const response = await fetch(`${GITHUB_API}/repos/${owner}/${repo}/readme`, {
+			headers,
+			signal: controller.signal,
+		});
+		if (!response.ok) return null;
+
+		const html = (await response.text()).trim();
+		return html ? { html } : null;
+	} catch {
+		return null;
 	} finally {
 		clearTimeout(timer);
 	}

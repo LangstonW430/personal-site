@@ -11,48 +11,81 @@
  * `order` and `featured` are sort/promotion mechanics with no field label in
  * CLAUDE.md's vocabulary, so they drive behavior elsewhere and are not
  * printed here.
+ *
+ * `prerender = false`: the second dynamic route on the site, after `/`. A
+ * record with a github.com `links.source` gets its README fetched live
+ * (same instrument-panel pattern as the homepage — LIVE/UNAVAILABLE stamp,
+ * 5-minute edge cache) so an update to the actual repo shows up here without
+ * a rebuild. That live fetch is genuinely per-request, so the whole route
+ * has to be SSR — Astro's static/dynamic switch is per source file, not per
+ * generated path, and a dynamic `[id]` can't prerender five records while
+ * SSR-ing three others. The other five records pay for this in build-output
+ * purity only: nothing observable changes for a visitor, they're still
+ * served fast, just via the same Vercel function as every other record now
+ * instead of a static file.
  */
-import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { getCollection, getEntry, render, type CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import NotFoundRecord from '../../components/NotFoundRecord.astro';
 import Time from '../../components/Time.astro';
 import { formatExtent } from '../../lib/format';
+import { fetchReadme, parseGithubSource, type ReadmeData } from '../../lib/github';
 
-export async function getStaticPaths() {
-	const [records, articles] = await Promise.all([getCollection('records'), getCollection('articles')]);
+export const prerender = false;
 
-	return records.map((record) => {
-		const accruals = articles
-			.filter((article) => article.data.record === record.data.acc)
-			.map((article) => ({ article, slug: article.id.slice(article.id.indexOf('/') + 1) }))
-			.sort((a, b) => a.article.data.note - b.article.data.note);
+const id = Astro.params.id;
+const record = id ? await getEntry('records', id) : undefined;
 
-		return {
-			params: { id: record.id },
-			props: { record, accruals },
-		};
-	});
+// Astro won't let an on-demand route rewrite to a prerendered one
+// (404.astro stays static, matching Vercel's own not-found handling for
+// URLs outside every route pattern) — so a record id that matches nothing
+// renders the same NotFoundRecord content directly, at this URL, with a
+// real 404 status, instead of rewriting to /404.
+if (!record) Astro.response.status = 404;
+
+let accruals: { article: CollectionEntry<'articles'>; slug: string }[] = [];
+let Content: Awaited<ReturnType<typeof render>>['Content'] | null = null;
+let extent: string | null = null;
+let hasLinks = false;
+let githubSource: ReturnType<typeof parseGithubSource> = null;
+let readme: ReadmeData | null = null;
+
+if (record) {
+	const articles = await getCollection('articles');
+	accruals = articles
+		.filter((article) => article.data.record === record.data.acc)
+		.map((article) => ({ article, slug: article.id.slice(article.id.indexOf('/') + 1) }))
+		.sort((a, b) => a.article.data.note - b.article.data.note);
+
+	({ Content } = await render(record));
+
+	extent = formatExtent(record.data.extent);
+	hasLinks = Boolean(record.data.links.live || record.data.links.source || record.data.links.writeup);
+
+	githubSource = parseGithubSource(record.data.links.source);
+	if (githubSource) {
+		// Same rationale as index.astro's own GITHUB_TOKEN read: process.env,
+		// not import.meta.env, because this has to be a genuine runtime lookup
+		// rather than a value Vite bakes into the build.
+		readme = await fetchReadme(githubSource.owner, githubSource.repo, process.env.GITHUB_TOKEN);
+	}
 }
+const readmeCheckedAt = new Date();
 
-interface Props {
-	record: CollectionEntry<'records'>;
-	accruals: { article: CollectionEntry<'articles'>; slug: string }[];
-}
-
-const { record, accruals } = Astro.props;
-const { Content } = await render(record);
-
-const extent = formatExtent(record.data.extent);
-const hasLinks = Boolean(record.data.links.live || record.data.links.source || record.data.links.writeup);
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=300');
 ---
 
 <Base
-	title={`ACC. ${record.data.acc} — ${record.data.title}`}
-	description={record.data.summary}
-	path={`/${record.id}/`}
-	image={`/og/${record.id}.png`}
+	title={record ? `ACC. ${record.data.acc} — ${record.data.title}` : '404 — Langston'}
+	description={record ? record.data.summary : 'No record at this address.'}
+	path={record ? `/${record.id}/` : Astro.url.pathname}
+	image={record ? `/og/${record.id}.png` : undefined}
 >
 	<main id="main" class="px-entry py-register max-w-[62rem] mx-auto">
-		<p class="no-print"><a href="/work/">&larr; Register</a></p>
+		<p class="no-print"><a href={record ? '/work/' : '/'}>&larr; {record ? 'Register' : 'Home'}</a></p>
+
+		{!record && <NotFoundRecord />}
+		{record && (
 
 		<article>
 			<header>
@@ -184,9 +217,7 @@ const hasLinks = Boolean(record.data.links.live || record.data.links.source || r
 					}
 				</dl>
 
-				<div class="font-prose leading-prose max-w-[62ch]">
-					<Content />
-				</div>
+				<div class="font-prose leading-prose max-w-[62ch]">{Content && <Content />}</div>
 			</div>
 
 			{
@@ -212,6 +243,33 @@ const hasLinks = Boolean(record.data.links.live || record.data.links.source || r
 					</section>
 				)
 			}
+
+			{
+				githubSource && (
+					<section class="mt-register bg-card border border-rule p-entry">
+						<div class="flex items-baseline justify-between flex-wrap gap-field">
+							<p class="field-label">README</p>
+							<p class="font-record font-typed text-xs text-stamp">{readme ? 'LIVE' : 'UNAVAILABLE'}</p>
+						</div>
+
+						{
+							readme ? (
+								<details class="mt-field">
+									<summary class="cursor-pointer font-record font-typed text-sm">
+										{githubSource.owner}/{githubSource.repo}
+									</summary>
+									<div class="readme-content font-prose leading-prose mt-entry max-w-[62ch]" set:html={readme.html} />
+								</details>
+							) : (
+								<p class="font-record font-typed text-sm mt-field">
+									Unavailable. Checked <Time date={readmeCheckedAt} />.
+								</p>
+							)
+						}
+					</section>
+				)
+			}
 		</article>
+		)}
 	</main>
 </Base>

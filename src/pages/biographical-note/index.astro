@@ -11,7 +11,7 @@
 import { getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Time from '../../components/Time.astro';
-import { isUnwritten } from '../../lib/content';
+import { CHRONOLOGY_KIND_LABEL, sortedChronology } from '../../lib/content';
 
 const profile = await getEntry('profile', 'profile');
 if (!profile) throw new Error('src/content/profile.yaml is missing or failed to load.');
@@ -22,22 +22,7 @@ if (!profile) throw new Error('src/content/profile.yaml is missing or failed to 
 // pipeline.
 const RESUME_PATH = '/resume.pdf';
 
-const KIND_LABEL: Record<string, string> = {
-	education: 'Education',
-	freelance: 'Freelance',
-	employment: 'Employment',
-};
-
-// An entry whose note is still the sentinel isn't a real entry yet — it
-// doesn't render at all, same rule as every other short field on the site.
-const chronology = profile.data.chronology
-	.filter((entry) => !isUnwritten(entry.note))
-	.sort((a, b) => {
-		if (!a.date && !b.date) return 0;
-		if (!a.date) return -1;
-		if (!b.date) return 1;
-		return b.date.getTime() - a.date.getTime();
-	});
+const chronology = sortedChronology(profile.data.chronology);
 ---
 
 <Base
@@ -66,7 +51,7 @@ const chronology = profile.data.chronology
 						<ul role="list" class="mt-entry flex flex-col gap-field">
 							{chronology.map((entry) => (
 								<li class="border-b border-rule pb-field">
-									<p class="field-label">{KIND_LABEL[entry.kind]}</p>
+									<p class="field-label">{CHRONOLOGY_KIND_LABEL[entry.kind]}</p>
 									<p class="font-record font-typed text-sm mt-hair">
 										{entry.date ? <Time date={entry.date} /> : 'Date TBD'} — {entry.note}
 									</p>

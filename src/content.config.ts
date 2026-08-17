@@ -328,6 +328,7 @@ const profile = defineCollection({
 		// the same way `availability` already does.
 		degree: z.string().min(1),
 		graduation: z.string().min(1),
+		gpa: z.string().min(1),
 		email: z.string().min(1),
 
 		// Real and always present — the account this whole site's GitHub panel

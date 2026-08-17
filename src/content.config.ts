@@ -336,6 +336,7 @@ const profile = defineCollection({
 		// already reads from — so this is the one contact-adjacent field with
 		// no unwritten state to handle.
 		githubProfile: z.url(),
+		linkedinProfile: z.url(),
 
 		// The live field — never a decoration. Prose, not a status enum,
 		// because "current availability" doesn't collapse cleanly into a

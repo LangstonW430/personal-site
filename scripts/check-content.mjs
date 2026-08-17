@@ -10,8 +10,11 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const ROOT = new URL('..', import.meta.url).pathname;
-const SEARCH_DIRS = ['src/content/records', 'src/pages'];
-const EXTENSIONS = ['.mdx', '.astro'];
+// src/content, not src/content/records: profile.yaml (the masthead and
+// /biographical-note/'s source) lives directly under src/content/, one level
+// above the records/ collection, and carries its own [[UNWRITTEN]] fields.
+const SEARCH_DIRS = ['src/content', 'src/pages'];
+const EXTENSIONS = ['.mdx', '.astro', '.yaml', '.yml'];
 const SENTINEL = '[[UNWRITTEN]]';
 
 function* walk(dir) {

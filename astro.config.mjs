@@ -100,6 +100,49 @@ function fontGuard({ stylesheet = 'src/styles/global.css' } = {}) {
 	};
 }
 
+/**
+ * Fails the build when the résumé PDF linked from /biographical-note/ is not
+ * in `public/`.
+ *
+ * Same shape as `fontGuard`, and for the same reason: a missing file here has
+ * no error state of its own. The link still renders, still looks clickable,
+ * and quietly 404s — the single worst broken link on this site, because it's
+ * the one a recruiter hits at exactly the moment they decided to act, and the
+ * one nobody browsing the register would ever stumble onto to notice is dead.
+ *
+ * @param {{ file?: string }} [options]
+ * @returns {import('astro').AstroIntegration}
+ */
+function resumeGuard({ file = 'resume.pdf' } = {}) {
+	/** @type {import('astro').AstroConfig | undefined} */
+	let resolved;
+
+	/** @param {import('astro').AstroConfig} config */
+	const isMissing = (config) => !existsSync(join(fileURLToPath(config.publicDir), file));
+
+	const report = () =>
+		`resume-guard: public/${file} is missing. It's linked from /biographical-note/ — a ` +
+		`missing résumé does not error at runtime, the link just renders and 404s. Add the ` +
+		`file, or update the path in both astro.config.mjs's resumeGuard and ` +
+		`src/pages/biographical-note/index.astro (the two are not linked by import, only by ` +
+		`convention, the same way global.css's @font-face paths and font-guard agree).`;
+
+	return {
+		name: 'resume-guard',
+		hooks: {
+			'astro:config:done': ({ config }) => {
+				resolved = config;
+			},
+			'astro:build:start': () => {
+				if (resolved && isMissing(resolved)) throw new Error(report());
+			},
+			'astro:server:start': ({ logger }) => {
+				if (resolved && isMissing(resolved)) logger.warn(report());
+			},
+		},
+	};
+}
+
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://personal-site-sigma-bay.vercel.app',
@@ -118,6 +161,7 @@ export default defineConfig({
 	integrations: [
 		mdx(),
 		fontGuard(),
+		resumeGuard(),
 		// Excludes /og/*.png — those are build artifacts (the OG image
 		// endpoint), not pages, and don't belong in a page sitemap.
 		sitemap({

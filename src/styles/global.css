@@ -346,6 +346,38 @@
 	.readme-content :where(h3, h4, h5, h6) {
 		font-size: var(--text-base);
 	}
+	/* GitHub gives every heading a permalink icon (class="anchor", wrapping
+	 * an octicon), hidden until the heading is hovered or the icon itself is
+	 * focused — github.com's own CSS, which none of this HTML carries.
+	 * Without it the icon just sits there permanently, which is what showed
+	 * up here before this rule existed. Opacity, not visibility or display,
+	 * so it stays in the keyboard tab order — a sighted mouse user hovers to
+	 * reveal it, a keyboard user tabs to it and gets the same reveal. */
+	.readme-content :where(h1, h2, h3, h4, h5, h6) a.anchor {
+		opacity: 0;
+		text-decoration: none;
+		transition: opacity 0.1s ease;
+	}
+	.readme-content :where(h1, h2, h3, h4, h5, h6):hover a.anchor,
+	.readme-content a.anchor:focus-visible {
+		opacity: 1;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.readme-content a.anchor {
+			transition: none;
+		}
+	}
+	/* Preflight resets every link on the site to color:inherit with no
+	 * underline — deliberate everywhere else, but this block is presented as
+	 * GitHub's own rendering, not this site's prose, so it gets GitHub's
+	 * convention back: a link reads as a link. `stamp` is off the table for
+	 * this — CLAUDE.md caps it at roughly four uses per page and a README's
+	 * links alone can run past that — so this uses `ink` the same way the
+	 * print stylesheet already resolves link color for the whole site. */
+	.readme-content :where(a):not(.anchor) {
+		color: var(--color-ink);
+		text-decoration: underline;
+	}
 	.readme-content :where(p, ul, ol, table, blockquote, pre) + :where(p, ul, ol, table, blockquote, pre) {
 		margin-top: var(--spacing-field);
 	}

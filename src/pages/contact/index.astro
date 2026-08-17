@@ -48,6 +48,16 @@ const hasEmail = !isUnwritten(profile.data.email);
 								</dd>
 							</div>
 						)}
+						{!isUnwritten(profile.data.services) && (
+							<div>
+								<dt class="field-label">Services</dt>
+								<dd class="font-record font-typed text-sm leading-record">
+									<a href={profile.data.services} {...EXTERNAL_LINK_ATTRS}>
+										{profile.data.services.replace('https://', '')}
+									</a>
+								</dd>
+							</div>
+						)}
 					</dl>
 				)
 			}

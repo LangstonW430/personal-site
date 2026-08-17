@@ -151,7 +151,14 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 	path="/"
 >
 	<main id="main" class="px-entry py-register max-w-[75rem] mx-auto">
-		<h1 class="font-prose text-xl leading-display">{profile.data.name}</h1>
+		<div class="flex items-baseline justify-between flex-wrap gap-x-entry gap-y-hair">
+			<h1 class="font-prose text-xl leading-display">{profile.data.name}</h1>
+			<p class="font-record font-typed text-sm">
+				<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS}>GitHub</a> ·{' '}
+				<a href={profile.data.linkedinProfile} {...EXTERNAL_LINK_ATTRS}>LinkedIn</a> ·{' '}
+				<a href="/contact/">Contact</a>
+			</p>
+		</div>
 
 		<!--
 			The masthead. Passport-page density: labelled fields, nothing
@@ -224,34 +231,6 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 				</div>
 			</dl>
 		</section>
-
-		<!--
-			A second, smaller bar under the masthead card — not a fifth column
-			bolted onto the dl above it. These four are outbound destinations
-			(three genuinely external, Contact one page over) rather than facts
-			about Langston, which is the actual distinction the split draws: the
-			card states things, this bar sends a visitor somewhere.
-		-->
-		<nav aria-label="Elsewhere" class="mt-field bg-card border border-rule px-entry py-field">
-			<ul role="list" class="flex flex-wrap gap-x-entry gap-y-hair font-record font-typed text-sm">
-				<li>
-					<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS}>GitHub</a>
-				</li>
-				<li>
-					<a href={profile.data.linkedinProfile} {...EXTERNAL_LINK_ATTRS}>LinkedIn</a>
-				</li>
-				<li>
-					<a href="/contact/">Contact</a>
-				</li>
-				{
-					!isUnwritten(profile.data.services) && (
-						<li>
-							<a href={profile.data.services} {...EXTERNAL_LINK_ATTRS}>Freelance</a>
-						</li>
-					)
-				}
-			</ul>
-		</nav>
 
 		{
 			chronology.length > 0 && (

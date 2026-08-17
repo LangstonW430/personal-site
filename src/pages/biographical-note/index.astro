@@ -16,11 +16,12 @@ import { CHRONOLOGY_KIND_LABEL, sortedChronology } from '../../lib/content';
 const profile = await getEntry('profile', 'profile');
 if (!profile) throw new Error('src/content/profile.yaml is missing or failed to load.');
 
-// Kept in sync with astro.config.mjs's resumeGuard by convention — same
-// pattern as the font paths in global.css and font-guard: hardcoded in both
-// places, not imported, because astro.config.mjs runs outside the src/ Vite
-// pipeline.
+// Kept in sync with astro.config.mjs's linkedFileGuard calls by convention —
+// same pattern as the font paths in global.css and font-guard: hardcoded in
+// both places, not imported, because astro.config.mjs runs outside the src/
+// Vite pipeline.
 const RESUME_PATH = '/resume.pdf';
+const TRANSCRIPT_PATH = '/transcript.pdf';
 
 const chronology = sortedChronology(profile.data.chronology);
 ---
@@ -63,9 +64,12 @@ const chronology = sortedChronology(profile.data.chronology);
 			}
 
 			<section class="mt-register">
-				<h2 class="field-label">Resume</h2>
+				<h2 class="field-label">Documents</h2>
 				<p class="font-record font-typed text-sm mt-field">
 					<a href={RESUME_PATH}>Download résumé (PDF)</a>
+				</p>
+				<p class="font-record font-typed text-sm mt-pair">
+					<a href={TRANSCRIPT_PATH}>Download transcript (PDF)</a>
 				</p>
 			</section>
 		</article>

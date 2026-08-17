@@ -3,29 +3,35 @@
 # (CLAUDE.md's own project description; the GitHub account the panel on `/`
 # already reads from) — not invented here.
 #
-# `name` is still a placeholder: every mention of Langston anywhere in this
-# project's context is first-name-only, no surname anywhere to draw from.
-# The homepage's <h1> needs the real full name — replace this the moment
-# it's available, nothing else in this file depends on it.
-#
 # Every field below carrying the literal [[UNWRITTEN]] string renders as
 # absent, not as that text — see src/lib/content.ts's isUnwritten(). Fill in
 # a real value and it appears; nothing else has to change.
 
-name: Langston
+name: Langston Woods
 role: CS student & freelance web developer
 location: Rochester, N.Y.
 institution: University of Rochester
 githubProfile: https://github.com/LangstonW430
 
-degree: "[[UNWRITTEN]]"
-graduation: "[[UNWRITTEN]]"
-gpa: "[[UNWRITTEN]]"
-email: "[[UNWRITTEN]]"
+degree: "B.S. Computer Science, AI Concentration; Math Minor"
+graduation: "May 2029"
+# Cumulative and major GPA read from the same field — the register's own
+# " · " join for a multi-part metadata value (medium.join(' · '), extent's
+# "commits · duration"), not a second GPA field.
+gpa: "3.6 overall · 3.9 major"
+email: "langstonw430@gmail.com"
 availability: "[[UNWRITTEN]]"
 
 chronology:
-  - kind: education
-    note: "[[UNWRITTEN]]"
-  - kind: freelance
-    note: "[[UNWRITTEN]]"
+  - date: 2022-06-01
+    kind: employment
+    note: "Academic Intervention Specialist, Vertus High School — one-on-one and small-group math/science support for 25+ students per summer session"
+  - date: 2025-08-25
+    kind: education
+    note: "Enrolled at the University of Rochester, B.S. Computer Science (AI concentration), Math minor — expected May 2029"
+  - date: 2026-04-01
+    kind: freelance
+    note: "Founded Langston Woods Software Services — freelance web development on Astro, Netlify, and Sveltia CMS; shipped production sites for 3 small-business clients"
+  - date: 2026-06-01
+    kind: employment
+    note: "Marketing and AI Intern, Thomas Media Group — AI-powered workflow automation with n8n and the Google Cloud SDK across CRM, project management, and design tooling"

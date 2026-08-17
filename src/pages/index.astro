@@ -32,7 +32,9 @@ import { CHRONOLOGY_KIND_LABEL, isUnwritten, sortedChronology } from '../lib/con
 export const prerender = false;
 
 const GITHUB_USERNAME = 'LangstonW430';
-const RESUME_PATH = '/resume.pdf'; // kept in sync with astro.config.mjs's resumeGuard by convention
+// Kept in sync with astro.config.mjs's linkedFileGuard calls by convention.
+const RESUME_PATH = '/resume.pdf';
+const TRANSCRIPT_PATH = '/transcript.pdf';
 
 const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
 const articles = await getCollection('articles');
@@ -220,6 +222,13 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 					<dt class="field-label">Resume</dt>
 					<dd class="font-record font-typed text-md mt-hair">
 						<a href={RESUME_PATH}>Download (PDF)</a>
+					</dd>
+				</div>
+
+				<div>
+					<dt class="field-label">Transcript</dt>
+					<dd class="font-record font-typed text-md mt-hair">
+						<a href={TRANSCRIPT_PATH}>Download (PDF)</a>
 					</dd>
 				</div>
 

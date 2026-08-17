@@ -101,8 +101,8 @@ function fontGuard({ stylesheet = 'src/styles/global.css' } = {}) {
 }
 
 /**
- * Fails the build when the résumé PDF linked from /biographical-note/ is not
- * in `public/`.
+ * Fails the build when a PDF linked from /biographical-note/ (résumé,
+ * transcript) is not in `public/`.
  *
  * Same shape as `fontGuard`, and for the same reason: a missing file here has
  * no error state of its own. The link still renders, still looks clickable,
@@ -110,10 +110,13 @@ function fontGuard({ stylesheet = 'src/styles/global.css' } = {}) {
  * the one a recruiter hits at exactly the moment they decided to act, and the
  * one nobody browsing the register would ever stumble onto to notice is dead.
  *
- * @param {{ file?: string }} [options]
+ * One function, called once per document: a second document (the transcript)
+ * is the same failure mode as the first, not a new one.
+ *
+ * @param {{ file: string, label: string }} options
  * @returns {import('astro').AstroIntegration}
  */
-function resumeGuard({ file = 'resume.pdf' } = {}) {
+function linkedFileGuard({ file, label }) {
 	/** @type {import('astro').AstroConfig | undefined} */
 	let resolved;
 
@@ -121,14 +124,14 @@ function resumeGuard({ file = 'resume.pdf' } = {}) {
 	const isMissing = (config) => !existsSync(join(fileURLToPath(config.publicDir), file));
 
 	const report = () =>
-		`resume-guard: public/${file} is missing. It's linked from /biographical-note/ — a ` +
-		`missing résumé does not error at runtime, the link just renders and 404s. Add the ` +
-		`file, or update the path in both astro.config.mjs's resumeGuard and ` +
+		`linked-file-guard: public/${file} is missing. It's linked from /biographical-note/ — a ` +
+		`missing ${label} does not error at runtime, the link just renders and 404s. Add the ` +
+		`file, or update the path in both astro.config.mjs's linkedFileGuard call and ` +
 		`src/pages/biographical-note/index.astro (the two are not linked by import, only by ` +
 		`convention, the same way global.css's @font-face paths and font-guard agree).`;
 
 	return {
-		name: 'resume-guard',
+		name: `linked-file-guard:${file}`,
 		hooks: {
 			'astro:config:done': ({ config }) => {
 				resolved = config;
@@ -161,7 +164,8 @@ export default defineConfig({
 	integrations: [
 		mdx(),
 		fontGuard(),
-		resumeGuard(),
+		linkedFileGuard({ file: 'resume.pdf', label: 'résumé' }),
+		linkedFileGuard({ file: 'transcript.pdf', label: 'transcript' }),
 		// Excludes /og/*.png — those are build artifacts (the OG image
 		// endpoint), not pages, and don't belong in a page sitemap.
 		sitemap({

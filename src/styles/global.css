@@ -119,6 +119,18 @@
 	--spacing-entry:    1.5rem;  /* padding inside a record; entry to entry */
 	--spacing-register: 3rem;    /* record to record; subsection break */
 	--spacing-section:  6rem;    /* one movement of the page to the next */
+
+	/* Zero is not a pick from the numeric scale the wipe above killed — it's
+	 * the one value with no arbitrary choice in it, needed for `inset-0` on
+	 * every full-row overlay link (register rows, article accruals) and for
+	 * `mt-0`/`pb-0` resets at the md: breakpoint. Without this, Tailwind
+	 * silently drops the whole `inset-0` declaration (no `--spacing` to
+	 * resolve `calc(var(--spacing) * 0)` against), which doesn't error — it
+	 * just leaves the overlay anchor at 0×0px, invisible and unclickable.
+	 * `--spacing-0` alone does not reopen `p-4`/`gap-2`: verified in the
+	 * build output that only the `-0` utilities compile, nothing else in the
+	 * numeric scale. */
+	--spacing-0: 0px;
 }
 
 /* ---------------------------------------------------------------------------

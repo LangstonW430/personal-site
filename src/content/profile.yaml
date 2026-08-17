@@ -1,13 +1,26 @@
-# The masthead and /biographical-note/ both read this file. Name, role, and
-# location are already-established facts stated in CLAUDE.md's own project
-# description — not invented here. Availability and every chronology note
-# are [[UNWRITTEN]]: current availability, a degree, a graduation date, and
-# any employment are Langston's facts to state, not this build's to guess.
+# The masthead and /biographical-note/ both read this file. Name, role,
+# location, institution, and githubProfile are already-established facts
+# (CLAUDE.md's own project description; the GitHub account the panel on `/`
+# already reads from) — not invented here.
+#
+# `name` is still a placeholder: every mention of Langston anywhere in this
+# project's context is first-name-only, no surname anywhere to draw from.
+# The homepage's <h1> needs the real full name — replace this the moment
+# it's available, nothing else in this file depends on it.
+#
+# Every field below carrying the literal [[UNWRITTEN]] string renders as
+# absent, not as that text — see src/lib/content.ts's isUnwritten(). Fill in
+# a real value and it appears; nothing else has to change.
 
 name: Langston
 role: CS student & freelance web developer
 location: Rochester, N.Y.
+institution: University of Rochester
+githubProfile: https://github.com/LangstonW430
 
+degree: "[[UNWRITTEN]]"
+graduation: "[[UNWRITTEN]]"
+email: "[[UNWRITTEN]]"
 availability: "[[UNWRITTEN]]"
 
 chronology:

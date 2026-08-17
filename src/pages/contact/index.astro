@@ -1,8 +1,18 @@
 ---
-/* Structure only — the actual contact channel is Langston's call, not
- * something to invent on his behalf, so the value itself stays [[UNWRITTEN]]
- * alongside the prose. */
+/* The intro prose is still Langston's to write — [[UNWRITTEN]] stays visible
+ * there, same as every other body paragraph on the site. The channel
+ * fields below are different: a short field left unwritten now hides
+ * entirely rather than showing the sentinel, and both read from the same
+ * profile.yaml the masthead does, so this page can't state a different
+ * email than the one on the register. */
+import { getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import { isUnwritten } from '../../lib/content';
+
+const profile = await getEntry('profile', 'profile');
+if (!profile) throw new Error('src/content/profile.yaml is missing or failed to load.');
+
+const hasEmail = !isUnwritten(profile.data.email);
 ---
 
 <Base title="Contact — Langston" description="Get in touch." path="/contact/">
@@ -18,16 +28,28 @@ import Base from '../../layouts/Base.astro';
 				</p>
 			</header>
 
-			<dl class="mt-register bg-card border border-rule p-entry flex flex-col gap-field max-w-[24rem]">
-				<div>
-					<dt class="field-label">Email</dt>
-					<dd class="font-record font-typed text-sm leading-record">[[UNWRITTEN]]</dd>
-				</div>
-				<div>
-					<dt class="field-label">Elsewhere</dt>
-					<dd class="font-record font-typed text-sm leading-record">[[UNWRITTEN]]</dd>
-				</div>
-			</dl>
+			{
+				(hasEmail || profile.data.githubProfile) && (
+					<dl class="mt-register bg-card border border-rule p-entry flex flex-col gap-field max-w-[24rem]">
+						{hasEmail && (
+							<div>
+								<dt class="field-label">Email</dt>
+								<dd class="font-record font-typed text-sm leading-record">
+									<a href={`mailto:${profile.data.email}`}>{profile.data.email}</a>
+								</dd>
+							</div>
+						)}
+						{profile.data.githubProfile && (
+							<div>
+								<dt class="field-label">Elsewhere</dt>
+								<dd class="font-record font-typed text-sm leading-record">
+									<a href={profile.data.githubProfile}>GitHub</a>
+								</dd>
+							</div>
+						)}
+					</dl>
+				)
+			}
 		</article>
 	</main>
 </Base>

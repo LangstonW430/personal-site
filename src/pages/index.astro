@@ -1,38 +1,35 @@
 ---
 /*
- * The register. Three panels above the list: the GitHub instrument panel,
- * Recent Changes (a union of accessions, accrual filings, and history
- * entries), then the full list in accession order.
+ * The homepage answers "who is this and can he do the job" before it
+ * answers "what is this document." Name is the <h1>; "Register" is a
+ * section label in field typography, same as any other column header — the
+ * table earned that demotion, it's still good, it just isn't the first
+ * thing a stranger needs to know.
  *
- * The list is tabular at md: and up (ACC. fixed left, content to the right,
- * hairline between entries), collapsing to labelled stacked fields below
- * that — a standard responsive-table reflow, not "the rail," so it doesn't
- * carry the same identity risk the record page's rail does. Each per-field
- * label/value pair is real `<dl>`/`<dt>`/`<dd>` markup: the `dt` is
- * `md:hidden` and its wrapper is `md:contents`, so at md: only the `dd`
- * participates in the row's grid — same value, same position, without two
- * different templates to maintain.
+ * Order: masthead, register label, the table, then GitHub and Recent
+ * Changes — both instruments about the work, which only mean something
+ * once a visitor already knows there's work to look at.
  *
  * `prerender = false`: this is the one route on the site that isn't static.
  * `server:defer` was the brief's first idea, but Astro's actual server-island
  * implementation injects a client-side `fetch` to swap the island in — that
  * directly violates zero-client-JS, which is the more load-bearing
- * constraint (see the commit message / conversation this phase was built
- * in). SSR-ing this one route instead, with an HTTP cache-control header
- * doing the 5-minute caching at the edge, gets a live GitHub readout with
- * genuinely zero client JS, at the cost of `/` no longer being a static file
- * in `dist/` — every other route is untouched.
+ * constraint. SSR-ing this one route instead, with an HTTP cache-control
+ * header doing the 5-minute caching at the edge, gets a live GitHub readout
+ * with genuinely zero client JS, at the cost of `/` no longer being a static
+ * file in `dist/` — every other route is untouched.
  */
 import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import GithubPanel from '../components/GithubPanel.astro';
 import Time from '../components/Time.astro';
-import { formatExtent } from '../lib/format';
 import { fetchGithubPanel, repoAllowlist, type GithubPanelData } from '../lib/github';
+import { isUnwritten } from '../lib/content';
 
 export const prerender = false;
 
 const GITHUB_USERNAME = 'LangstonW430';
+const RESUME_PATH = '/resume.pdf'; // kept in sync with astro.config.mjs's resumeGuard by convention
 
 const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
 const articles = await getCollection('articles');
@@ -64,7 +61,12 @@ const githubCheckedAt = new Date();
 // the background, rather than blocking on a live fetch.
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=300');
 
-const COLUMNS = 'md:grid-cols-[5rem_2fr_1.4fr_1.4fr_5.5rem]';
+// EXTENT dropped from this table entirely (kept LOC-free, still) — four of
+// eight records had no measured extent, and an active record's "duration"
+// has no honest value until it ships, so a real dash on real work is worse
+// than the column not existing here. It stays on record pages, where an
+// absent value already reads as "not measured yet" rather than "missing."
+const COLUMNS = 'md:grid-cols-[5rem_1fr_1.3fr_5.5rem]';
 
 type Change = {
 	date: Date;
@@ -75,78 +77,203 @@ type Change = {
 
 const recordByAcc = new Map(records.map((record) => [record.data.acc, record]));
 
+// This site's own build history (2026.08) is excluded from the homepage's
+// Recent Changes — it belongs on that record's page. A homepage whose most
+// recent activity is all about itself isn't evidence of anything else.
+const SELF_ACC = '2026.08';
+
 const changes: Change[] = [
-	...records.map(
-		(record): Change => ({
-			date: record.data.acquired,
-			kind: 'Accessioned',
-			label: `${record.data.acc} — ${record.data.title}`,
-			href: `/${record.id}/`,
-		}),
-	),
-	...records.flatMap((record) =>
-		(record.data.history ?? []).map(
-			(entry): Change => ({
-				date: entry.date,
-				kind: 'Revised',
-				label: `${record.data.acc} — ${entry.note}`,
+	...records
+		.filter((record) => record.data.acc !== SELF_ACC)
+		.map(
+			(record): Change => ({
+				date: record.data.acquired,
+				kind: 'Accessioned',
+				label: `${record.data.acc} — ${record.data.title}`,
 				href: `/${record.id}/`,
 			}),
 		),
-	),
-	...articles.flatMap((article): Change[] => {
-		const parent = recordByAcc.get(article.data.record);
-		if (!parent) return [];
-		const slug = article.id.slice(article.id.indexOf('/') + 1);
-		return [
-			{
-				date: article.data.filed,
-				kind: 'Filed',
-				label: `${parent.data.acc}, note ${article.data.note} — ${article.data.title}`,
-				href: `/${parent.id}/${slug}/`,
-			},
-		];
-	}),
+	...records
+		.filter((record) => record.data.acc !== SELF_ACC)
+		.flatMap((record) =>
+			(record.data.history ?? []).map(
+				(entry): Change => ({
+					date: entry.date,
+					kind: 'Revised',
+					label: `${record.data.acc} — ${entry.note}`,
+					href: `/${record.id}/`,
+				}),
+			),
+		),
+	...articles
+		.filter((article) => article.data.record !== SELF_ACC)
+		.flatMap((article): Change[] => {
+			const parent = recordByAcc.get(article.data.record);
+			if (!parent) return [];
+			const slug = article.id.slice(article.id.indexOf('/') + 1);
+			return [
+				{
+					date: article.data.filed,
+					kind: 'Filed',
+					label: `${parent.data.acc}, note ${article.data.note} — ${article.data.title}`,
+					href: `/${parent.id}/${slug}/`,
+				},
+			];
+		}),
 ];
 
 changes.sort((a, b) => b.date.getTime() - a.date.getTime());
-const RECENT_CHANGES_LIMIT = 8;
+const RECENT_CHANGES_LIMIT = 5;
 const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 ---
 
 <Base
-	title="Langston — register of works"
+	title={`${profile.data.name} — register of works`}
 	description="A register of software and web development work: accession number, medium, extent, and condition for each entry."
 	path="/"
 >
 	<main id="main" class="px-entry py-register max-w-[75rem] mx-auto">
-		<h1 class="font-prose text-xl leading-display">Register</h1>
+		<h1 class="font-prose text-xl leading-display">{profile.data.name}</h1>
 
 		<!--
-			The masthead. Record fields, not a hero — no portrait, no tagline,
-			the register is a document with a header, not a landing page with a
-			name on it. Availability is set apart in `stamp`: the same
-			live-data-indicator use the GitHub panel's LIVE/UNAVAILABLE readout
-			carries, because it's the one field here that's a status, not a fact.
+			The masthead. Passport-page density: labelled fields, nothing
+			decorative, larger and denser than a standard record field so it
+			cannot be skipped the way a 10px line could be. Every field that
+			might still be unfilled checks isUnwritten() (src/lib/content.ts)
+			first — an unfilled field is simply absent, never visible
+			placeholder text, on this page or any other.
 		-->
-		<dl class="mt-field flex flex-wrap gap-x-entry gap-y-hair border-b border-rule pb-entry">
-			<div class="flex items-baseline gap-hair">
-				<dt class="field-label">Name</dt>
-				<dd class="font-record font-typed text-sm">{profile.data.name}</dd>
-			</div>
-			<div class="flex items-baseline gap-hair">
-				<dt class="field-label">Role</dt>
-				<dd class="font-record font-typed text-sm">{profile.data.role}</dd>
-			</div>
-			<div class="flex items-baseline gap-hair">
-				<dt class="field-label">Location</dt>
-				<dd class="font-record font-typed text-sm">{profile.data.location}</dd>
-			</div>
-			<div class="flex items-baseline gap-hair">
-				<dt class="field-label">Availability</dt>
-				<dd class="font-record font-typed text-sm text-stamp">{profile.data.availability}</dd>
-			</div>
-		</dl>
+		<section class="mt-field bg-card border border-rule p-entry">
+			<dl class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-entry gap-y-field">
+				<div>
+					<dt class="field-label">Institution</dt>
+					<dd class="font-record font-typed text-md mt-hair">{profile.data.institution}</dd>
+				</div>
+
+				{
+					!isUnwritten(profile.data.degree) && (
+						<div>
+							<dt class="field-label">Degree</dt>
+							<dd class="font-record font-typed text-md mt-hair">{profile.data.degree}</dd>
+						</div>
+					)
+				}
+
+				{
+					!isUnwritten(profile.data.graduation) && (
+						<div>
+							<dt class="field-label">Expected Graduation</dt>
+							<dd class="font-record font-typed text-md mt-hair">{profile.data.graduation}</dd>
+						</div>
+					)
+				}
+
+				<div>
+					<dt class="field-label">Role</dt>
+					<dd class="font-record font-typed text-md mt-hair">{profile.data.role}</dd>
+				</div>
+
+				<div>
+					<dt class="field-label">Location</dt>
+					<dd class="font-record font-typed text-md mt-hair">{profile.data.location}</dd>
+				</div>
+
+				{
+					!isUnwritten(profile.data.availability) && (
+						<div>
+							<dt class="field-label">Availability</dt>
+							<dd class="font-record font-typed text-md mt-hair text-stamp">{profile.data.availability}</dd>
+						</div>
+					)
+				}
+
+				{
+					!isUnwritten(profile.data.email) && (
+						<div>
+							<dt class="field-label">Email</dt>
+							<dd class="font-record font-typed text-md mt-hair break-all">
+								<a href={`mailto:${profile.data.email}`}>{profile.data.email}</a>
+							</dd>
+						</div>
+					)
+				}
+
+				<div>
+					<dt class="field-label">Resume</dt>
+					<dd class="font-record font-typed text-md mt-hair">
+						<a href={RESUME_PATH}>Download (PDF)</a>
+					</dd>
+				</div>
+
+				<div>
+					<dt class="field-label">GitHub</dt>
+					<dd class="font-record font-typed text-md mt-hair break-all">
+						<a href={profile.data.githubProfile}>{profile.data.githubProfile.replace('https://', '')}</a>
+					</dd>
+				</div>
+
+				<div>
+					<dt class="field-label">Contact</dt>
+					<dd class="font-record font-typed text-md mt-hair">
+						<a href="/contact/">Get in touch</a>
+					</dd>
+				</div>
+			</dl>
+		</section>
+
+		<h2 class="field-label mt-entry">Register</h2>
+
+		<div class={`hidden md:grid ${COLUMNS} gap-field border-b border-rule pb-pair mt-field`}>
+			<p class="field-label">Acc.</p>
+			<p class="field-label">Title</p>
+			<p class="field-label">Medium</p>
+			<p class="field-label">Status</p>
+		</div>
+
+		<ul role="list" class="mt-field md:mt-0">
+			{
+				records.map((record) => (
+					<li>
+						<article
+							class={`relative border-b border-rule py-entry md:py-field md:grid ${COLUMNS} md:gap-field md:items-baseline`}
+						>
+							<a href={`/${record.id}/`} class="absolute inset-0">
+								<span class="sr-only">
+									{record.data.acc} — {record.data.title}
+								</span>
+							</a>
+
+							<dl class="contents">
+								<div class="md:contents">
+									<dt class="field-label md:hidden">Acc.</dt>
+									<dd class="font-record font-typed text-md text-stamp">{record.data.acc}</dd>
+								</div>
+							</dl>
+
+							<div class="mt-field md:mt-0">
+								<h3 class="font-prose text-lg leading-display md:text-base md:leading-record font-body">
+									{record.data.title}
+								</h3>
+								{!isUnwritten(record.data.summary) && (
+									<p class="font-prose text-sm leading-record mt-hair max-w-[42ch]">{record.data.summary}</p>
+								)}
+							</div>
+
+							<dl class="contents">
+								<div class="mt-field md:mt-0 md:contents">
+									<dt class="field-label md:hidden">Medium</dt>
+									<dd class="font-record font-typed text-sm leading-record">{record.data.medium.join(' · ')}</dd>
+								</div>
+								<div class="mt-field md:mt-0 md:contents">
+									<dt class="field-label md:hidden">Status</dt>
+									<dd class="font-record font-typed text-sm">{record.data.status.toUpperCase()}</dd>
+								</div>
+							</dl>
+						</article>
+					</li>
+				))
+			}
+		</ul>
 
 		<GithubPanel data={githubData} checkedAt={githubCheckedAt} />
 
@@ -168,60 +295,5 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 				</section>
 			)
 		}
-
-		<div class={`hidden md:grid ${COLUMNS} gap-field border-b border-rule pb-pair mt-register`}>
-			<p class="field-label">Acc.</p>
-			<p class="field-label">Title</p>
-			<p class="field-label">Medium</p>
-			<p class="field-label">Extent</p>
-			<p class="field-label">Status</p>
-		</div>
-
-		<ul role="list" class="mt-register md:mt-0">
-			{
-				records.map((record) => {
-					const extent = formatExtent(record.data.extent);
-					return (
-						<li>
-							<article
-								class={`relative border-b border-rule py-entry md:py-field md:grid ${COLUMNS} md:gap-field md:items-baseline`}
-							>
-								<a href={`/${record.id}/`} class="absolute inset-0">
-									<span class="sr-only">
-										{record.data.acc} — {record.data.title}
-									</span>
-								</a>
-
-								<dl class="contents">
-									<div class="md:contents">
-										<dt class="field-label md:hidden">Acc.</dt>
-										<dd class="font-record font-typed text-md text-stamp">{record.data.acc}</dd>
-									</div>
-								</dl>
-
-								<h2 class="mt-field md:mt-0 font-prose text-lg leading-display md:text-base md:leading-record font-body">
-									{record.data.title}
-								</h2>
-
-								<dl class="contents">
-									<div class="mt-field md:mt-0 md:contents">
-										<dt class="field-label md:hidden">Medium</dt>
-										<dd class="font-record font-typed text-sm leading-record">{record.data.medium.join(' · ')}</dd>
-									</div>
-									<div class="mt-field md:mt-0 md:contents">
-										<dt class="field-label md:hidden">Extent</dt>
-										<dd class="font-record font-typed text-sm leading-record">{extent ?? '—'}</dd>
-									</div>
-									<div class="mt-field md:mt-0 md:contents">
-										<dt class="field-label md:hidden">Status</dt>
-										<dd class="font-record font-typed text-sm">{record.data.status.toUpperCase()}</dd>
-									</div>
-								</dl>
-							</article>
-						</li>
-					);
-				})
-			}
-		</ul>
 	</main>
 </Base>

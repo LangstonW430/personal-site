@@ -1,0 +1,81 @@
+---
+/*
+ * The finding-aid form: a Biographical and Historical Note, then a
+ * Chronology, ahead of an inventory of the collection — this page is that
+ * note, sitting outside the register's own inventory of works.
+ *
+ * Chronology sorts most-recent-first; entries with no date (nothing has
+ * been filled in yet) sort to the top rather than the bottom, read as
+ * "current/ongoing, date TBD" rather than "oldest, unknown."
+ */
+import { getEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Time from '../../components/Time.astro';
+
+const profile = await getEntry('profile', 'profile');
+if (!profile) throw new Error('src/content/profile.yaml is missing or failed to load.');
+
+// Kept in sync with astro.config.mjs's resumeGuard by convention — same
+// pattern as the font paths in global.css and font-guard: hardcoded in both
+// places, not imported, because astro.config.mjs runs outside the src/ Vite
+// pipeline.
+const RESUME_PATH = '/resume.pdf';
+
+const KIND_LABEL: Record<string, string> = {
+	education: 'Education',
+	freelance: 'Freelance',
+	employment: 'Employment',
+};
+
+const chronology = [...profile.data.chronology].sort((a, b) => {
+	if (!a.date && !b.date) return 0;
+	if (!a.date) return -1;
+	if (!b.date) return 1;
+	return b.date.getTime() - a.date.getTime();
+});
+---
+
+<Base
+	title="Biographical Note — Langston"
+	description="Biographical note, chronology, and résumé."
+	path="/biographical-note/"
+>
+	<main id="main" class="px-entry py-register max-w-[62rem] mx-auto">
+		<p class="no-print"><a href="/">&larr; Register</a></p>
+
+		<article>
+			<h1 class="font-prose text-xl leading-display mt-entry">Biographical Note</h1>
+
+			<div class="font-prose leading-prose mt-field max-w-[62ch]">
+				<p>
+					[[UNWRITTEN]] Who this is, in the register's own voice — not a resume summary, not a
+					tagline. What the practice is, what the degree is for, and why the work above is
+					organized the way it is.
+				</p>
+			</div>
+
+			<section class="mt-register">
+				<h2 class="field-label">Chronology</h2>
+				<ul role="list" class="mt-entry flex flex-col gap-field">
+					{
+						chronology.map((entry) => (
+							<li class="border-b border-rule pb-field">
+								<p class="field-label">{KIND_LABEL[entry.kind]}</p>
+								<p class="font-record font-typed text-sm mt-hair">
+									{entry.date ? <Time date={entry.date} /> : 'Date TBD'} — {entry.note}
+								</p>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+
+			<section class="mt-register">
+				<h2 class="field-label">Resume</h2>
+				<p class="font-record font-typed text-sm mt-field">
+					<a href={RESUME_PATH}>Download résumé (PDF)</a>
+				</p>
+			</section>
+		</article>
+	</main>
+</Base>

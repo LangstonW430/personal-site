@@ -301,4 +301,38 @@ const articles = defineCollection({
 	}),
 });
 
-export const collections = { records, articles };
+/**
+ * The person, not a work. One entry — the masthead and the biographical
+ * note both read from it, so the two surfaces can't state the name or role
+ * differently by accident.
+ *
+ * `chronology` dates are optional and deliberately so: a chronology entry
+ * with no `date` is not a bug, it's an entry nobody has filled in a real
+ * date for yet. Nothing here is allowed to guess a graduation year or an
+ * employment date on Langston's behalf.
+ */
+const profile = defineCollection({
+	loader: glob({ base: './src/content', pattern: 'profile.yaml', generateId: () => 'profile' }),
+	schema: z.strictObject({
+		name: z.string().min(1),
+		role: z.string().min(1),
+		location: z.string().min(1),
+
+		// The live field — never a decoration. Prose, not a status enum,
+		// because "current availability" doesn't collapse cleanly into a
+		// fixed set of states without losing the nuance a client needs.
+		availability: z.string().min(1),
+
+		chronology: z
+			.array(
+				z.strictObject({
+					date: z.date().optional(),
+					kind: z.enum(['education', 'freelance', 'employment']),
+					note: z.string().min(1),
+				}),
+			)
+			.default([]),
+	}),
+});
+
+export const collections = { records, articles, profile };

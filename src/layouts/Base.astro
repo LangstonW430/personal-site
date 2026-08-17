@@ -26,5 +26,24 @@ const { title, description, path, image } = Astro.props;
 	<body class="bg-board text-ink">
 		<a href="#main" class="skip-link">Skip to record</a>
 		<slot />
+
+		<!--
+			Structural navigation, not a nav bar with a logo — a document's
+			back matter, in the same Commit Mono every record field uses. It's a
+			footer rather than a persistent header because every page already
+			carries its own "&larr; back" link at the top for its own parent;
+			this is the one place the four non-record destinations are reachable
+			from anywhere, uniformly, without competing with that.
+		-->
+		<footer class="no-print border-t border-rule mt-section px-entry py-entry">
+			<nav aria-label="Site">
+				<ul role="list" class="flex flex-wrap gap-x-entry gap-y-hair font-record font-typed text-sm">
+					<li><a href="/">Register</a></li>
+					<li><a href="/biographical-note/">Biographical Note</a></li>
+					<li><a href="/colophon/">Colophon</a></li>
+					<li><a href="/contact/">Contact</a></li>
+				</ul>
+			</nav>
+		</footer>
 	</body>
 </html>

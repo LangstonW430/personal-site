@@ -23,7 +23,7 @@
  * genuinely zero client JS, at the cost of `/` no longer being a static file
  * in `dist/` — every other route is untouched.
  */
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import GithubPanel from '../components/GithubPanel.astro';
 import Time from '../components/Time.astro';
@@ -36,6 +36,8 @@ const GITHUB_USERNAME = 'LangstonW430';
 
 const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
 const articles = await getCollection('articles');
+const profile = await getEntry('profile', 'profile');
+if (!profile) throw new Error('src/content/profile.yaml is missing or failed to load — the masthead has nothing to read.');
 
 const allowlist = repoAllowlist(records.map((record) => record.data.links.source));
 
@@ -119,6 +121,32 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 >
 	<main id="main" class="px-entry py-register max-w-[75rem] mx-auto">
 		<h1 class="font-prose text-xl leading-display">Register</h1>
+
+		<!--
+			The masthead. Record fields, not a hero — no portrait, no tagline,
+			the register is a document with a header, not a landing page with a
+			name on it. Availability is set apart in `stamp`: the same
+			live-data-indicator use the GitHub panel's LIVE/UNAVAILABLE readout
+			carries, because it's the one field here that's a status, not a fact.
+		-->
+		<dl class="mt-field flex flex-wrap gap-x-entry gap-y-hair border-b border-rule pb-entry">
+			<div class="flex items-baseline gap-hair">
+				<dt class="field-label">Name</dt>
+				<dd class="font-record font-typed text-sm">{profile.data.name}</dd>
+			</div>
+			<div class="flex items-baseline gap-hair">
+				<dt class="field-label">Role</dt>
+				<dd class="font-record font-typed text-sm">{profile.data.role}</dd>
+			</div>
+			<div class="flex items-baseline gap-hair">
+				<dt class="field-label">Location</dt>
+				<dd class="font-record font-typed text-sm">{profile.data.location}</dd>
+			</div>
+			<div class="flex items-baseline gap-hair">
+				<dt class="field-label">Availability</dt>
+				<dd class="font-record font-typed text-sm text-stamp">{profile.data.availability}</dd>
+			</div>
+		</dl>
 
 		<GithubPanel data={githubData} checkedAt={githubCheckedAt} />
 

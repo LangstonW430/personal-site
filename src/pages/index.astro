@@ -30,6 +30,7 @@ import RegisterTable from '../components/RegisterTable.astro';
 import Time from '../components/Time.astro';
 import { fetchGithubPanel, repoAllowlist, type GithubPanelData } from '../lib/github';
 import { CHRONOLOGY_KIND_LABEL, isUnwritten, publishedArticles, sortedChronology } from '../lib/content';
+import { EXTERNAL_LINK_ATTRS } from '../lib/links';
 
 export const prerender = false;
 
@@ -226,21 +227,23 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 				<div>
 					<dt class="field-label">Resume</dt>
 					<dd class="font-record font-typed text-md mt-hair">
-						<a href={RESUME_PATH}>Download (PDF)</a>
+						<a href={RESUME_PATH} {...EXTERNAL_LINK_ATTRS}>Download (PDF)</a>
 					</dd>
 				</div>
 
 				<div>
 					<dt class="field-label">Transcript</dt>
 					<dd class="font-record font-typed text-md mt-hair">
-						<a href={TRANSCRIPT_PATH}>Download (PDF)</a>
+						<a href={TRANSCRIPT_PATH} {...EXTERNAL_LINK_ATTRS}>Download (PDF)</a>
 					</dd>
 				</div>
 
 				<div>
 					<dt class="field-label">GitHub</dt>
 					<dd class="font-record font-typed text-md mt-hair break-all">
-						<a href={profile.data.githubProfile}>{profile.data.githubProfile.replace('https://', '')}</a>
+						<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS}>
+							{profile.data.githubProfile.replace('https://', '')}
+						</a>
 					</dd>
 				</div>
 

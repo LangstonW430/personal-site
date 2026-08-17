@@ -8,6 +8,7 @@
 import { getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { isUnwritten } from '../../lib/content';
+import { EXTERNAL_LINK_ATTRS } from '../../lib/links';
 
 const profile = await getEntry('profile', 'profile');
 if (!profile) throw new Error('src/content/profile.yaml is missing or failed to load.');
@@ -43,7 +44,7 @@ const hasEmail = !isUnwritten(profile.data.email);
 							<div>
 								<dt class="field-label">Elsewhere</dt>
 								<dd class="font-record font-typed text-sm leading-record">
-									<a href={profile.data.githubProfile}>GitHub</a>
+									<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS}>GitHub</a>
 								</dd>
 							</div>
 						)}

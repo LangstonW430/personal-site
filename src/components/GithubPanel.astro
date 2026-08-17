@@ -13,6 +13,7 @@
  */
 import Time from './Time.astro';
 import type { GithubPanelData } from '../lib/github';
+import { EXTERNAL_LINK_ATTRS } from '../lib/links';
 
 interface Props {
 	data: GithubPanelData | null;
@@ -44,7 +45,7 @@ const mostRecentPush = data?.repos.length
 				<ul role="list" class="mt-entry flex flex-col gap-field">
 					{data.repos.map((repo) => (
 						<li class="border-b border-rule pb-field">
-							<a href={repo.url} class="font-record font-typed text-sm text-stamp">
+							<a href={repo.url} class="font-record font-typed text-sm text-stamp" {...EXTERNAL_LINK_ATTRS}>
 								{repo.owner}/{repo.name}
 							</a>
 							<p class="font-record font-typed text-xs mt-hair">

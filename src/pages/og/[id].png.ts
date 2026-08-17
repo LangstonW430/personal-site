@@ -1,29 +1,41 @@
 /*
- * One OG image per record, generated at build time — `output: 'static'`
- * prerenders every route including this one, so nothing renders an image at
- * request time. Uses the real palette and the real faces: Satori can't read
- * the shipped WOFF2s (it supports TTF/OTF/WOFF only), so the two weights
- * this card needs — Commit Mono 450, Source Serif 4 600 — are static TTF
- * instances derived once from the self-hosted variable fonts and committed
- * under scripts/og-fonts/. How they were built is documented there.
+ * One OG image per record, generated at build time — this route is
+ * prerendered even though Phase 4 made the register a server route, so
+ * nothing renders an image at request time. Uses the real palette and the
+ * real faces: Satori can't read the shipped WOFF2s (it supports TTF/OTF/WOFF
+ * only), so the two weights this card needs — Commit Mono 450, Source Serif
+ * 4 600 — are static TTF instances derived once from the self-hosted
+ * variable fonts and committed under scripts/og-fonts/. How they were built
+ * is documented there.
+ *
+ * Font paths are built from `process.cwd()`, not `new URL(path, import.meta.url)`
+ * — Vite treats that pattern as a static asset reference and relocates it,
+ * and where it relocates to differs between a pure-static build and the
+ * hybrid static+server build Phase 4 introduced (mixing in the SSR register
+ * route flips the whole build from Astro's "static" output mode to
+ * "server"). A plain runtime path sidesteps that analysis and reads the same
+ * file correctly in both.
  *
  * New build-time-only dependencies: satori (layout → SVG) and
  * @resvg/resvg-js (SVG → PNG). Neither ships to the browser.
  */
 import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { formatExtent } from '../../lib/format';
 
+export const prerender = true;
+
 export async function getStaticPaths() {
 	const records = await getCollection('records');
 	return records.map((record) => ({ params: { id: record.id }, props: { record } }));
 }
 
-const COMMIT_MONO = readFileSync(new URL('../../../scripts/og-fonts/CommitMono-450.ttf', import.meta.url));
-const SOURCE_SERIF = readFileSync(new URL('../../../scripts/og-fonts/SourceSerif4-600.ttf', import.meta.url));
+const COMMIT_MONO = readFileSync(join(process.cwd(), 'scripts/og-fonts/CommitMono-450.ttf'));
+const SOURCE_SERIF = readFileSync(join(process.cwd(), 'scripts/og-fonts/SourceSerif4-600.ttf'));
 
 const COLOR = {
 	board: '#E4E5E0',

@@ -268,7 +268,11 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 												{entry.date ? <Time date={entry.date} /> : 'Date TBD'} — {entry.note}
 											</span>
 										</summary>
-										<p class="font-prose text-sm leading-record mt-pair max-w-[62ch]">{entry.detail}</p>
+										<ul role="list" class="list-disc pl-entry mt-pair flex flex-col gap-hair max-w-[62ch]">
+											{entry.detail.map((line) => (
+												<li class="font-prose text-sm leading-record">{line}</li>
+											))}
+										</ul>
 									</details>
 								) : (
 									<div class="flex flex-wrap items-baseline gap-pair">

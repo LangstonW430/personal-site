@@ -349,8 +349,11 @@ const profile = defineCollection({
 					note: z.string().min(1),
 					// The one-line summary (`note`) is always visible. `detail` is the
 					// full description, shown only on expand — a <details> disclosure,
-					// not a second source of truth for the same fact.
-					detail: z.string().min(1).optional(),
+					// not a second source of truth for the same fact. An array, not a
+					// paragraph: these came from LinkedIn as bullet points, and a role
+					// with five responsibilities reads as five responsibilities, not
+					// one 90-word block a reader has to parse apart themselves.
+					detail: z.array(z.string().min(1)).min(1).optional(),
 				}),
 			)
 			.default([]),

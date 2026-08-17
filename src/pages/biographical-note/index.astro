@@ -58,7 +58,11 @@ const chronology = sortedChronology(profile.data.chronology);
 											<summary class="cursor-pointer font-record font-typed text-sm">
 												{entry.date ? <Time date={entry.date} /> : 'Date TBD'} — {entry.note}
 											</summary>
-											<p class="font-prose text-sm leading-record mt-pair max-w-[62ch]">{entry.detail}</p>
+											<ul role="list" class="list-disc pl-entry mt-pair flex flex-col gap-hair max-w-[62ch]">
+												{entry.detail.map((line) => (
+													<li class="font-prose text-sm leading-record">{line}</li>
+												))}
+											</ul>
 										</details>
 									) : (
 										<p class="font-record font-typed text-sm mt-hair">

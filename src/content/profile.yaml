@@ -8,10 +8,17 @@
 # a real value and it appears; nothing else has to change.
 
 name: Langston Woods
-role: CS student & freelance web developer
+# Same " · " join as gpa below and extent's "commits · duration" — three
+# facets of one role, not three separate fields.
+role: "CS Student · AI/ML Engineer · Software Developer"
 location: Rochester, N.Y.
 institution: University of Rochester
 githubProfile: https://github.com/LangstonW430
+# The freelance-facing counterpart to githubProfile — recruiters get
+# GitHub, prospective clients get this. Same isUnwritten()-gated pattern as
+# degree/graduation/etc. below even though it's filled in now, so pulling it
+# temporarily is a one-line edit like everything else here.
+services: "https://services.langstonwoods.com"
 
 degree: "B.S. Computer Science, AI Concentration; Math Minor"
 graduation: "May 2029"

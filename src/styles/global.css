@@ -218,6 +218,20 @@
 		font-variant-numeric: tabular-nums;
 	}
 
+	/* Preflight zeroes margin on every element, `p` included — same hole as
+	 * the heading-weight fix above. Left alone, a record's MDX body (or any
+	 * other multi-paragraph prose block) renders as consecutive <p> tags with
+	 * no vertical gap between them: same line-height throughout, no visual
+	 * break, indistinguishable from one giant paragraph regardless of how
+	 * short any individual one is. Scoped to `.leading-prose` — the wrapper
+	 * every prose body block already carries (record and article content,
+	 * the biographical note, colophon, 404) — not to `.font-prose` broadly,
+	 * which also sets headings and single-line summaries where an adjacent-
+	 * paragraph rule would never match anything anyway. */
+	.leading-prose :where(p) + :where(p) {
+		margin-top: var(--spacing-entry);
+	}
+
 	/* Focus rings are one of only three permitted uses of `stamp`. */
 	:focus-visible {
 		outline: 1px solid var(--color-stamp);

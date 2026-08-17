@@ -33,51 +33,41 @@ chronology:
   - date: 2022-06-01
     kind: employment
     note: "Academic Intervention Specialist, Vertus Charter High School — math/science support for at-risk students"
-    detail: >-
-      Provided targeted one-on-one and small-group instruction in math and science to high school
-      students to address learning gaps and strengthen foundational skills, supporting students in
-      building confidence, improving subject comprehension, and developing effective study
-      strategies. Collaborated closely with classroom teachers to reinforce core instruction and
-      develop individualized learning plans tailored to at-risk students. Supported 25+ students
-      per summer session, with an average grade improvement of 15% and 80% reaching grade-level
-      proficiency on weekly assessments; 87% of surveyed teachers reported significant academic
-      improvement.
+    detail:
+      - Provide targeted one-on-one and small-group instruction in math and science to high school students to address learning gaps and strengthen foundational skills.
+      - Support students in building confidence, improving subject comprehension, and developing effective study strategies.
+      - Collaborate closely with classroom teachers to reinforce core instruction and develop individualized learning plans tailored to at-risk students.
+      - Monitor progress through ongoing assessment, adjusting instructional approach to keep students on track.
+      - 25+ students per summer session, average grade improvement of 15%, 80% reaching grade-level proficiency; 87% of surveyed teachers report significant academic improvement.
   - date: 2024-06-01
     kind: employment
     note: "Information Technology Intern, Rochester Regional Joint Board — hardware/software support under the Lead IT Specialist (Jun.–Aug. 2024)"
-    detail: >-
-      Collaborated directly with the Lead IT Specialist to support day-to-day IT operations across
-      the organization. Assisted with maintenance and troubleshooting of office hardware including
-      desktops, laptops, printers, and networking equipment. Provided software support for staff,
-      including installation, configuration, and issue resolution.
+    detail:
+      - Collaborated directly with the Lead IT Specialist to support day-to-day IT operations across the organization.
+      - Assisted with maintenance and troubleshooting of office hardware, including desktops, laptops, printers, and networking equipment.
+      - Provided software support for staff, including installation, configuration, and issue resolution.
   - date: 2025-08-25
     kind: education
     note: "Enrolled at the University of Rochester, B.S. Computer Science (AI concentration), Math minor — expected May 2029"
-    detail: >-
-      B.S. Computer Science, AI concentration, with a Math minor, expected May 2029. Relevant
-      coursework: Data Structures and Algorithms, Discrete Mathematics, Linear Algebra and
-      Differential Equations. Planned clusters: Computational Linguistics, Ethics of Technology.
+    detail:
+      - B.S. Computer Science, AI concentration, with a Math minor, expected May 2029.
+      - "Relevant coursework: Data Structures and Algorithms, Discrete Mathematics, Linear Algebra and Differential Equations."
+      - "Planned clusters: Computational Linguistics, Ethics of Technology."
   - date: 2026-01-01
     kind: freelance
     note: "Web Designer, self-employed — mobile-responsive websites for small businesses, from design through client-facing launch"
-    detail: >-
-      Design and develop websites for small businesses with a focus on clean design, mobile
-      responsiveness, and brand growth, working directly with business owners to build customized
-      online experiences that improve visibility, customer engagement, and professionalism.
-      Shipped production sites for 3 small-business clients on Astro, deployed and maintained on
-      Netlify with Sveltia CMS for client-managed content, owning the full project lifecycle from
-      scoping through launch and post-launch support.
+    detail:
+      - Design and develop websites for small businesses with a focus on clean design, mobile responsiveness, and brand growth.
+      - Work directly with business owners to build customized online experiences that improve visibility, customer engagement, and professionalism.
+      - Shipped production sites for 3 small-business clients on Astro, deployed and maintained on Netlify with Sveltia CMS for client-managed content.
+      - Own the full project lifecycle from scoping through launch and post-launch support.
   - date: 2026-06-01
     kind: employment
     note: "Marketing and AI Intern, Thomas Media Group — AI-powered workflow automation and technology infrastructure across CRM, design, and production tooling"
-    detail: >-
-      Design, test, and implement AI-powered tools and workflow automations to improve operational
-      efficiency across internal business processes. Support and optimize company technology
-      infrastructure — CRM, project management, design, and AI platforms including HubSpot, Asana,
-      Figma, Claude, ChatGPT, Qwilr, and Google Workspace. Collaborate with cross-functional teams
-      to identify process bottlenecks, evaluate technical solutions, and build scalable internal
-      systems, documenting each in technical guides and knowledge bases for organization-wide
-      adoption. Manage digital asset pipelines for multimedia content and production resources, and
-      maintain the audio/video hardware and software used in client-facing production environments.
-      Assist with website maintenance and client-facing technical support, and track deliverables
-      through Asana across multiple concurrent initiatives.
+    detail:
+      - Design, test, and implement AI-powered tools and workflow automations to improve operational efficiency across internal business processes.
+      - "Support and optimize company technology infrastructure — CRM, project management, design, and AI platforms including HubSpot, Asana, Figma, Claude, ChatGPT, Qwilr, and Google Workspace."
+      - Collaborate with cross-functional teams to identify process bottlenecks, evaluate technical solutions, and build scalable internal systems.
+      - Create technical documentation, process guides, and knowledge bases for organization-wide adoption.
+      - Manage digital asset pipelines for multimedia content and production resources; maintain the audio/video hardware and software used in client-facing production environments.
+      - Assist with website maintenance and client-facing technical support; track deliverables through Asana across multiple concurrent initiatives.

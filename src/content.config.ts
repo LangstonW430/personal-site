@@ -201,12 +201,14 @@ const records = defineCollection({
 
 			status: z.enum(['active', 'shipped', 'archived']),
 
-			// Extent is measured: 4,180 LOC · 118 commits · 7 weeks. Every part is
-			// optional because a record should state only what was actually counted
-			// — a guessed number is worse than an absent one.
+			// Extent is measured: 118 commits · 7 weeks. Every part is optional
+			// because a record should state only what was actually counted — a
+			// guessed number is worse than an absent one. `loc` was here through
+			// Phase 3.1; dropped in 3.2 because it invites comparing 4,176 lines
+			// in two days against 1,726 over eight weeks, and the bigger number
+			// reads as generated volume rather than more work.
 			extent: z
 				.strictObject({
-					loc: z.number().int().positive().optional(),
 					commits: z.number().int().positive().optional(),
 					duration: z.string().min(1).optional(),
 				})
@@ -317,6 +319,21 @@ const profile = defineCollection({
 		name: z.string().min(1),
 		role: z.string().min(1),
 		location: z.string().min(1),
+		institution: z.string().min(1),
+
+		// Not `.email()`/`.url()`-validated even though they hold an email and
+		// a URL respectively: a field carrying the literal [[UNWRITTEN]]
+		// sentinel has to pass schema validation too (isUnwritten() is what
+		// keeps it off the page, not the schema), so these stay plain strings
+		// the same way `availability` already does.
+		degree: z.string().min(1),
+		graduation: z.string().min(1),
+		email: z.string().min(1),
+
+		// Real and always present — the account this whole site's GitHub panel
+		// already reads from — so this is the one contact-adjacent field with
+		// no unwritten state to handle.
+		githubProfile: z.url(),
 
 		// The live field — never a decoration. Prose, not a status enum,
 		// because "current availability" doesn't collapse cleanly into a

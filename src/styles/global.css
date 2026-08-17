@@ -232,6 +232,22 @@
 		margin-top: var(--spacing-entry);
 	}
 
+	/* Same Preflight reset as the paragraph-spacing rule above, different
+	 * property: every link on the site inherits color and drops its
+	 * underline, deliberately, everywhere that link is UI chrome (nav,
+	 * masthead fields, a register row's own title). Inside running prose —
+	 * a record or article body, the biographical note, colophon, 404 — a
+	 * link is content, not chrome, and needs to read as one at a glance
+	 * instead of relying on cursor and context alone. `stamp` is off the
+	 * table here for the same reason it was for the README embed: capped at
+	 * roughly four uses per page, easily outrun by an ordinary paragraph of
+	 * links. `ink` + underline is the same resolution already used for
+	 * README links and for every link site-wide in print. */
+	.leading-prose :where(a) {
+		color: var(--color-ink);
+		text-decoration: underline;
+	}
+
 	/* Focus rings are one of only three permitted uses of `stamp`. */
 	:focus-visible {
 		outline: 1px solid var(--color-stamp);

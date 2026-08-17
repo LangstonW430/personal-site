@@ -1,0 +1,75 @@
+---
+/*
+ * The register's own tabular list — column headers, then one row per
+ * record. Shared by the homepage's three-item preview and the full list at
+ * /work/ so the two can't drift on markup or column widths; only which
+ * records get passed in differs.
+ */
+import type { CollectionEntry } from 'astro:content';
+import { isUnwritten } from '../lib/content';
+
+interface Props {
+	records: CollectionEntry<'records'>[];
+}
+
+const { records } = Astro.props;
+
+// EXTENT dropped from this table entirely (kept LOC-free, still) — four of
+// eight records had no measured extent, and an active record's "duration"
+// has no honest value until it ships, so a real dash on real work is worse
+// than the column not existing here. It stays on record pages, where an
+// absent value already reads as "not measured yet" rather than "missing."
+const COLUMNS = 'md:grid-cols-[5rem_1fr_1.3fr_5.5rem]';
+---
+
+<div class={`hidden md:grid ${COLUMNS} gap-field border-b border-rule pb-pair mt-field`}>
+	<p class="field-label">Acc.</p>
+	<p class="field-label">Title</p>
+	<p class="field-label">Medium</p>
+	<p class="field-label">Status</p>
+</div>
+
+<ul role="list" class="mt-field md:mt-0">
+	{
+		records.map((record) => (
+			<li>
+				<article
+					class={`relative border-b border-rule py-entry md:py-field md:grid ${COLUMNS} md:gap-field md:items-baseline`}
+				>
+					<a href={`/${record.id}/`} class="absolute inset-0">
+						<span class="sr-only">
+							{record.data.acc} — {record.data.title}
+						</span>
+					</a>
+
+					<dl class="contents">
+						<div class="md:contents">
+							<dt class="field-label md:hidden">Acc.</dt>
+							<dd class="font-record font-typed text-md text-stamp">{record.data.acc}</dd>
+						</div>
+					</dl>
+
+					<div class="mt-field md:mt-0">
+						<h3 class="font-prose text-lg leading-display md:text-base md:leading-record font-body">
+							{record.data.title}
+						</h3>
+						{!isUnwritten(record.data.summary) && (
+							<p class="font-prose text-sm leading-record mt-hair max-w-[42ch]">{record.data.summary}</p>
+						)}
+					</div>
+
+					<dl class="contents">
+						<div class="mt-field md:mt-0 md:contents">
+							<dt class="field-label md:hidden">Medium</dt>
+							<dd class="font-record font-typed text-sm leading-record">{record.data.medium.join(' · ')}</dd>
+						</div>
+						<div class="mt-field md:mt-0 md:contents">
+							<dt class="field-label md:hidden">Status</dt>
+							<dd class="font-record font-typed text-sm">{record.data.status.toUpperCase()}</dd>
+						</div>
+					</dl>
+				</article>
+			</li>
+		))
+	}
+</ul>

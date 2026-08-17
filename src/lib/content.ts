@@ -16,6 +16,7 @@ export type ChronologyEntry = {
 	date?: Date;
 	kind: 'education' | 'freelance' | 'employment';
 	note: string;
+	detail?: string;
 };
 
 export const CHRONOLOGY_KIND_LABEL: Record<ChronologyEntry['kind'], string> = {

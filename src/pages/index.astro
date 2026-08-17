@@ -253,6 +253,19 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 						<a href="/contact/">Get in touch</a>
 					</dd>
 				</div>
+
+				{
+					!isUnwritten(profile.data.services) && (
+						<div>
+							<dt class="field-label">Services</dt>
+							<dd class="font-record font-typed text-md mt-hair break-all">
+								<a href={profile.data.services} {...EXTERNAL_LINK_ATTRS}>
+									{profile.data.services.replace('https://', '')}
+								</a>
+							</dd>
+						</div>
+					)
+				}
 			</dl>
 		</section>
 
@@ -295,12 +308,12 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 			)
 		}
 
-		<h2 class="field-label mt-entry">Register</h2>
+		<h2 class="field-label mt-entry">Project Register</h2>
 
 		<RegisterTable records={topRecords} />
 
 		<p class="font-record font-typed text-xs mt-field">
-			<a href="/work/">View full register &rarr;</a>
+			<a href="/work/">View the full Project Register &rarr;</a>
 		</p>
 
 		<GithubPanel data={githubData} checkedAt={githubCheckedAt} />

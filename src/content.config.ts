@@ -330,6 +330,7 @@ const profile = defineCollection({
 		graduation: z.string().min(1),
 		gpa: z.string().min(1),
 		email: z.string().min(1),
+		services: z.string().min(1),
 
 		// Real and always present — the account this whole site's GitHub panel
 		// already reads from — so this is the one contact-adjacent field with

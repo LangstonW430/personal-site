@@ -84,7 +84,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
 	image={record ? `/og/${record.id}.png` : undefined}
 >
 	<main id="main" class="px-entry py-register max-w-[62rem] mx-auto">
-		<p class="no-print"><a href={record ? '/work/' : '/'}>&larr; {record ? 'Register' : 'Home'}</a></p>
+		<p class="no-print"><a href={record ? '/work/' : '/'}>&larr; {record ? 'Project Register' : 'Home'}</a></p>
 
 		{!record && <NotFoundRecord />}
 		{record && (

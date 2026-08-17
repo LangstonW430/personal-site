@@ -1,0 +1,27 @@
+---
+/*
+ * The full register, split out from `/` so the homepage can stay a
+ * 30-second read: a three-record preview there links here for the rest.
+ * Same table markup as that preview (RegisterTable.astro), every record
+ * instead of three.
+ */
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import RegisterTable from '../../components/RegisterTable.astro';
+
+const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
+---
+
+<Base
+	title="Register — Langston Woods"
+	description="The full register of software and web development work: accession number, medium, and status for each entry."
+	path="/work/"
+>
+	<main id="main" class="px-entry py-register max-w-[75rem] mx-auto">
+		<p class="no-print"><a href="/">&larr; Home</a></p>
+
+		<h1 class="font-prose text-xl leading-display mt-entry">Register</h1>
+
+		<RegisterTable records={records} />
+	</main>
+</Base>

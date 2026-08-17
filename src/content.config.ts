@@ -347,6 +347,10 @@ const profile = defineCollection({
 					date: z.date().optional(),
 					kind: z.enum(['education', 'freelance', 'employment']),
 					note: z.string().min(1),
+					// The one-line summary (`note`) is always visible. `detail` is the
+					// full description, shown only on expand — a <details> disclosure,
+					// not a second source of truth for the same fact.
+					detail: z.string().min(1).optional(),
 				}),
 			)
 			.default([]),

@@ -32,7 +32,7 @@ const chronology = sortedChronology(profile.data.chronology);
 	path="/biographical-note/"
 >
 	<main id="main" class="px-entry py-register max-w-[62rem] mx-auto">
-		<p class="no-print"><a href="/">&larr; Register</a></p>
+		<p class="no-print"><a href="/">&larr; Home</a></p>
 
 		<article>
 			<h1 class="font-prose text-xl leading-display mt-entry">Biographical Note</h1>
@@ -53,9 +53,18 @@ const chronology = sortedChronology(profile.data.chronology);
 							{chronology.map((entry) => (
 								<li class="border-b border-rule pb-field">
 									<p class="field-label">{CHRONOLOGY_KIND_LABEL[entry.kind]}</p>
-									<p class="font-record font-typed text-sm mt-hair">
-										{entry.date ? <Time date={entry.date} /> : 'Date TBD'} — {entry.note}
-									</p>
+									{entry.detail ? (
+										<details class="mt-hair">
+											<summary class="cursor-pointer font-record font-typed text-sm">
+												{entry.date ? <Time date={entry.date} /> : 'Date TBD'} — {entry.note}
+											</summary>
+											<p class="font-prose text-sm leading-record mt-pair max-w-[62ch]">{entry.detail}</p>
+										</details>
+									) : (
+										<p class="font-record font-typed text-sm mt-hair">
+											{entry.date ? <Time date={entry.date} /> : 'Date TBD'} — {entry.note}
+										</p>
+									)}
 								</li>
 							))}
 						</ul>

@@ -122,8 +122,8 @@
 
 	/* Zero is not a pick from the numeric scale the wipe above killed — it's
 	 * the one value with no arbitrary choice in it, needed for `inset-0` on
-	 * every full-row overlay link (register rows, article accruals) and for
-	 * `mt-0`/`pb-0` resets at the md: breakpoint. Without this, Tailwind
+	 * every full-row overlay link (register rows) and for `mt-0`/`pb-0`
+	 * resets at the md: breakpoint. Without this, Tailwind
 	 * silently drops the whole `inset-0` declaration (no `--spacing` to
 	 * resolve `calc(var(--spacing) * 0)` against), which doesn't error — it
 	 * just leaves the overlay anchor at 0×0px, invisible and unclickable.
@@ -224,8 +224,8 @@
 	 * no vertical gap between them: same line-height throughout, no visual
 	 * break, indistinguishable from one giant paragraph regardless of how
 	 * short any individual one is. Scoped to `.leading-prose` — the wrapper
-	 * every prose body block already carries (record and article content,
-	 * the biographical note, colophon, 404) — not to `.font-prose` broadly,
+	 * every prose body block already carries (record content, the
+	 * biographical note, colophon, 404) — not to `.font-prose` broadly,
 	 * which also sets headings and single-line summaries where an adjacent-
 	 * paragraph rule would never match anything anyway. */
 	.leading-prose :where(p) + :where(p) {
@@ -236,13 +236,12 @@
 	 * property: every link on the site inherits color and drops its
 	 * underline, deliberately, everywhere that link is UI chrome (nav,
 	 * masthead fields, a register row's own title). Inside running prose —
-	 * a record or article body, the biographical note, colophon, 404 — a
-	 * link is content, not chrome, and needs to read as one at a glance
-	 * instead of relying on cursor and context alone. `stamp` is off the
-	 * table here for the same reason it was for the README embed: capped at
-	 * roughly four uses per page, easily outrun by an ordinary paragraph of
-	 * links. `ink` + underline is the same resolution already used for
-	 * README links and for every link site-wide in print. */
+	 * a record body, the biographical note, colophon, 404 — a link is
+	 * content, not chrome, and needs to read as one at a glance instead of
+	 * relying on cursor and context alone. `stamp` is off the table here:
+	 * capped at roughly four uses per page, easily outrun by an ordinary
+	 * paragraph of links. `ink` + underline is the same resolution already
+	 * used for every link site-wide in print. */
 	.leading-prose :where(a) {
 		color: var(--color-ink);
 		text-decoration: underline;
@@ -400,115 +399,6 @@
 		.chronology-chevron {
 			transition: none;
 		}
-	}
-
-	/*
-	 * .readme-content — a record's github.com README, fetched live and
-	 * injected as GitHub's own rendered HTML (see lib/github.ts's
-	 * fetchReadme). That HTML carries none of this project's classes, only
-	 * bare tags, so every element needs the token system applied by hand
-	 * here rather than through Tailwind utilities on the markup itself —
-	 * there is no markup to put a class on. Scoped tightly to this one class
-	 * so none of it leaks into the site's own prose elsewhere.
-	 */
-	.readme-content :where(h1, h2, h3, h4, h5, h6) {
-		font-weight: var(--font-weight-strong);
-		margin-top: var(--spacing-entry);
-	}
-	.readme-content :where(h1) {
-		font-size: var(--text-lg);
-	}
-	.readme-content :where(h2) {
-		font-size: var(--text-md);
-	}
-	.readme-content :where(h3, h4, h5, h6) {
-		font-size: var(--text-base);
-	}
-	/* GitHub gives every heading a permalink icon (class="anchor", wrapping
-	 * an octicon), hidden until the heading is hovered or the icon itself is
-	 * focused — github.com's own CSS, which none of this HTML carries.
-	 * Without it the icon just sits there permanently, which is what showed
-	 * up here before this rule existed. Opacity, not visibility or display,
-	 * so it stays in the keyboard tab order — a sighted mouse user hovers to
-	 * reveal it, a keyboard user tabs to it and gets the same reveal. */
-	.readme-content :where(h1, h2, h3, h4, h5, h6) a.anchor {
-		opacity: 0;
-		text-decoration: none;
-		transition: opacity 0.1s ease;
-	}
-	.readme-content :where(h1, h2, h3, h4, h5, h6):hover a.anchor,
-	.readme-content a.anchor:focus-visible {
-		opacity: 1;
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.readme-content a.anchor {
-			transition: none;
-		}
-	}
-	/* Preflight resets every link on the site to color:inherit with no
-	 * underline — deliberate everywhere else, but this block is presented as
-	 * GitHub's own rendering, not this site's prose, so it gets GitHub's
-	 * convention back: a link reads as a link. `stamp` is off the table for
-	 * this — CLAUDE.md caps it at roughly four uses per page and a README's
-	 * links alone can run past that — so this uses `ink` the same way the
-	 * print stylesheet already resolves link color for the whole site. */
-	.readme-content :where(a):not(.anchor) {
-		color: var(--color-ink);
-		text-decoration: underline;
-	}
-	.readme-content :where(p, ul, ol, table, blockquote, pre) + :where(p, ul, ol, table, blockquote, pre) {
-		margin-top: var(--spacing-field);
-	}
-	.readme-content :where(ul, ol) {
-		padding-left: var(--spacing-entry);
-	}
-	.readme-content :where(ul) {
-		list-style: disc;
-	}
-	.readme-content :where(ol) {
-		list-style: decimal;
-	}
-	.readme-content :where(code) {
-		font-family: var(--font-record);
-		font-size: var(--text-sm);
-		background-color: var(--color-board);
-		padding: 0 var(--spacing-hair);
-	}
-	.readme-content :where(pre) {
-		font-family: var(--font-record);
-		font-size: var(--text-sm);
-		line-height: var(--leading-record);
-		background-color: var(--color-board);
-		padding: var(--spacing-field);
-		overflow-x: auto;
-	}
-	.readme-content :where(pre code) {
-		background-color: transparent;
-		padding: 0;
-	}
-	.readme-content :where(table) {
-		border-collapse: collapse;
-		font-size: var(--text-sm);
-		width: 100%;
-	}
-	.readme-content :where(th, td) {
-		border: 1px solid var(--color-rule);
-		padding: var(--spacing-hair) var(--spacing-pair);
-		text-align: left;
-	}
-	.readme-content :where(blockquote) {
-		border-left: 1px solid var(--color-rule);
-		padding-left: var(--spacing-field);
-		color: var(--color-ink-muted);
-	}
-	.readme-content :where(img) {
-		max-width: 100%;
-		height: auto;
-	}
-	.readme-content :where(hr) {
-		border: none;
-		border-top: 1px solid var(--color-rule);
-		margin: var(--spacing-entry) 0;
 	}
 }
 

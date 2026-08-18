@@ -6,13 +6,35 @@
  * restrained rather than played for a joke.
  */
 import Base from '../layouts/Base.astro';
-import NotFoundRecord from '../components/NotFoundRecord.astro';
 ---
 
 <Base title="404 — Langston" description="No record at this address." path="/404/">
 	<main id="main" class="px-entry py-register max-w-[62rem] mx-auto">
 		<p class="no-print"><a href="/">&larr; Home</a></p>
 
-		<NotFoundRecord />
+		<article>
+			<header>
+				<p class="field-label mt-entry">Acc.</p>
+				<p class="font-record font-typed text-md text-stamp">—</p>
+
+				<h1 class="font-prose text-xl leading-display mt-hair">No record at this address</h1>
+				<p class="font-prose leading-prose mt-field max-w-[62ch]">
+					The register has no entry for this URL. It was never accessioned, or the address is wrong.
+				</p>
+			</header>
+
+			<div class="mt-register grid gap-entry grid-cols-1 md:grid-cols-[15rem_1fr]">
+				<dl class="bg-card border border-rule p-entry flex flex-col gap-field">
+					<div>
+						<dt class="field-label">Status</dt>
+						<dd class="font-record font-typed text-sm leading-record">NOT FOUND</dd>
+					</div>
+				</dl>
+
+				<div class="font-prose leading-prose max-w-[62ch]">
+					<p><a href="/">Return to the register</a> and look for the work by title instead.</p>
+				</div>
+			</div>
+		</article>
 	</main>
 </Base>

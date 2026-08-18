@@ -344,10 +344,19 @@
 	 * .chronology-row — the Experience/Chronology accordion's <summary>. A
 	 * native <details>/<summary> already gives keyboard access, a focus
 	 * ring, and an expanded/collapsed state exposed to assistive tech for
-	 * free; this supplies only the visual language on top of that. The
-	 * chevron goes from "collapsed" (›) to "expanded" (⌄) by rotating 90°,
-	 * not by swapping characters, so neither the interaction nor the icon
-	 * needs a line of JS.
+	 * free; this supplies only the visual language on top of that.
+	 *
+	 * Deliberately no hover fill. A filled background on hover is what makes
+	 * a row read as a card — a ledger line doesn't light up when you point
+	 * at it, the ink under your finger gets a little more attention instead.
+	 * Three restrained cues instead, all of them things a printed index
+	 * already does: the title picks up an underline (row 1 gets more
+	 * emphasis, not the whole row a new fill), the chevron's ink darkens,
+	 * and the rule the row sits above darkens with it — traced, not lit.
+	 *
+	 * The chevron itself goes from "collapsed" (›) to "expanded" (⌄) by
+	 * rotating 90°, not by swapping characters, so neither the interaction
+	 * nor the icon needs a line of JS.
 	 */
 	.chronology-row {
 		display: flex;
@@ -356,9 +365,7 @@
 		gap: var(--spacing-field);
 		cursor: pointer;
 		list-style: none; /* Firefox draws a marker on <summary> without this */
-		padding: var(--spacing-field) var(--spacing-hair);
-		margin-inline: calc(var(--spacing-hair) * -1);
-		transition: background-color 0.1s ease;
+		padding-block: var(--spacing-pair);
 	}
 
 	/* Chrome/Safari's marker isn't covered by list-style. */
@@ -366,15 +373,23 @@
 		display: none;
 	}
 
-	.chronology-row:hover {
-		background-color: var(--color-board);
+	.chronology-row:hover .chronology-title,
+	.chronology-row:focus-visible .chronology-title {
+		text-decoration: underline;
+	}
+
+	.chronology-row:hover .chronology-chevron,
+	.chronology-row:focus-visible .chronology-chevron {
+		color: var(--color-ink);
 	}
 
 	.chronology-chevron {
 		flex-shrink: 0;
 		font-family: var(--font-record);
 		color: var(--color-ink-muted);
-		transition: transform 0.15s ease;
+		transition:
+			transform 0.15s ease,
+			color 0.1s ease;
 	}
 
 	details[open] > .chronology-row .chronology-chevron {
@@ -382,7 +397,6 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.chronology-row,
 		.chronology-chevron {
 			transition: none;
 		}
@@ -495,6 +509,20 @@
 		border: none;
 		border-top: 1px solid var(--color-rule);
 		margin: var(--spacing-entry) 0;
+	}
+}
+
+/* Tailwind's own layer order (theme, base, components, utilities) puts
+ * utilities last — highest priority, regardless of specificity. A rule
+ * declared in @layer components, like everything above, can never beat a
+ * plain `.border-rule` utility no matter how it's targeted; it has to live
+ * here instead. This is the one selector on the site that needs that: the
+ * chronology row's hover-darkened rule (a Tailwind border-color utility on
+ * the <li>) has to outrank the border-rule utility already on the same
+ * element. */
+@layer utilities {
+	li:has(> details > .chronology-row:hover) {
+		border-color: var(--color-ink-muted);
 	}
 }
 

@@ -40,7 +40,9 @@ availability: "[[UNWRITTEN]]"
 chronology:
   - date: 2022-06-01
     kind: employment
-    note: "Academic Intervention Specialist, Vertus Charter High School — math/science support for at-risk students"
+    title: "Academic Intervention Specialist"
+    org: "Vertus Charter High School"
+    summary: "Math/science support for at-risk students."
     detail:
       - Provide targeted one-on-one and small-group instruction in math and science to high school students to address learning gaps and strengthen foundational skills.
       - Support students in building confidence, improving subject comprehension, and developing effective study strategies.
@@ -49,21 +51,27 @@ chronology:
       - 25+ students per summer session, average grade improvement of 15%, 80% reaching grade-level proficiency; 87% of surveyed teachers report significant academic improvement.
   - date: 2024-06-01
     kind: employment
-    note: "Information Technology Intern, Rochester Regional Joint Board — hardware/software support under the Lead IT Specialist (Jun.–Aug. 2024)"
+    title: "Information Technology Intern"
+    org: "Rochester Regional Joint Board"
+    summary: "Hardware/software support under the Lead IT Specialist (Jun.–Aug. 2024)."
     detail:
       - Collaborated directly with the Lead IT Specialist to support day-to-day IT operations across the organization.
       - Assisted with maintenance and troubleshooting of office hardware, including desktops, laptops, printers, and networking equipment.
       - Provided software support for staff, including installation, configuration, and issue resolution.
   - date: 2025-08-25
     kind: education
-    note: "Enrolled at the University of Rochester, B.S. Computer Science (AI concentration), Math minor — expected May 2029"
+    title: "B.S. Computer Science"
+    org: "University of Rochester"
+    summary: "AI concentration, Math minor — expected May 2029."
     detail:
       - B.S. Computer Science, AI concentration, with a Math minor, expected May 2029.
       - "Relevant coursework: Data Structures and Algorithms, Discrete Mathematics, Linear Algebra and Differential Equations."
       - "Planned clusters: Computational Linguistics, Ethics of Technology."
   - date: 2026-01-01
     kind: freelance
-    note: "Web Designer, self-employed — mobile-responsive websites for small businesses, from design through client-facing launch"
+    title: "Web Designer"
+    org: "Self-employed"
+    summary: "Mobile-responsive websites for small businesses, from design through client-facing launch."
     detail:
       - Design and develop websites for small businesses with a focus on clean design, mobile responsiveness, and brand growth.
       - Work directly with business owners to build customized online experiences that improve visibility, customer engagement, and professionalism.
@@ -71,7 +79,9 @@ chronology:
       - Own the full project lifecycle from scoping through launch and post-launch support.
   - date: 2026-06-01
     kind: employment
-    note: "Marketing and AI Intern, Thomas Media Group — AI-powered workflow automation and technology infrastructure across CRM, design, and production tooling"
+    title: "Marketing & AI Intern"
+    org: "Thomas Media Group"
+    summary: "AI-powered workflow automation and technology infrastructure across CRM, design, and production tooling."
     detail:
       - Design, test, and implement AI-powered tools and workflow automations to improve operational efficiency across internal business processes.
       - "Support and optimize company technology infrastructure — CRM, project management, design, and AI platforms including HubSpot, Asana, Figma, Claude, ChatGPT, Qwilr, and Google Workspace."

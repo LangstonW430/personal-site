@@ -341,6 +341,54 @@
 	}
 
 	/*
+	 * .chronology-row — the Experience/Chronology accordion's <summary>. A
+	 * native <details>/<summary> already gives keyboard access, a focus
+	 * ring, and an expanded/collapsed state exposed to assistive tech for
+	 * free; this supplies only the visual language on top of that. The
+	 * chevron goes from "collapsed" (›) to "expanded" (⌄) by rotating 90°,
+	 * not by swapping characters, so neither the interaction nor the icon
+	 * needs a line of JS.
+	 */
+	.chronology-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--spacing-field);
+		cursor: pointer;
+		list-style: none; /* Firefox draws a marker on <summary> without this */
+		padding: var(--spacing-field) var(--spacing-hair);
+		margin-inline: calc(var(--spacing-hair) * -1);
+		transition: background-color 0.1s ease;
+	}
+
+	/* Chrome/Safari's marker isn't covered by list-style. */
+	.chronology-row::-webkit-details-marker {
+		display: none;
+	}
+
+	.chronology-row:hover {
+		background-color: var(--color-board);
+	}
+
+	.chronology-chevron {
+		flex-shrink: 0;
+		font-family: var(--font-record);
+		color: var(--color-ink-muted);
+		transition: transform 0.15s ease;
+	}
+
+	details[open] > .chronology-row .chronology-chevron {
+		transform: rotate(90deg);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.chronology-row,
+		.chronology-chevron {
+			transition: none;
+		}
+	}
+
+	/*
 	 * .readme-content — a record's github.com README, fetched live and
 	 * injected as GitHub's own rendered HTML (see lib/github.ts's
 	 * fetchReadme). That HTML carries none of this project's classes, only

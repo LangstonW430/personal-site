@@ -348,13 +348,21 @@ const profile = defineCollection({
 				z.strictObject({
 					date: z.date().optional(),
 					kind: z.enum(['education', 'freelance', 'employment']),
-					note: z.string().min(1),
-					// The one-line summary (`note`) is always visible. `detail` is the
-					// full description, shown only on expand — a <details> disclosure,
-					// not a second source of truth for the same fact. An array, not a
-					// paragraph: these came from LinkedIn as bullet points, and a role
-					// with five responsibilities reads as five responsibilities, not
-					// one 90-word block a reader has to parse apart themselves.
+					// title/org replace what used to be one combined `note` string
+					// ("Title, Org — description") — split so the collapsed row can
+					// show position and organization as their own lines instead of
+					// parsing them back out of a sentence. `summary` is the short
+					// description that sentence used to end in; it now surfaces only
+					// on expand, as the lead line above `detail`.
+					title: z.string().min(1),
+					org: z.string().min(1),
+					summary: z.string().min(1).optional(),
+					// `detail` is the full description, shown only on expand — a
+					// <details> disclosure, not a second source of truth for the same
+					// fact. An array, not a paragraph: these came from LinkedIn as
+					// bullet points, and a role with five responsibilities reads as
+					// five responsibilities, not one 90-word block a reader has to
+					// parse apart themselves.
 					detail: z.array(z.string().min(1)).min(1).optional(),
 				}),
 			)

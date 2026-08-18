@@ -17,7 +17,9 @@ export function isUnwritten(value: string | null | undefined): boolean {
 export type ChronologyEntry = {
 	date?: Date;
 	kind: 'education' | 'freelance' | 'employment';
-	note: string;
+	title: string;
+	org: string;
+	summary?: string;
 	detail?: string[];
 };
 
@@ -33,7 +35,7 @@ export const CHRONOLOGY_KIND_LABEL: Record<ChronologyEntry['kind'], string> = {
 // sort to the top, read as current/ongoing rather than oldest/unknown.
 export function sortedChronology(entries: ChronologyEntry[]): ChronologyEntry[] {
 	return entries
-		.filter((entry) => !isUnwritten(entry.note))
+		.filter((entry) => !isUnwritten(entry.title))
 		.sort((a, b) => {
 			if (!a.date && !b.date) return 0;
 			if (!a.date) return -1;

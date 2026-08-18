@@ -236,28 +236,46 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 			chronology.length > 0 && (
 				<section class="mt-register bg-card border border-rule p-entry">
 					<h2 class="field-label">Experience</h2>
-					<ul role="list" class="mt-field flex flex-col gap-field">
+					<ul role="list" class="mt-field flex flex-col">
 						{chronology.map((entry) => (
-							<li class="border-b border-rule pb-field last:border-b-0 last:pb-0">
+							<li class="border-b border-rule last:border-b-0">
 								{entry.detail ? (
 									<details>
-										<summary class="cursor-pointer flex flex-wrap items-baseline gap-pair">
-											<span class="field-label shrink-0">{CHRONOLOGY_KIND_LABEL[entry.kind]}</span>
-											<span class="font-record font-typed text-sm">
-												{entry.date ? <Time date={entry.date} /> : 'Date TBD'} — {entry.note}
+										<summary class="chronology-row">
+											<span class="min-w-0 flex-1">
+												<span class="flex items-baseline gap-pair">
+													<span class="field-label shrink-0">{CHRONOLOGY_KIND_LABEL[entry.kind]}</span>
+													<span class="font-record font-typed text-xs text-ink-muted">
+														{entry.date ? <Time date={entry.date} /> : 'Date TBD'}
+													</span>
+												</span>
+												<span class="block font-prose text-md leading-display mt-hair">{entry.title}</span>
+												<span class="block font-record font-typed text-sm text-ink-muted mt-hair">{entry.org}</span>
 											</span>
+											<span class="chronology-chevron" aria-hidden="true">›</span>
 										</summary>
-										<ul role="list" class="list-disc pl-entry mt-pair flex flex-col gap-hair max-w-[62ch]">
-											{entry.detail.map((line) => (
-												<li class="font-prose text-sm leading-record">{line}</li>
-											))}
-										</ul>
+										<div class="pb-field pl-field border-l border-rule ml-hair">
+											{entry.summary && (
+												<p class="font-prose text-sm leading-record mt-pair max-w-[62ch]">{entry.summary}</p>
+											)}
+											<ul role="list" class="list-disc pl-entry mt-pair flex flex-col gap-hair max-w-[62ch]">
+												{entry.detail.map((line) => (
+													<li class="font-prose text-sm leading-record">{line}</li>
+												))}
+											</ul>
+										</div>
 									</details>
 								) : (
-									<div class="flex flex-wrap items-baseline gap-pair">
-										<span class="field-label shrink-0">{CHRONOLOGY_KIND_LABEL[entry.kind]}</span>
-										<span class="font-record font-typed text-sm">
-											{entry.date ? <Time date={entry.date} /> : 'Date TBD'} — {entry.note}
+									<div class="flex items-center justify-between gap-field px-hair py-field">
+										<span class="min-w-0 flex-1">
+											<span class="flex items-baseline gap-pair">
+												<span class="field-label shrink-0">{CHRONOLOGY_KIND_LABEL[entry.kind]}</span>
+												<span class="font-record font-typed text-xs text-ink-muted">
+													{entry.date ? <Time date={entry.date} /> : 'Date TBD'}
+												</span>
+											</span>
+											<span class="block font-prose text-md leading-display mt-hair">{entry.title}</span>
+											<span class="block font-record font-typed text-sm text-ink-muted mt-hair">{entry.org}</span>
 										</span>
 									</div>
 								)}

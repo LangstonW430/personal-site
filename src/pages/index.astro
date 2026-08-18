@@ -249,12 +249,14 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 														{entry.date ? <Time date={entry.date} /> : 'Date TBD'}
 													</span>
 												</span>
-												<span class="block font-prose text-md leading-display mt-hair">{entry.title}</span>
+												<span class="chronology-title block font-prose text-md leading-display mt-hair">
+													{entry.title}
+												</span>
 												<span class="block font-record font-typed text-sm text-ink-muted mt-hair">{entry.org}</span>
 											</span>
 											<span class="chronology-chevron" aria-hidden="true">›</span>
 										</summary>
-										<div class="pb-field pl-field border-l border-rule ml-hair">
+										<div class="pb-pair pl-field border-l border-rule">
 											{entry.summary && (
 												<p class="font-prose text-sm leading-record mt-pair max-w-[62ch]">{entry.summary}</p>
 											)}
@@ -266,7 +268,7 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 										</div>
 									</details>
 								) : (
-									<div class="flex items-center justify-between gap-field px-hair py-field">
+									<div class="flex items-center justify-between gap-field py-pair">
 										<span class="min-w-0 flex-1">
 											<span class="flex items-baseline gap-pair">
 												<span class="field-label shrink-0">{CHRONOLOGY_KIND_LABEL[entry.kind]}</span>

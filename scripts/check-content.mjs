@@ -8,8 +8,12 @@
 
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+// fileURLToPath, not `.pathname`: on Windows the latter yields "/C:/dev/..."
+// with a leading slash, and join() then produces "C:\C:\dev\..." — the script
+// crashed with ENOENT on every Windows run.
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
 // src/content, not src/content/records: profile.yaml (the masthead and
 // /biographical-note/'s source) lives directly under src/content/, one level
 // above the records/ collection, and carries its own [[UNWRITTEN]] fields.

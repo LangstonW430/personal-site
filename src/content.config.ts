@@ -188,8 +188,8 @@ const records = defineCollection({
 });
 
 /**
- * The person, not a work. One entry — the masthead and the biographical
- * note both read from it, so the two surfaces can't state the name or role
+ * The person, not a work. One entry — the masthead and /contact/ both read
+ * from it, so the two surfaces can't state the name, role, or email
  * differently by accident.
  *
  * `chronology` dates are optional and deliberately so: a chronology entry

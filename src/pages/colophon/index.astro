@@ -2,21 +2,48 @@
 /*
  * The colophon: traditionally a printer's specification note — paper,
  * typeface, press, date. The `<dl>` below is the same idea applied to a
- * static site and is real, sourced from the project's own settled stack
- * decisions (astro.config.mjs, package.json, global.css) rather than
- * invented. Only the narrative prose is Langston's to write, hence the
- * [[UNWRITTEN]] paragraphs.
+ * static site, sourced from the project's own settled decisions
+ * (astro.config.mjs, package.json, global.css) rather than invented.
+ *
+ * Every value here was checked against the repo on 2026-08-19 rather than
+ * carried forward from memory. Two were wrong:
+ *
+ *   CLIENT JS said "every route is prerendered". False — `/` sets
+ *   `prerender = false` and renders on demand. The *claim* of no client JS
+ *   survived the check (the production build emits zero .js: none in
+ *   dist/client, none in .vercel/output/static, no <script> in any built
+ *   HTML, and no hydration or server-island directive anywhere in src).
+ *   Only the reason was wrong, so only the reason changed.
+ *
+ *   HOSTING said "static output" and stopped, which omits the adapter that
+ *   makes the one on-demand route legal.
+ *
+ * TYPE became TYPEFACES: it sat four lines under "TypeScript strict" and
+ * could be read as naming a type system.
+ *
+ * DECLINED is last and is the only field here that isn't inventory. The
+ * others are true of this site and of many sites; what a register refuses
+ * to accession is the part that carries judgement.
  */
 import Base from '../../layouts/Base.astro';
 
 const spec: { label: string; value: string }[] = [
 	{ label: 'Framework', value: 'Astro 7, TypeScript strict' },
 	{ label: 'Styling', value: 'Tailwind v4, default scales wiped' },
-	{ label: 'Type', value: 'Commit Mono + Source Serif 4 Variable, self-hosted' },
+	{ label: 'Typefaces', value: 'Commit Mono + Source Serif 4 Variable, self-hosted' },
 	{ label: 'Content', value: 'MDX in src/content/, no CMS' },
-	{ label: 'Hosting', value: 'Vercel, static output' },
-	{ label: 'Client JS', value: 'None — every route is prerendered' },
+	{ label: 'Hosting', value: 'Vercel — static output, @astrojs/vercel adapter for the one on-demand route' },
+	{ label: 'Client JS', value: 'None. One route server-renders, the rest prerender; neither ships a bundle.' },
+	{ label: 'Declined', value: 'Cloudflare, Convex, Next.js, shadcn/ui, Google Fonts CDN, CMS backend' },
 ];
+
+// The rail was 15rem, which broke "Source Serif 4 Variable" across lines —
+// a wrapped proper noun reads as two things. Widened in two steps so the
+// prose column stays the wider of the two at every width the split applies
+// at: a single 26rem rail would out-measure the prose at the md: breakpoint
+// itself, which inverts the asymmetry the layout exists to state. Below md:
+// it stacks, rail first, same as a record page.
+const SPLIT = 'md:grid-cols-[20rem_1fr] lg:grid-cols-[26rem_1fr]';
 ---
 
 <Base title="Colophon — Langston" description="How this site is built and what it runs on." path="/colophon/">
@@ -27,12 +54,13 @@ const spec: { label: string; value: string }[] = [
 			<header>
 				<h1 class="font-prose text-xl leading-display mt-entry">Colophon</h1>
 				<p class="font-prose leading-prose mt-field max-w-[62ch]">
-					[[UNWRITTEN]] A short note on why this site is built the way it is — the register conceit, the
-					stack decisions, what got left out on purpose.
+					I wanted a theme that would not distract from the content while still working as a
+					personal site. The archival register does that — it inherently places the focus on the
+					projects, which is what I think a personal site for computer science should do.
 				</p>
 			</header>
 
-			<div class="mt-register grid gap-entry grid-cols-1 md:grid-cols-[15rem_1fr]">
+			<div class={`mt-register grid gap-entry grid-cols-1 ${SPLIT}`}>
 				<dl class="bg-card border border-rule p-entry flex flex-col gap-field">
 					{
 						spec.map((row) => (
@@ -44,12 +72,22 @@ const spec: { label: string; value: string }[] = [
 					}
 				</dl>
 
-				<div class="font-prose leading-prose max-w-[62ch]">
-					<p>
-						[[UNWRITTEN]] Longer notes on the design tradition this site borrows from — the accession
-						record, the herbarium sheet, the auction catalogue entry — and why a personal site built for
-						recruiters and freelance clients ended up looking like a registrar's ledger instead of a
-						portfolio.
+				<div>
+					<div class="font-prose leading-prose max-w-[62ch]">
+						<p>
+							The second constraint was speed of orientation. Ninety percent of what matters should
+							be available within ten seconds of opening the site, so the important information sits
+							at the top of the home page rather than behind a hero and a screen of filler.
+						</p>
+						<p>
+							My previous personal site was built around a pleasing design. This one was built by
+							subtraction. For every element I considered adding, I asked whether it was strictly
+							necessary and whether it provided value, and removed it when the answer was no.
+						</p>
+					</div>
+
+					<p class="font-record font-typed text-sm mt-register border-t border-rule pt-field max-w-[62ch]">
+						The build itself is catalogued as <a href="/2026.08-register/">2026.08</a>.
 					</p>
 				</div>
 			</div>

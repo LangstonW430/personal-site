@@ -7,12 +7,12 @@
  * to prove there's real work without asking a stranger to read all eight
  * records before deciding to keep going.
  *
- * Order: masthead, Experience, register preview, then GitHub and Recent
- * Changes — both instruments about the work, which only mean something once
- * a visitor already knows there's work to look at. Experience sits with the
+ * Order: masthead, Experience, register preview, then the GitHub panel — an
+ * instrument about the work, which only means something once a visitor
+ * already knows there's work to look at, and which ends the page on the one
+ * claim a static document can't make for itself. Experience sits with the
  * masthead rather than after the register: it's still "who is this," a
- * compact read of the same chronology /biographical-note/ gives in full, not
- * a claim about the work below.
+ * compact read of the same chronology, not a claim about the work below.
  *
  * `prerender = false`: this is the one route on the site that isn't static.
  * `server:defer` was the brief's first idea, but Astro's actual server-island
@@ -35,19 +35,20 @@ import { EXTERNAL_LINK_ATTRS } from '../lib/links';
 export const prerender = false;
 
 const GITHUB_USERNAME = 'LangstonW430';
-// Kept in sync with astro.config.mjs's linkedFileGuard calls by convention.
-// Transcript isn't linked from the homepage — /biographical-note/'s
-// Documents section carries both it and the résumé.
+// Kept in sync with astro.config.mjs's linkedFileGuard call by convention.
+// The same path is linked from /contact/'s Document section; the résumé is
+// the only document the site offers.
 const RESUME_PATH = '/resume.pdf';
 
 const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
 const profile = await getEntry('profile', 'profile');
 if (!profile) throw new Error('src/content/profile.yaml is missing or failed to load — the masthead has nothing to read.');
 
-// Same source and sort as /biographical-note/'s Chronology — this is the
-// compact version, three lines instead of the full note, with a link out
-// to the rest. Not a second source of truth: both pages read profile.yaml
-// through the same sortedChronology() helper.
+// The only chronology on the site now — /biographical-note/ carried a flat
+// duplicate of it until that page was folded into /contact/, which kept the
+// note and dropped the second copy. Still routed through sortedChronology()
+// rather than sorted inline, so a future second consumer can't disagree with
+// this one about ordering or about how undated entries are placed.
 const chronology = sortedChronology(profile.data.chronology);
 
 // This site's own build history (2026.08) is excluded from both the
@@ -56,8 +57,17 @@ const chronology = sortedChronology(profile.data.chronology);
 // about itself isn't evidence of anything else.
 const SELF_ACC = '2026.08';
 
-// `featured` is the explicit override (none set yet); with none set, the 3
-// most recently accessioned non-self records lead instead. Either way this
+// `featured` is the explicit override, and it replaces the default set
+// rather than adding to it: 2026.02 and 2026.06 are flagged, so the preview
+// is those two and nothing else. Fewer than three is intentional — the cap
+// is a ceiling, not a quota, and a short list of work worth leading with
+// beats padding it out to fill a row.
+//
+// The override deliberately does NOT apply the SELF_ACC exclusion below. The
+// fallback keeps the register's own record off its own homepage; flagging it
+// would be an explicit decision to override that, which is a choice worth
+// leaving available rather than blocking. With no record flagged at all, the
+// 3 non-self records with the highest `order` lead instead. Either way this
 // is a preview, not a second copy of the register — /work/ has the rest.
 const featured = records.filter((record) => record.data.featured);
 const topRecords = (featured.length > 0 ? featured : records.filter((record) => record.data.acc !== SELF_ACC))
@@ -65,7 +75,13 @@ const topRecords = (featured.length > 0 ? featured : records.filter((record) => 
 	.sort((a, b) => b.data.order - a.data.order)
 	.slice(0, 3);
 
-const allowlist = repoAllowlist(records.map((record) => record.data.links.source));
+const allowlist = repoAllowlist(
+	records.map((record) => ({
+		source: record.data.links.source,
+		acc: record.data.acc,
+		title: record.data.title,
+	})),
+);
 
 let githubData: GithubPanelData | null = null;
 try {
@@ -90,41 +106,20 @@ const githubCheckedAt = new Date();
 // the background, rather than blocking on a live fetch.
 Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=300');
 
-type Change = {
-	date: Date;
-	kind: 'Accessioned' | 'Revised';
-	label: string;
-	href: string;
-};
-
-const changes: Change[] = [
-	...records
-		.filter((record) => record.data.acc !== SELF_ACC)
-		.map(
-			(record): Change => ({
-				date: record.data.acquired,
-				kind: 'Accessioned',
-				label: `${record.data.acc} — ${record.data.title}`,
-				href: `/${record.id}/`,
-			}),
-		),
-	...records
-		.filter((record) => record.data.acc !== SELF_ACC)
-		.flatMap((record) =>
-			(record.data.history ?? []).map(
-				(entry): Change => ({
-					date: entry.date,
-					kind: 'Revised',
-					label: `${record.data.acc} — ${entry.note}`,
-					href: `/${record.id}/`,
-				}),
-			),
-		),
-];
-
-changes.sort((a, b) => b.date.getTime() - a.date.getTime());
-const RECENT_CHANGES_LIMIT = 5;
-const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
+// A "Recent changes" panel stood here through Phase 3. Cut, not deferred:
+// every row it could build read "Accessioned", because the `Revised` half
+// draws on `history[]` and only this site's own record has one — which
+// SELF_ACC excludes. What shipped was five rows of date-plus-title, strictly
+// less than the register table 200px above it, under a label a reader
+// outside the catalog tradition has to decode. It also aged badly by
+// construction: a heading promising recency, with a newest entry that goes
+// stale the moment a week passes without a new accession.
+//
+// The mechanism is intact in the schema (`history[]` on a record, rendered on
+// its own page). This is worth rebuilding on the homepage when condition
+// notes actually start moving — ACTIVE to SHIPPED is a real change worth
+// announcing; "I catalogued a thing" is a fact about the catalog, not the
+// work.
 ---
 
 <Base
@@ -267,7 +262,7 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 						))}
 					</ul>
 					<p class="font-record font-typed text-xs mt-field">
-						<a href="/biographical-note/">Full biographical note &amp; résumé &rarr;</a>
+						<a href="/contact/">Biographical note &amp; résumé &rarr;</a>
 					</p>
 				</section>
 			)
@@ -282,24 +277,5 @@ const recentChanges = changes.slice(0, RECENT_CHANGES_LIMIT);
 		</p>
 
 		<GithubPanel data={githubData} checkedAt={githubCheckedAt} />
-
-		{
-			recentChanges.length > 0 && (
-				<section class="mt-register bg-card border border-rule p-entry">
-					<h2 class="field-label">Recent changes</h2>
-					<ul role="list" class="flex flex-col gap-pair mt-field">
-						{recentChanges.map((change) => (
-							<li class="flex flex-wrap items-baseline gap-pair">
-								<Time date={change.date} class="font-record font-typed text-xs text-ink-muted shrink-0" />
-								<span class="field-label shrink-0">{change.kind}</span>
-								<a href={change.href} class="font-record font-typed text-sm">
-									{change.label}
-								</a>
-							</li>
-						))}
-					</ul>
-				</section>
-			)
-		}
 	</main>
 </Base>

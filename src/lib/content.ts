@@ -27,10 +27,11 @@ export const CHRONOLOGY_KIND_LABEL: Record<ChronologyEntry['kind'], string> = {
 	employment: 'Employment',
 };
 
-// Shared by the homepage's compact Experience section and the full
-// Chronology on /biographical-note/, so the two can't sort or filter
-// unwritten entries differently by accident. Undated entries ("date TBD")
-// sort to the top, read as current/ongoing rather than oldest/unknown.
+// Currently one consumer: the homepage's Experience section. It was two
+// until /biographical-note/'s flat Chronology was dropped, and the helper
+// stays a helper so a second consumer can't reintroduce a different sort or
+// a different rule for unwritten entries. Undated entries ("date TBD") sort
+// to the top, read as current/ongoing rather than oldest/unknown.
 export function sortedChronology(entries: ChronologyEntry[]): ChronologyEntry[] {
 	return entries
 		.filter((entry) => !isUnwritten(entry.title))

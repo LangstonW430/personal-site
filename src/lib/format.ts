@@ -5,6 +5,15 @@
 /** ISO date, e.g. "2026-06-14" — the format a record is dated in. */
 export const formatDate = (d: Date): string => d.toISOString().slice(0, 10);
 
+/**
+ * Date to the minute, e.g. "2026-08-18 18:12 UTC". Explicitly UTC and
+ * explicitly labelled: this renders on a server whose timezone is Vercel's,
+ * not the reader's, so an unlabelled "18:12" would be a different real moment
+ * depending on where the page was built. Naming the zone costs four
+ * characters and makes the figure checkable against GitHub itself.
+ */
+export const formatDateTime = (d: Date): string => `${d.toISOString().slice(0, 16).replace('T', ' ')} UTC`;
+
 type Extent = {
 	commits?: number;
 	duration?: string;

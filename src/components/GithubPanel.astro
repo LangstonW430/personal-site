@@ -3,7 +3,19 @@
  * The instrument panel. `stamp` marks the freshness readout — CLAUDE.md
  * reserves that ink for accession numbers, live-data indicators, and focus
  * rings; this is the live-data indicator the token system was always meant
- * to carry, arriving in this phase.
+ * to carry.
+ *
+ * What this panel is for: proving the work is ongoing, with a number that
+ * could not have been typed by hand. That is the only thing here a static
+ * page can't claim, so it's the only thing the panel reports. Language was
+ * dropped — MEDIUM in the register above already says it, better. Open-issue
+ * count was dropped because GitHub's `open_issues_count` silently includes
+ * pull requests, so "3 open issues" could be one issue and two PRs, and a
+ * number that needs a footnote is worse than no number.
+ *
+ * Rows are named after the record, not just the repo slug: a reader who has
+ * just scanned "CollabDocs" in the register shouldn't have to work out that
+ * `collaboration-app` is the same thing.
  *
  * No fabricated "last synchronized" claim on failure: this is a stateless
  * per-request render with no store, so there's no persisted prior-success
@@ -22,9 +34,17 @@ interface Props {
 
 const { data, checkedAt } = Astro.props;
 
-const mostRecentPush = data?.repos.length
-	? data.repos.reduce((latest, repo) => (repo.pushedAt > latest ? repo.pushedAt : latest), data.repos[0].pushedAt)
-	: null;
+// "Active" is derived, never asserted. A hardcoded status word next to a live
+// timestamp would be the one claim on this page that isn't measured — and it
+// would keep claiming it through a six-month gap, which is exactly when a
+// reader would be checking. Past the window the word is simply absent and the
+// timestamp speaks for itself; nothing here invents a second status
+// vocabulary to describe going quiet.
+const ACTIVE_WITHIN_DAYS = 30;
+const DAY_MS = 86_400_000;
+
+const lastPush = data?.mostRecentPush ? new Date(data.mostRecentPush) : null;
+const isActive = lastPush !== null && Date.now() - lastPush.getTime() <= ACTIVE_WITHIN_DAYS * DAY_MS;
 ---
 
 <section class="mt-register bg-card border border-rule p-entry">
@@ -36,29 +56,35 @@ const mostRecentPush = data?.repos.length
 	{
 		data ? (
 			<>
-				<p class="font-record font-typed text-sm mt-field">
-					{data.publicRepoCount} public {data.publicRepoCount === 1 ? 'repository' : 'repositories'} · most
-					recent push{' '}
-					{mostRecentPush && <Time date={new Date(mostRecentPush)} class="text-stamp" />}
-				</p>
+				{lastPush && (
+					<p class="font-record font-typed text-sm mt-field">
+						{isActive && 'Active · '}latest push <Time date={lastPush} class="text-stamp" />
+					</p>
+				)}
 
-				<ul role="list" class="mt-entry flex flex-col gap-field">
-					{data.repos.map((repo) => (
-						<li class="border-b border-rule pb-field">
-							<a href={repo.url} class="font-record font-typed text-sm text-stamp" {...EXTERNAL_LINK_ATTRS}>
-								{repo.owner}/{repo.name}
-							</a>
-							<p class="font-record font-typed text-xs mt-hair">
-								{repo.language ?? '—'} · pushed <Time date={new Date(repo.pushedAt)} />
-								{repo.openIssues > 0 && ` · ${repo.openIssues} open ${repo.openIssues === 1 ? 'issue' : 'issues'}`}
-							</p>
-						</li>
-					))}
-				</ul>
+				{data.repos.length > 0 && (
+					<ul role="list" class="mt-entry flex flex-col gap-field">
+						{data.repos.map((repo) => (
+							<li class="border-b border-rule last:border-b-0 pb-field last:pb-0">
+								<div class="flex items-baseline justify-between flex-wrap gap-x-field gap-y-hair">
+									<a href={repo.url} class="font-record font-typed text-sm text-stamp" {...EXTERNAL_LINK_ATTRS}>
+										{repo.owner}/{repo.name}
+									</a>
+									<p class="font-record font-typed text-xs">
+										pushed <Time date={new Date(repo.pushedAt)} />
+									</p>
+								</div>
+								<p class="font-record font-typed text-xs text-ink-muted mt-hair">
+									{repo.acc} — {repo.title}
+								</p>
+							</li>
+						))}
+					</ul>
+				)}
 			</>
 		) : (
 			<p class="font-record font-typed text-sm mt-field">
-				Unavailable. Checked <Time date={checkedAt} />.
+				Unavailable. Checked <Time date={checkedAt} precision="minute" />.
 			</p>
 		)
 	}

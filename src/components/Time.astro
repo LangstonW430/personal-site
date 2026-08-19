@@ -1,15 +1,25 @@
 ---
 /* Every date on the site renders through here so <time datetime> and the
- * display text can never drift apart — they're the same formatDate call. */
-import { formatDate } from '../lib/format';
+ * display text can never drift apart — they're the same format call.
+ *
+ * `precision="minute"` is for figures where the clock time is the point —
+ * a live push timestamp, where "today" and "an hour ago" read very
+ * differently to someone judging whether the work is ongoing. Records stay
+ * on the default: a record's dates are days, not moments. */
+import { formatDate, formatDateTime } from '../lib/format';
 
 interface Props {
 	date: Date;
 	class?: string;
+	precision?: 'date' | 'minute';
 }
 
-const { date, class: className } = Astro.props;
-const iso = formatDate(date);
+const { date, class: className, precision = 'date' } = Astro.props;
+// The machine-readable attribute always carries full ISO precision; only the
+// human-readable text is trimmed. A crawler reading datetime="2026-08-18"
+// off a timestamp that was actually 18:12 would be losing real information.
+const iso = precision === 'minute' ? date.toISOString() : formatDate(date);
+const display = precision === 'minute' ? formatDateTime(date) : formatDate(date);
 ---
 
-<time datetime={iso} class={className}>{iso}</time>
+<time datetime={iso} class={className}>{display}</time>

@@ -1,4 +1,4 @@
-# The masthead and /biographical-note/ both read this file. Name, role,
+# The masthead and /contact/ both read this file. Name, role,
 # location, institution, and githubProfile are already-established facts
 # (CLAUDE.md's own project description; the GitHub account the panel on `/`
 # already reads from) — not invented here.

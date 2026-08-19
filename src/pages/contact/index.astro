@@ -1,10 +1,33 @@
 ---
-/* The intro prose is still Langston's to write — [[UNWRITTEN]] stays visible
- * there, same as every other body paragraph on the site. The channel
- * fields below are different: a short field left unwritten now hides
- * entirely rather than showing the sentinel, and both read from the same
- * profile.yaml the masthead does, so this page can't state a different
- * email than the one on the register. */
+/*
+ * Contact absorbed the Biographical Note. That page held four paragraphs, a
+ * résumé link, and nothing else once its Chronology came out — not enough
+ * unique material to justify a top-level destination, and the note reads
+ * better as context around the contact details than as a page a recruiter
+ * has to visit separately.
+ *
+ * Order is deliberate and is the one thing here not to rearrange: channels
+ * first, note second. A recruiter who opens this page wants the email, and
+ * should not have to read a biography to reach it.
+ *
+ * The channels were a `bg-card` panel until they weren't. A bordered box
+ * floating above running prose reads as two documents stapled together —
+ * the card announces "this is a component" exactly where the page wants to
+ * say "this is one record." They are now hairline-ruled rows in the same
+ * idiom as the register at /work/: label column, value column, a rule per
+ * boundary and no rule that isn't one. The card-on-board value step still
+ * carries depth everywhere it means something (the masthead, a record's
+ * rail); it was doing nothing here but drawing an outline around four lines
+ * of text.
+ *
+ * The résumé is a row in that list rather than a section of its own. It is
+ * a way of reaching the same person as the four rows above it, and a
+ * separate heading made one PDF look like a second kind of thing.
+ *
+ * Every field reads from the same profile.yaml the masthead does, so this
+ * page cannot state a different email than the register does. Short fields
+ * left unwritten hide entirely rather than showing the sentinel.
+ */
 import { getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { isUnwritten } from '../../lib/content';
@@ -13,54 +36,118 @@ import { EXTERNAL_LINK_ATTRS } from '../../lib/links';
 const profile = await getEntry('profile', 'profile');
 if (!profile) throw new Error('src/content/profile.yaml is missing or failed to load.');
 
+// Kept in sync with astro.config.mjs's linkedFileGuard call by convention —
+// hardcoded in both places, not imported, because astro.config.mjs runs
+// outside the src/ Vite pipeline.
+const RESUME_PATH = '/resume.pdf';
+
 const hasEmail = !isUnwritten(profile.data.email);
+
+/** Display form of a URL: no scheme, no `www.`, no trailing slash. The link
+ *  still points at the full URL — this is only what the reader sees, so a
+ *  LinkedIn profile doesn't render as forty characters of boilerplate. */
+const bare = (url: string) => url.replace(/^https:\/\/(www\.)?/, '').replace(/\/$/, '');
+
+// The rows and the note share one measure: `font-prose max-w-[62ch]` on
+// their common wrapper is what makes 62ch resolve against Source Serif
+// rather than the mono the rows are set in, so the rules above and the
+// paragraphs below land on an exact right edge instead of two that nearly
+// agree. Children set their own face; only the measure is inherited.
+//
+// One row shape, five rows. Stacked below md: (label over value, the same
+// pairing a record's rail uses), two columns at md: and up. Matches
+// RegisterTable's breakpoint idiom rather than inventing a second one.
+const ROW =
+	'border-b border-rule py-field md:grid md:grid-cols-[7rem_1fr] md:gap-field md:items-baseline';
+const VALUE = 'font-record font-typed text-sm leading-record mt-hair md:mt-0 break-words';
 ---
 
-<Base title="Contact — Langston" description="Get in touch." path="/contact/">
+<Base
+	title="Contact — Langston"
+	description="Contact details, biographical note, and résumé."
+	path="/contact/"
+>
 	<main id="main" class="px-entry py-register max-w-[62rem] mx-auto">
 		<p class="no-print"><a href="/">&larr; Home</a></p>
 
 		<article>
-			<header>
-				<h1 class="font-prose text-xl leading-display mt-entry">Contact</h1>
-				<p class="font-prose leading-prose mt-field max-w-[62ch]">
-					[[UNWRITTEN]] A line or two on what kind of work this is for — recruiting conversations,
-					freelance inquiries — and what to expect back.
-				</p>
-			</header>
+			<h1 class="font-prose text-xl leading-display mt-entry">Contact</h1>
 
-			{
-				(hasEmail || profile.data.githubProfile) && (
-					<dl class="mt-register bg-card border border-rule p-entry flex flex-col gap-field max-w-[24rem]">
-						{hasEmail && (
-							<div>
+			<div class="font-prose max-w-[62ch]">
+				<dl class="mt-entry border-t border-rule">
+					{
+						hasEmail && (
+							<div class={ROW}>
 								<dt class="field-label">Email</dt>
-								<dd class="font-record font-typed text-sm leading-record">
+								<dd class={VALUE}>
 									<a href={`mailto:${profile.data.email}`}>{profile.data.email}</a>
 								</dd>
 							</div>
-						)}
-						{profile.data.githubProfile && (
-							<div>
-								<dt class="field-label">Elsewhere</dt>
-								<dd class="font-record font-typed text-sm leading-record">
-									<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS}>GitHub</a>
-								</dd>
-							</div>
-						)}
-						{!isUnwritten(profile.data.services) && (
-							<div>
+						)
+					}
+
+					<div class={ROW}>
+						<dt class="field-label">LinkedIn</dt>
+						<dd class={VALUE}>
+							<a href={profile.data.linkedinProfile} {...EXTERNAL_LINK_ATTRS}>
+								{bare(profile.data.linkedinProfile)}
+							</a>
+						</dd>
+					</div>
+
+					<div class={ROW}>
+						<dt class="field-label">GitHub</dt>
+						<dd class={VALUE}>
+							<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS}>
+								{bare(profile.data.githubProfile)}
+							</a>
+						</dd>
+					</div>
+
+					{
+						!isUnwritten(profile.data.services) && (
+							<div class={ROW}>
 								<dt class="field-label">Services</dt>
-								<dd class="font-record font-typed text-sm leading-record">
+								<dd class={VALUE}>
 									<a href={profile.data.services} {...EXTERNAL_LINK_ATTRS}>
-										{profile.data.services.replace('https://', '')}
+										{bare(profile.data.services)}
 									</a>
 								</dd>
 							</div>
-						)}
-					</dl>
-				)
-			}
+						)
+					}
+
+					<div class={ROW}>
+						<dt class="field-label">Résumé</dt>
+						<dd class={VALUE}>
+							<a href={RESUME_PATH} {...EXTERNAL_LINK_ATTRS}>Download (PDF)</a>
+						</dd>
+					</div>
+				</dl>
+
+				<section class="mt-register">
+					<h2 class="field-label">Note</h2>
+					<div class="leading-prose mt-field">
+						<p>Computer science student at the University of Rochester.</p>
+						<p>
+							Most of what I've built started as someone else's problem. I run a small freelance
+							practice, which means shipping for local businesses on short timelines with real
+							money attached. PromptDesk came out of that: a CRM for solo freelancers that handles
+							clients, projects, time tracking, and Stripe invoicing, then turns that data into
+							prompts you paste into whatever AI tool you already use. It never calls a model
+							itself, which was the point.
+						</p>
+						<p>
+							I'm looking for a software engineering internship. My interests span software
+							development and AI.
+						</p>
+						<p>
+							This is a catalogue. One record per project, in the order I started them, each with a
+							written account of the decisions behind it.
+						</p>
+					</div>
+				</section>
+			</div>
 		</article>
 	</main>
 </Base>

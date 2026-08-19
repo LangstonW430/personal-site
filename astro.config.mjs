@@ -4,10 +4,38 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from 'astro/config';
+import { loadEnv } from 'vite';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
+
+/**
+ * Bridges `.env` files into `process.env` so local development can hold a
+ * GITHUB_TOKEN the same way Vercel does.
+ *
+ * Astro loads `.env` into `import.meta.env`, not `process.env` — and this
+ * project reads secrets from `process.env` deliberately (see the note in
+ * src/pages/index.astro: Vite statically inlines `import.meta.env.X`, which
+ * once baked a token's literal value into a deployed function bundle). The
+ * two facts together mean a `.env` file would otherwise be silently ignored
+ * by the one piece of code that wants it. This closes that gap without
+ * touching the rule that produced it.
+ *
+ * `loadEnv` is Vite's own dotenv reader — already present as an Astro
+ * dependency, so no new package — and it covers `.env`, `.env.local`, and the
+ * mode-specific variants. The `''` prefix argument is what makes it return
+ * unprefixed keys; Vite's default would only hand back `VITE_*`.
+ *
+ * `??=`, never `=`: a real environment variable always wins. On Vercel the
+ * platform has already populated `process.env`, so every assignment here
+ * no-ops and production behaviour is unchanged. Nothing reaches the browser
+ * either — this mutates the build/dev process only, and the client bundle
+ * still has no `import.meta.env` reference to inline.
+ */
+for (const [key, value] of Object.entries(loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), ''))) {
+	process.env[key] ??= value;
+}
 
 /**
  * Fails the build when an `@font-face` rule points at a file that is not in
@@ -101,8 +129,8 @@ function fontGuard({ stylesheet = 'src/styles/global.css' } = {}) {
 }
 
 /**
- * Fails the build when a PDF linked from /biographical-note/ (résumé,
- * transcript) is not in `public/`.
+ * Fails the build when a PDF linked from the site (the résumé) is not in
+ * `public/`.
  *
  * Same shape as `fontGuard`, and for the same reason: a missing file here has
  * no error state of its own. The link still renders, still looks clickable,
@@ -110,8 +138,8 @@ function fontGuard({ stylesheet = 'src/styles/global.css' } = {}) {
  * the one a recruiter hits at exactly the moment they decided to act, and the
  * one nobody browsing the register would ever stumble onto to notice is dead.
  *
- * One function, called once per document: a second document (the transcript)
- * is the same failure mode as the first, not a new one.
+ * Parameterised by file rather than hardcoded, so a second linked document
+ * would be another call rather than another function.
  *
  * @param {{ file: string, label: string }} options
  * @returns {import('astro').AstroIntegration}
@@ -124,11 +152,12 @@ function linkedFileGuard({ file, label }) {
 	const isMissing = (config) => !existsSync(join(fileURLToPath(config.publicDir), file));
 
 	const report = () =>
-		`linked-file-guard: public/${file} is missing. It's linked from /biographical-note/ — a ` +
+		`linked-file-guard: public/${file} is missing. It's linked from / and /contact/ — a ` +
 		`missing ${label} does not error at runtime, the link just renders and 404s. Add the ` +
-		`file, or update the path in both astro.config.mjs's linkedFileGuard call and ` +
-		`src/pages/biographical-note/index.astro (the two are not linked by import, only by ` +
-		`convention, the same way global.css's @font-face paths and font-guard agree).`;
+		`file, or update the path in astro.config.mjs's linkedFileGuard call and in both ` +
+		`src/pages/index.astro and src/pages/contact/index.astro (these are not linked by ` +
+		`import, only by convention, the same way global.css's @font-face paths and ` +
+		`font-guard agree).`;
 
 	return {
 		name: `linked-file-guard:${file}`,
@@ -165,7 +194,6 @@ export default defineConfig({
 		mdx(),
 		fontGuard(),
 		linkedFileGuard({ file: 'resume.pdf', label: 'résumé' }),
-		linkedFileGuard({ file: 'transcript.pdf', label: 'transcript' }),
 		// Excludes /og/*.png — those are build artifacts (the OG image
 		// endpoint), not pages, and don't belong in a page sitemap.
 		sitemap({

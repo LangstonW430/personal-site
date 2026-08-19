@@ -9,8 +9,7 @@ status: active
 extent:
   commits: 7
 condition: |-
-  [[UNWRITTEN]]
-  Active, mid-build. Phase 2a spine is live; this record and its seven siblings are Phase 2b's placeholder content, not final copy.
+  Active, mid-build. Routes, schema guards, OG image generation, RSS and the register itself are live. The GitHub server island is unbuilt, and the biographical note, colophon and contact pages still carry placeholder prose.
 history:
   - date: 2026-08-14
     note: Repository initialized from the Astro starter.
@@ -23,10 +22,8 @@ links:
 order: 8
 ---
 
-[[UNWRITTEN]]
+The site cataloguing itself, which is recursive and unavoidable — a register of works has to include the register. The build ran deliberately out of the usual order: routes, schema and a document shell before any real content existed, on the theory that a layout designed against placeholder text produces the same section shape everywhere, because there's nothing particular to respond to.
 
-This record is the site cataloguing itself, which is a little recursive and unavoidable — a register of works has to include the register. The build followed its own phase map deliberately out of the usual order: routes, schema, and a document shell before any real content existed, on the theory that designing a layout against placeholder text just produces the same section shape everywhere, since there's nothing particular to respond to.
+The token system came first. Tailwind's default scales are wiped to `initial`, which makes `bg-slate-800` a build error rather than a convenient shortcut; two self-hosted faces and no third; no gradients and no box-shadow token in any of the four shadow namespaces, so a shadow is not discouraged but inexpressible. Six spacing values named by intent instead of by number.
 
-Phase 0 fixed the token system — a wiped Tailwind theme, two typefaces, no gradients, no box-shadows, a six-value spacing scale named by intent instead of by number. Phase 2a built the spine against a single fixture record: every route, the accession and note-uniqueness guards, a real Head component, zero client JavaScript. This record, and the seven others in the register, are Phase 2b — real dates and links, placeholder prose, so the layout gets built against actual field lengths instead of lorem ipsum.
-
-What's left is the part that can't be scaffolded: the real writeups, in Langston's own words, for what each of these eight records actually is.
+The content layer checks itself rather than trusting the author. The record loader throws on a reused accession number or on a directory name that disagrees with its own frontmatter — either one means there are two answers to "which record is this." The article loader injects each note's parent accession before validation, so it arrives as a typed field instead of a path re-parsed in a template. Everything ships static: OG images render at build through Satori and resvg, RSS and sitemap are generated, and no route serves client JavaScript.

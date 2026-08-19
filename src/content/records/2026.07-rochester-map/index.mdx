@@ -11,18 +11,15 @@ extent:
   commits: 11
   duration: 2 days
 condition: |-
-  [[UNWRITTEN]]
-  Shipped and live. The pairing logic and pin-drop flow are stable; the aggregate contour view is newer and less battle-tested.
+  Shipped and live. Pin drop, pairing and the match rule are covered by unit tests; the contour aggregate is newer and thinner on coverage. The committed map geometry is ODbL-derived, so any rendering of it has to credit OpenStreetMap contributors.
 locality: Rochester, N.Y.
 links:
   source: https://github.com/LangstonW430/interactive-map
 order: 7
 ---
 
-[[UNWRITTEN]]
+The premise is a Schelling point problem stated as a question instead of a diagram: if you and a stranger both had to be in Rochester tomorrow and couldn't communicate first, where would you go to find each other? A visitor drops a pin, picks an arrival time, and says whether they've been to the city before. There's no tile provider and no map library underneath it — the base map is one SVG, because the point was never geographic precision.
 
-The premise is a Schelling point problem stated as a question instead of a diagram: if you and a stranger both had to be in Rochester tomorrow and couldn't communicate first, where would you go to find each other? A visitor drops a pin on a hand-drawn map, picks an arrival time, and says whether they've been to the city before. There's no tile provider and no map library underneath it — the map is a single SVG, drawn by hand, because the point was never geographic precision.
+On submit the pin is paired against exactly one earlier pin, chosen uniformly at random, and that pairing is frozen onto the document. Re-rolling it on read would hand a returning visitor a different opponent than the one they were shown. The outcome is deliberately not stored: it's a pure function of two immutable pins — within 100 metres of ground distance, and the same arrival slot exactly — reported as two separate axes so that "right place, wrong time" survives the trip from server to copy intact. One pin per session, enforced by an opaque client-generated token on an indexed lookup; Convex mutations are serializable transactions, so check-then-insert is race-safe without reaching for a rate limiter.
 
-On submit, the new pin gets paired against exactly one prior pin, chosen uniformly at random, and that pairing is the headline result — not a heatmap, not a probability, one specific person's guess held up against yours. The aggregate view exists too: contours, an arrival-time distribution, the share of the map a pin would have caught. It sits below the match, deliberately, as a follow-up rather than the lead.
-
-Street and landmark data for the base map came out of the Overpass API against OpenStreetMap, extracted once and hand-simplified rather than fetched live — there's no runtime dependency on Overpass at all, only a build-time script that produced the SVG in the first place. Pins themselves are Convex documents, and once placed, permanent; there's no edit or move path anywhere in the app, on purpose.
+Street and building geometry came out of Overpass in a single hand-run script: a bounding box inverted from the projection at the viewBox corners, Douglas–Peucker simplification, clipped to the box, emitted as committed JSON. Nothing hits Overpass at build or request time. The aggregate view — contours, an arrival-time distribution, the share of the map a pin would have caught — sits below the match, deliberately, as a follow-up rather than the lead.

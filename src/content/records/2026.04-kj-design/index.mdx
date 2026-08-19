@@ -12,14 +12,15 @@ extent:
   commits: 91
   duration: 8 weeks
 condition: |-
-  [[UNWRITTEN]]
-  Stable. Client site, no open issues.
+  Stable, no open issues. One thing to watch: the CMS admin loads Sveltia from unpkg at `dist/sveltia-cms.js` with no version pinned, so a breaking release upstream would take the admin down without a commit here. The published site is unaffected either way.
 locality: Rochester, N.Y.
 links:
   live: https://kjdesignllc.com
 order: 4
 ---
 
-[[UNWRITTEN]]
+Astro 5 with no CSS framework — the stylesheet is hand-written, which for a designer's own site was the point. Nothing in the layout is a default anyone would recognize on sight.
 
-A static portfolio built around KJ's own mockups rather than a template, split into design, art, and photography categories with a project grid that opens into full case pages. Content is Git-backed through a CMS admin, so new work goes up without touching code.
+Thirteen projects across design, art and photography, typed through Astro content collections and opening from the work grid into their own pages behind a lightbox. The work is real client work — the Eastman Museum, Brockport, ColorStack's Black Enterprise edition, a St. Anne's Family Services holiday card — so the grid had to hold a print piece and a photo series side by side without either reading as a mistake.
+
+Content runs through Sveltia CMS at `/admin`, committing to `main` on GitHub with Netlify Identity handling auth. Every page is editable, not just the project list: hero copy, both about sections, the contact heading, every image. That was as much the deliverable as the site — KJ files new work without touching code and without paying for a CMS backend.

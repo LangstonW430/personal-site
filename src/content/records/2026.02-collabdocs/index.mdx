@@ -1,23 +1,20 @@
 ---
 acc: '2026.02'
 title: CollabDocs
-summary: A real-time collaborative document editor — multi-cursor editing on a TipTap canvas with comments, formatting, and presence, backed by Convex for sync and auth.
+summary: A shared document editor — a TipTap canvas with anchored comments, per-document roles and email invites, backed by Convex reactive queries and an explicit last-write-wins conflict rule.
 role: Sole developer
 medium: ['Next.js', 'TypeScript', 'Convex', 'TipTap', 'Tailwind CSS']
 acquired: 2026-04-20
 status: active
 condition: |-
-  [[UNWRITTEN]]
-  Active. Core editing and auth work; a few TipTap extensions (tables, task lists) are wired but under-tested against concurrent edits.
+  Untouched since April 2026. Editing, auth, comments, roles and invites work. Concurrent editing is last-write-wins by design, so two people typing in the same paragraph will lose one side's changes — that is the known limit, not a bug to be found. The table and task-list extensions are wired but thin on tests.
 links:
   source: https://github.com/LangstonW430/collaboration-app
 order: 2
 ---
 
-[[UNWRITTEN]]
+Convex's reactive queries carry the document, so a save on one client lands in every other open editor without a socket layer of its own. What the app does not have is a CRDT. Edits are debounced and written whole, and `lib/sync/conflictResolver.ts` states the rule plainly: the higher server timestamp wins, ties go to the server. That is a real limitation with two people in one paragraph, and it is written down rather than hidden behind the phrase "real-time."
 
-CollabDocs starts from the assumption that "real-time" is the whole feature, not a nice-to-have bolted onto a normal document editor. Every keystroke goes through Convex's reactive queries, which is what makes two cursors in the same paragraph feel like the same document instead of two documents politely diffing against each other.
+The editor is TipTap with the extensions a working document tool needs — tables, task lists, text alignment, code blocks through lowlight, a character count — plus two written for this app: an image node that uploads to Convex storage, and a chart node rendering through Chart.js. Comments are a custom `CommentMark` that anchors a thread to a span and keeps the quoted excerpt with it, so a thread survives edits around it and can be resolved from the sidebar. Sharing runs on a collaborators table with editor and viewer roles against an invites table carrying pending, accepted and declined states.
 
-The editor itself is TipTap, extended with the pieces a working doc tool actually needs: tables, task lists, an image extension, text alignment, a character count that doesn't lag behind typing. Auth runs through a password provider, which was the boring, correct choice over rolling anything custom.
-
-The harder problem, still being worked through, is less about the editor and more about what happens when two people's changes land in the same sentence at once — that's where most of the remaining engineering effort actually is.
+The parts usually skipped at this size are present: zod validation on every mutation, DOMPurify on rendered content, rate limiting, an audit log indexed by time, user and document, structured logging with request IDs, Sentry, and both Vitest and Playwright suites.

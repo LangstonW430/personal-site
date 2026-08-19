@@ -12,16 +12,15 @@ extent:
   commits: 26
   duration: 4 weeks
 condition: |-
-  [[UNWRITTEN]]
-  Shipped and stable. Deps current as of the June ship date; no client-reported issues since launch.
+  Shipped and stable. Astro 6 and Tailwind 3 as of the June ship date, not updated since; no client-reported issues.
 locality: Livonia, N.Y.
 links:
   live: https://mariashairemporium.com
 order: 3
 ---
 
-[[UNWRITTEN]]
+The salon's whole pitch is craft and attention, and a generic small-business theme would have undercut that on arrival. The type system runs four self-hosted faces — Italiana, Cinzel, Cormorant Garamond and Lora — picked for warmth over neutrality, a deliberate departure from the mono-and-one-serif system this register itself uses. A client site earns its own voice.
 
-Maria's Hair Emporium needed a site that read as considered rather than templated — the salon's whole pitch is craft and attention, and a generic small-business theme would have undercut that on arrival. The type system leans on four serif and display faces picked for warmth over neutrality, a deliberate departure from the mono-and-one-serif system this register itself uses; a client site earns its own voice.
+Seven pages: home, services, gallery, about, contact, a workshop page, and a styleguide kept in the build so the type and color decisions stay checkable against the thing they were decided for. The gallery is twenty-one entries in an Astro content collection across cuts, color and extensions, each its own markdown file, opened through a lightbox. Services are eight categories in one JSON file. Nothing needed a CMS or a database; updates are a content edit and a redeploy.
 
-Structure is deliberately simple: services, a gallery, staff, and a contact page that routes straight to a phone call, because that's how this business actually books appointments. Nothing here needed a CMS or a database — the whole site is static, and updates happen by editing content and redeploying.
+The contact page took its structure from how the business actually books. Appointments go through Square, so that link and the phone number lead, rather than sitting under a general-purpose form. The forms that exist are split by service, and the extension inquiry accepts a photo upload, because that consultation cannot start without one.

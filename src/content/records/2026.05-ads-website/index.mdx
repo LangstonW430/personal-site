@@ -7,15 +7,12 @@ medium: ['Astro', 'TypeScript', 'Tailwind CSS']
 acquired: 2026-07-17
 status: active
 condition: |-
-  [[UNWRITTEN]]
-  In progress. Structure and CMS wiring are done; team directory and testimonials are still placeholder content on the client's side.
+  In progress. Structure, CMS wiring and the bid form are done. Brand tokens are sampled off the client's logo and will change when a brand guide arrives; team and testimonial pages are still placeholder copy pending client content. Like the KJ build, the admin loads Sveltia unpinned from unpkg.
 order: 5
 ---
 
-[[UNWRITTEN]]
+Nine pages for a commercial HVAC air-distribution parts distributor, built around one goal: make it easy and credible to invite the company to bid on a job. Capability statement, product lines, a twenty-three-entry brand roster — Modine, Mestek, Hart & Cooley, Krueger, DuraVent, Senneca — and a request-a-bid form posting to Netlify behind a honeypot field. Every page ladders to the bid rather than trying to be a general-purpose company brochure.
 
-This is a nine-page bid-focused site for a commercial HVAC parts distributor, built around one goal: make it easy and credible to invite the company to bid on a job. Every page — capability statement, brand roster, product lines, contact — ladders up to that, rather than trying to be a general-purpose company brochure.
+Brand color, type and spacing live in `src/styles/tokens.css`, read by the Tailwind config, so re-skinning the site is a one-file edit rather than a find-and-replace across templates. The file is labelled a placeholder in its own header: the values were sampled off the client's logo because no brand guide exists yet, and the comment says so rather than letting a guess quietly harden into a decision. Header and hero heights both derive from one `--logo-height` custom property with height-based media queries, so the hero survives a short window instead of being eaten by the bar above it.
 
-Brand colors live as CSS custom properties that the Tailwind config reads, so re-skinning the whole site is a one-file edit rather than a find-and-replace across templates. Content runs through a Git-backed CMS admin — the client edits copy and swaps photos without a database or a hosting bill for a CMS backend.
-
-Real content — logo, hero photography, product photos, brand roster — is landing incrementally as the client provides it; the team directory and testimonials are still placeholders on their end, tracked in the repo's own checklist rather than guessed at here.
+Content runs through Sveltia CMS on a GitHub backend — the client edits copy and swaps photography without a database or a hosting bill for a CMS backend. Real assets are landing incrementally as they arrive.

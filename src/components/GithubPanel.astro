@@ -45,6 +45,40 @@ const DAY_MS = 86_400_000;
 
 const lastPush = data?.mostRecentPush ? new Date(data.mostRecentPush) : null;
 const isActive = lastPush !== null && Date.now() - lastPush.getTime() <= ACTIVE_WITHIN_DAYS * DAY_MS;
+
+/*
+ * Which repos get a row.
+ *
+ * Previously: all of them. That was fine at three tracked repos and gets
+ * worse with every record added, since the list is built from `links.source`
+ * across the whole register — a panel about current activity would slowly
+ * turn into a second copy of the register, sorted differently.
+ *
+ * Now: everything pushed inside the window, and never fewer than MIN_ROWS.
+ * The two halves answer different failure modes. The window keeps a dormant
+ * repo from padding a list that claims to be about recent work. The minimum
+ * keeps the panel from collapsing to one row — or none — during a quiet
+ * fortnight, where an almost-empty box reads as broken rather than as quiet.
+ *
+ * Deliberately no maximum. If ten repos really were pushed this fortnight,
+ * ten rows is the true answer and the panel should say so.
+ *
+ * `data.repos` arrives sorted newest-first from fetchGithubPanel, so the
+ * fallback slice takes the most recent N without re-sorting here.
+ *
+ * The 14 here and the 30 above are different questions, not a discrepancy:
+ * 30 asks "is this person still working", 14 asks "on what, lately".
+ */
+const ROW_WINDOW_DAYS = 14;
+const MIN_ROWS = 3;
+
+const allRepos = data?.repos ?? [];
+const withinWindow = allRepos.filter(
+	(repo) => Date.now() - new Date(repo.pushedAt).getTime() <= ROW_WINDOW_DAYS * DAY_MS,
+);
+// slice() is safe past the end — fewer than MIN_ROWS tracked repos yields
+// however many exist, which is the honest floor.
+const rows = withinWindow.length >= MIN_ROWS ? withinWindow : allRepos.slice(0, MIN_ROWS);
 ---
 
 <section class="mt-register bg-card border border-rule p-entry">
@@ -62,9 +96,9 @@ const isActive = lastPush !== null && Date.now() - lastPush.getTime() <= ACTIVE_
 					</p>
 				)}
 
-				{data.repos.length > 0 && (
+				{rows.length > 0 && (
 					<ul role="list" class="mt-entry flex flex-col gap-field">
-						{data.repos.map((repo) => (
+						{rows.map((repo) => (
 							<li class="border-b border-rule last:border-b-0 pb-field last:pb-0">
 								<div class="flex items-baseline justify-between flex-wrap gap-x-field gap-y-hair">
 									<a href={repo.url} class="font-record font-typed text-sm text-stamp" {...EXTERNAL_LINK_ATTRS}>

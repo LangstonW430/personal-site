@@ -20,7 +20,19 @@ const ogImage = image ? new URL(image, Astro.site).toString() : undefined;
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<!--
+  "LW" set in Commit Mono, stamp on card — the same two colours and the same
+  face every accession number on the site uses. Built by scripts/build-favicon.mjs
+  and committed; it is not regenerated at build time.
+
+  SVG first, .ico second: browsers that understand the SVG take it and scale
+  cleanly to any density, and the rest fall through to the .ico, which carries
+  16/32/48 rasters in one file. Order matters — the .ico must come after, or
+  Chrome takes it and ignores the vector.
+-->
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="canonical" href={canonical} />
 
 <!--

@@ -13,7 +13,8 @@
 		"check:content": "node scripts/check-content.mjs",
 		"lint": "node scripts/lint-spacing.mjs",
 		"astro": "astro",
-		"build:favicon": "node scripts/build-favicon.mjs"
+		"build:favicon": "node scripts/build-favicon.mjs",
+		"build:resume": "node scripts/build-resume.mjs"
 	},
 	"dependencies": {
 		"@astrojs/mdx": "^7.0.5",
@@ -25,6 +26,7 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
+		"@myriaddreamin/typst-ts-node-compiler": "^0.7.0",
 		"@resvg/resvg-js": "^2.6.2",
 		"@types/node": "^26.2.0",
 		"satori": "^0.29.0",

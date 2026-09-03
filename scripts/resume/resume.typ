@@ -99,10 +99,10 @@
 - Designed a dependency-free prompt-generation pipeline that deduplicates CRM records via Jaccard similarity, scores them with a weighted composite of recency decay, deal value, and objective relevance, and greedily allocates results against a token budget
 - Integrated a read-only Stripe sync (webhooks + restricted API keys, AES-256-GCM encrypted credential storage) with idempotent charge processing keyed on payment-intent ID to prevent double-counted revenue
 
-#phead[*Exbo | TypeScript, React, React Router, PostgreSQL, CSS*][*Mar. 2026*]
-- Developed a full-stack forum and social media web application enabling users to create accounts, post threads, and engage in community discussions, deployed on Vercel
-- Architected a relational database schema using PostgreSQL with custom PL/pgSQL functions to handle user authentication, thread storage, and dynamic content retrieval
-- Built a responsive multi-page frontend with React and React Router, implementing client-side routing for seamless navigation across posts, profiles, and community feeds
+#phead[*CollabDocs | TypeScript, Next.js, Convex, TipTap, Tailwind CSS*][*Apr. 2026*]
+- Built a shared document editor on Convex reactive queries, so a save on one client lands in every other open editor without a socket layer of its own
+- Extended TipTap with a custom image node uploading to Convex storage, a Chart.js chart node, and a CommentMark anchoring comment threads to a text span with the quoted excerpt
+- Implemented per-document sharing with editor and viewer roles and an email invite flow, with zod-validated mutations, an indexed audit log, and Vitest and Playwright suites
 
 #section[Technical Skills]
 

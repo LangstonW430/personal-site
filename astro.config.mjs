@@ -188,7 +188,9 @@ export default defineConfig({
 	// islands inject a client-side fetch to swap themselves in, which fails
 	// zero-client-JS, the more load-bearing constraint of the two).
 	output: 'static',
-	adapter: vercel(),
+	adapter: vercel({
+		webAnalytics: { enabled: true },
+	}),
 
 	integrations: [
 		mdx(),

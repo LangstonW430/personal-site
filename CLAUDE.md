@@ -217,7 +217,7 @@ Phases do not run out of order.
 | 2 | Register + records | `/`, `/work`, `/work/[acc]`, `/writing`, `/writing/[slug]`, `/about` — static, zero client JS |
 | 3 | Craft layer | 404, colophon, `/now`, per-page OG images, RSS, sitemap, view transitions, a11y pass |
 | 4 | Signature | GitHub instrument panel — server island, live data renders in `stamp` |
-| 5 | — | Resolved: the Overpass SVG map is catalogued as its own record, `2026.04`. No separate phase needed. |
+| 5 | — | Resolved: the Overpass SVG map is catalogued as its own record, `2026.07`. No separate phase needed. |
 | 6 | Vote feature | Conditional. Only if 0–4 are live and it still appeals. |
 
 **Phase 2 does not begin until real content exists.** Designing around placeholder text is the specific mechanism that produces identical sections — with nothing particular to respond to, every section gets the same container.

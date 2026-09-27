@@ -1,0 +1,55 @@
+---
+acc: '2026.01'
+title: Freelance Web Practice
+summary: >-
+  Small-business web work from the first speculative mockups through three
+  client engagements — seven unpaid builds across React, Astro and three CMS
+  backends, then a salon, a designer's own site, and an HVAC parts distributor
+  still in progress.
+# Three clients under one record and the field holds one name, so they are
+# " · "-joined — the same convention medium, `role` and profile.yaml's `gpa`
+# already use for a multi-part value in a single string. Each is named again
+# in the body, attached to the work it paid for.
+client: Maria's Hair Emporium · KJ Design · HVAC parts distributor
+role: Designer & developer
+# The union of what the four merged records each declared, nothing added.
+# Held to five: the OG card renders this joined at 22px inside a fixed-height
+# 1200×630 frame, and Satori overflows rather than shrinks.
+medium: ['Astro', 'React', 'Vite', 'TypeScript', 'Tailwind CSS']
+acquired: 2026-04-09
+status: active
+# Four conditions collapsed into the one the schema allows. Every specific
+# worth having is kept: the unpinned Sveltia admin on two builds, the sampled
+# brand tokens, the placeholder pages, and the fact that the seven mockups
+# are genuinely dead rather than merely old.
+condition: |-
+  Mixed by engagement, and one record holds one condition, so: two shipped and stable, one in progress, seven archived. Maria's Hair Emporium is on Astro 6 and Tailwind 3 as of its June ship date, not updated since, with no client-reported issues. KJ Design has no open issues, but its CMS admin loads Sveltia from unpkg with no version pinned — a breaking release upstream would take the admin down without a commit here, though the published site is unaffected either way. The Ads build carries the same unpinned admin, plus brand tokens sampled off the client's logo that will change when a brand guide arrives, and placeholder copy on the team and testimonial pages pending client content. The seven practice builds are archived: last commit June 2026, dependencies never pinned and untouched since. The two no-build pages still open anywhere; the React, Vite and Next ones would each need a fresh install checked against current Node before they would start.
+locality: Livonia and Rochester, N.Y.
+history:
+  - date: 2026-09-27
+    note: '2026.03, 2026.04 and 2026.05 merged into this record. Those numbers are retired, not reissued.'
+# No `extent`: real counts exist for two of the four engagements and sit in
+# the body on the shipped work they actually measure. A running total for an
+# open practice is an age, not a measurement — see the note in
+# RegisterTable.astro on why an active record's duration is not a figure.
+#
+# No `links`: the field holds one `live` URL and two of these shipped to
+# different domains, so any single link would misstate the record. Both are
+# in the body beside the engagement they belong to. No `source` either — all
+# three client repos are private and 404 for anyone not signed in as their
+# owner, and the seven practice builds span seven separate repositories,
+# three public and four not.
+order: 1
+---
+
+One record, four engagements: three paid client sites and, before them, seven speculative builds that were the apprenticeship for them. They were catalogued as four separate records until September 2026, when four rows of one practice stopped reading as four distinct works. 2026.03, 2026.04 and 2026.05 were folded in here and their numbers retired rather than reissued.
+
+Maria's Hair Emporium, in Livonia, was the first paid one — 26 commits over four weeks, shipped June 2026, live at <a href="https://mariashairemporium.com" target="_blank" rel="noopener noreferrer">mariashairemporium.com</a>. The salon's whole pitch is craft and attention, and a generic small-business theme would have undercut that on arrival. The type system runs four self-hosted faces — Italiana, Cinzel, Cormorant Garamond and Lora — picked for warmth over neutrality, a deliberate departure from the mono-and-one-serif system this register itself uses. A client site earns its own voice. Seven pages, one of them a styleguide kept in the build so the type and color decisions stay checkable against the thing they were decided for. The gallery is twenty-one entries in an Astro content collection across cuts, color and extensions, each its own markdown file, opened through a lightbox; services are eight categories in one JSON file. Nothing needed a CMS or a database — updates are a content edit and a redeploy. The contact page took its structure from how the business actually books: appointments go through Square, so that link and the phone number lead rather than sitting under a general-purpose form, and the extension inquiry accepts a photo upload, because that consultation cannot start without one.
+
+KJ Design, a Rochester graphic designer's own site, ran 91 commits over eight weeks and shipped in August 2026 — live at <a href="https://kjdesignllc.com" target="_blank" rel="noopener noreferrer">kjdesignllc.com</a>. Astro 5 with no CSS framework; the stylesheet is hand-written, which for a designer's own site was the point, and nothing in the layout is a default anyone would recognize on sight. Thirteen projects across design, art and photography, typed through Astro content collections and opening from the work grid into their own pages behind a lightbox. The work is real client work — the Eastman Museum, Brockport, ColorStack's Black Enterprise edition, a St. Anne's Family Services holiday card — so the grid had to hold a print piece and a photo series side by side without either reading as a mistake. Content runs through Sveltia CMS at `/admin`, committing to `main` on GitHub with Netlify Identity handling auth, and every page is editable, not just the project list: hero copy, both about sections, the contact heading, every image. That was as much the deliverable as the site — KJ files new work without touching code and without paying for a CMS backend.
+
+The third client build started in July 2026 and is still open: nine pages for a commercial HVAC air-distribution parts distributor, built around one goal — make it easy and credible to invite the company to bid on a job. Capability statement, product lines, a twenty-three-entry brand roster — Modine, Mestek, Hart & Cooley, Krueger, DuraVent, Senneca — and a request-a-bid form posting to Netlify behind a honeypot field. Every page ladders to the bid rather than trying to be a general-purpose company brochure. Brand color, type and spacing live in `src/styles/tokens.css`, read by the Tailwind config, so re-skinning the site is a one-file edit rather than a find-and-replace across templates; the file is labelled a placeholder in its own header, because the values were sampled off the client's logo and no brand guide exists yet, and saying so beats letting a guess quietly harden into a decision. Header and hero heights both derive from one `--logo-height` custom property with height-based media queries, so the hero survives a short window instead of being eaten by the bar above it. Sveltia again, on a GitHub backend. No live link yet: the repo is private and the site has not been handed over to a client domain, so there is nothing honest to point at.
+
+Before any of that, seven mockups built back to back between April and June 2026, each one picking a different constraint on purpose. The bakery ran React and Vite against Sanity as a headless backend, with a separate studio holding singleton schemas for the hero, about, CTA and footer alongside product, category and testimonial documents. The first landscaper was React, Vite and Tailwind across eleven section components; the second answered the same brief with no build step at all — six hand-written HTML pages, one stylesheet, and `@vercel/analytics` as the only dependency. The HVAC page went the other way: Next 15 App Router, GSAP and Framer Motion, Lenis smooth scroll, a custom cursor, per-project detail routes, generated sitemap, robots and OG image. A coaching practice and a general business page are a single `index.html` each with no dependencies. The last put React Router in front of a Vercel serverless function posting through Resend, with a Playwright script that screenshots each build and a prerender pass over the static routes.
+
+None of the seven shipped for a client. The point was finding out, before a client's money was on the line, which parts of a stack are load-bearing and which are habit — which is why the variance is in the tooling rather than the subject matter. Two of the seven use Tailwind, two use no build tooling at all, and one carries a CMS backend heavier than the site in front of it. That spread was the experiment, and the three builds above are what it was for.

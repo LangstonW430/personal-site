@@ -177,7 +177,7 @@ reserved for live data, small typed annotation labels, and structure that carrie
 information. It just attaches them to something the site genuinely is — a register
 of works — rather than to a metaphor it had outgrown.
 
-**The map is not lost.** It is catalogued as its own record, `2026.04`, which is
+**The map is not lost.** It is catalogued as its own record, `2026.07`, which is
 a better outcome than being the theme: as a record it can state its own extent and
 condition, which is a stronger claim than being wallpaper.
 

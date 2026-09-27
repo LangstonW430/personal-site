@@ -28,7 +28,17 @@ This is a structural conceit, not a decorative one. There is no paper texture, n
 
 `ACC.` · `ACQUIRED` · `COMPLETED` · `MEDIUM` (never "stack" or "tech") · `EXTENT` · `PROVENANCE` · `CONDITION` · `LOCALITY` · `STATUS`
 
-Accession numbers are `YYYY.NN`, assigned in order of entry, **never reused and never renumbered**. Status is one of `ACTIVE` / `SHIPPED` / `ARCHIVED`.
+Accession numbers are `YYYY.NN`, assigned in order of entry. Status is one of
+`ACTIVE` / `SHIPPED` / `ARCHIVED`.
+
+The register was re-sequenced once, on 2026-09-27, when four freelance records
+merged into `2026.01` and the remaining records were renumbered to close the
+gaps. That is a deliberate exception to the rule this section used to state
+absolutely, and it has a cost worth naming: a number no longer points at the
+same work forever, so `2026.04` means the Rochester map only until the next
+re-sequence. **Do not renumber again casually.** The value of an accession is
+that it is stable; spend that twice and it stops being an identifier and
+becomes a row number.
 
 ### Register language
 
@@ -217,7 +227,7 @@ Phases do not run out of order.
 | 2 | Register + records | `/`, `/work`, `/work/[acc]`, `/writing`, `/writing/[slug]`, `/about` — static, zero client JS |
 | 3 | Craft layer | 404, colophon, `/now`, per-page OG images, RSS, sitemap, view transitions, a11y pass |
 | 4 | Signature | GitHub instrument panel — server island, live data renders in `stamp` |
-| 5 | — | Resolved: the Overpass SVG map is catalogued as its own record, `2026.07`. No separate phase needed. |
+| 5 | — | Resolved: the Overpass SVG map is catalogued as its own record, `2026.04`. No separate phase needed. |
 | 6 | Vote feature | Conditional. Only if 0–4 are live and it still appeals. |
 
 **Phase 2 does not begin until real content exists.** Designing around placeholder text is the specific mechanism that produces identical sections — with nothing particular to respond to, every section gets the same container.

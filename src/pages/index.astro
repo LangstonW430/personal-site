@@ -51,14 +51,14 @@ if (!profile) throw new Error('src/content/profile.yaml is missing or failed to 
 // this one about ordering or about how undated entries are placed.
 const chronology = sortedChronology(profile.data.chronology);
 
-// This site's own build history (2026.08) is excluded from both the
+// This site's own build history (2026.05) is excluded from both the
 // homepage's top-3 preview and Recent Changes — it belongs on that record's
 // page. A homepage whose headline work, or most recent activity, is all
 // about itself isn't evidence of anything else.
-const SELF_ACC = '2026.08';
+const SELF_ACC = '2026.05';
 
 // `featured` is the explicit override, and it replaces the default set
-// rather than adding to it: 2026.02 and 2026.06 are flagged, so the preview
+// rather than adding to it: 2026.02 and 2026.03 are flagged, so the preview
 // is those two and nothing else. Fewer than three is intentional — the cap
 // is a ceiling, not a quota, and a short list of work worth leading with
 // beats padding it out to fill a row.

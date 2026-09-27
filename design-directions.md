@@ -177,7 +177,7 @@ reserved for live data, small typed annotation labels, and structure that carrie
 information. It just attaches them to something the site genuinely is — a register
 of works — rather than to a metaphor it had outgrown.
 
-**The map is not lost.** It is catalogued as its own record, `2026.07`, which is
+**The map is not lost.** It is catalogued as its own record, `2026.04`, which is
 a better outcome than being the theme: as a record it can state its own extent and
 condition, which is a stronger claim than being wallpaper.
 
@@ -583,7 +583,9 @@ no off-list utility is in use today.
 - `stamp` is accession numbers, live data, and focus rings. Four uses per page, maximum.
 - No sans-serif anywhere. Two faces, assigned by rule.
 - Mono on fields, serif on prose. The split is not negotiable per-component.
-- Accession numbers are never reused and never renumbered. The build enforces it.
+- Accession numbers are assigned in order of entry. The build enforces their
+  format and uniqueness, not their permanence — the register was re-sequenced
+  once on 2026-09-27 (see CLAUDE.md). Treat that as an exception, not a habit.
 - Never "collection," "curated," "showcase," "portfolio," or "journey."
 - Structural devices encode information or they do not ship.
 

@@ -3,7 +3,7 @@
  * Generates the site's favicon set from the real palette and the real face.
  *
  * Run by hand — `npm run build:favicon` — not at build time. The output is
- * committed, the same way lib/map-geometry.json is on 2026.07: a mark that
+ * committed, the same way lib/map-geometry.json is on 2026.04: a mark that
  * regenerates on every deploy is a mark that can silently change without a
  * commit saying so.
  *

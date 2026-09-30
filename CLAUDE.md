@@ -28,7 +28,17 @@ This is a structural conceit, not a decorative one. There is no paper texture, n
 
 `ACC.` · `ACQUIRED` · `COMPLETED` · `MEDIUM` (never "stack" or "tech") · `EXTENT` · `PROVENANCE` · `CONDITION` · `LOCALITY` · `STATUS`
 
-Accession numbers are `YYYY.NN`, assigned in order of entry, **never reused and never renumbered**. Status is one of `ACTIVE` / `SHIPPED` / `ARCHIVED`.
+Accession numbers are `YYYY.NN`, assigned in order of entry. Status is one of
+`ACTIVE` / `SHIPPED` / `ARCHIVED`.
+
+The register was re-sequenced once, on 2026-09-27, when four freelance records
+merged into `2026.01` and the remaining records were renumbered to close the
+gaps. That is a deliberate exception to the rule this section used to state
+absolutely, and it has a cost worth naming: a number no longer points at the
+same work forever, so `2026.04` means the Rochester map only until the next
+re-sequence. **Do not renumber again casually.** The value of an accession is
+that it is stable; spend that twice and it stops being an identifier and
+becomes a row number.
 
 ### Register language
 

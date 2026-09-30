@@ -583,7 +583,9 @@ no off-list utility is in use today.
 - `stamp` is accession numbers, live data, and focus rings. Four uses per page, maximum.
 - No sans-serif anywhere. Two faces, assigned by rule.
 - Mono on fields, serif on prose. The split is not negotiable per-component.
-- Accession numbers are never reused and never renumbered. The build enforces it.
+- Accession numbers are assigned in order of entry. The build enforces their
+  format and uniqueness, not their permanence — the register was re-sequenced
+  once on 2026-09-27 (see CLAUDE.md). Treat that as an exception, not a habit.
 - Never "collection," "curated," "showcase," "portfolio," or "journey."
 - Structural devices encode information or they do not ship.
 

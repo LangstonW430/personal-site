@@ -1,0 +1,32 @@
+---
+acc: '2026.06'
+title: Intern Radar
+summary: A watcher on the SimplifyJobs Summer 2027 internship list — it filters and ranks every new posting against a stated profile with a per-user keyword-weight model that learns from feedback, and emails what survives on the user's own schedule.
+role: Sole developer
+medium: ['Next.js', 'TypeScript', 'Convex', 'Python', 'Resend']
+acquired: 2026-09-30
+status: active
+extent:
+  commits: 53
+  duration: 2 days
+condition: |-
+  Active, under construction, and young enough that any account of it dates within the week. Hourly ingest, hard filters, scoring, online learning, email digests, open sign-up and six ATS fetchers all work, and the interface was rebuilt on a token system on 2026-10-01. Resume embeddings are computed nightly, but the feature that would score against them is switched off in shared/scoring.json, so they currently cost a job and buy nothing. The README still calls this single-user; open sign-up landed before that line was updated.
+history:
+  - date: 2026-09-30
+    note: 'Repository initialized; ingest, filters, JD fetchers and a trained per-user classifier built in one day.'
+  - date: 2026-10-01
+    note: 'The trained model and its preference vectors were removed and replaced by the per-user keyword-weight model.'
+links:
+  live: https://radar.langstonwoods.com
+  source: https://github.com/LangstonW430/intern-radar
+featured: true
+order: 6
+---
+
+The source is a community-maintained GitHub repository, `SimplifyJobs/Summer2027-Internships`, which a Convex cron reads hourly. The ingest does not trust it: the feed crosses a zod schema, malformed records are counted and skipped rather than silently dropped, and a compact `sourceId → contentHash` index decides what is new, changed or gone without reading a single full listing document. That indirection is a budget decision — Convex's free tier allows 1 GB of database bandwidth a month, and a naive hourly diff over 2,105 active listings would spend it on nothing. Postings that fall out of the feed are deactivated, not deleted.
+
+The ranking model is the second one. The first shipped on 2026-09-30: a trained per-user classifier over a fixed feature vector, gated on precision@10 against a held-out label split. It came out the next day, together with its model tables and preference vectors, because it answered the wrong question — a new account has no labels to train on, and a score that cannot be explained is not useful advice about a job. What replaced it is a per-user map of keyword weights seeded from want and avoid interests the user states directly, so the model has opinions before it has any feedback.
+
+A score is one logistic function: `bias + Σ weight·idf·position` over the 285-term vocabulary matched in the posting, plus eleven structural features, through a sigmoid. Weights are clamped to the range −3 to 3 and inverse document frequency to 4.0, so no single rare term can carry a listing on its own. Position is graded — a keyword in the title counts 1.5, in a qualifications section 1.2, in the body 1.0 — and `avoid` is deliberately heavier than `want`, −1.5 against 1.0, because a dealbreaker should outrank an interest. Each piece of feedback applies one online gradient step, `Δw = lr · sampleWeight · (y − p) · idf · position` at a learning rate of 0.5, capped more tightly for keywords seen only once or twice and decayed 2% back toward the user's stated anchor, so learning can drift from their own words without escaping them. An application counts double a thumbs-up. Every match stores the contributions that produced its score and they sum to the logit exactly, which is what lets the interface say why a posting ranked where it did. Two multipliers sit outside the model and are never learned: a listing with no job description keeps 0.6 of its score rather than having one guessed for it, and a posting past a week old decays on a 21-day half-life toward a floor of 0.25, so nothing stale can present as a perfect match.
+
+Ranking a posting on its title alone is thin, so the description has to be fetched, and the listings point at a dozen different applicant tracking systems. A survey of the 2,105 active postings on 2026-09-30 put Workday at 38.5%, Greenhouse at 15.8%, iCIMS at 11.8% and Oracle Cloud at 9.6%; six adapters — Workday, Greenhouse including boards embedded behind a `?gh_jid=` parameter, iCIMS, Oracle, Ashby and Lever — reach about 82% between them, all through public JSON endpoints over plain HTTP with no headless browser. The remainder are marked `unsupported` rather than retried forever. That work runs nightly in GitHub Actions rather than in Convex, where a 60-minute job and a cached embedding model cost nothing, and the workflow re-enables its own schedule on every run because GitHub disables scheduled workflows on a public repository after 60 days without activity. Location filtering is offline against a 64,596-city lookup derived from GeoNames cities1000 and committed to the repository, so a radius check costs no request. The scoring, learning and extraction modules are pure functions over plain data with no database access anywhere inside them, which is what makes 28 Vitest files enough to cover them; the ATS adapters carry 8 more under pytest against saved responses.

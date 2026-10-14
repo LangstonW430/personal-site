@@ -1,7 +1,7 @@
 # personal-site
 
 A register of works. Astro 7, TypeScript strict, Tailwind v4 with its default
-scales wiped, static output on Netlify.
+scales wiped, static output on Vercel.
 
 Read `CLAUDE.md` before changing anything — it holds the stack decisions, the
 Catalog theme, the token system, the forbidden patterns, and the phase map, and
@@ -20,23 +20,18 @@ settled.
 
 ## Deploy
 
-Netlify, building from `main`. `netlify.toml` pins the build command and the
-publish directory, so neither depends on dashboard settings or autodetection.
+Vercel, building from `main`. Framework preset **Astro**; the defaults are
+correct and need no override.
 
 One route renders on demand: `/` sets `prerender = false` so the GitHub panel
-is built server-side per request. `@astrojs/netlify` compiles it to a function
-under `.netlify/v1/functions/ssr/`, which Netlify picks up on its own. Every
-other route is prerendered to `dist/`.
+is built server-side per request, and `@astrojs/vercel` compiles it to a
+serverless function. Every other route is prerendered. `output: 'static'` in
+`astro.config.mjs` no longer describes the whole site — see
+`design-directions.md` for why that deviation was taken.
 
-`publish` is `dist`, not `dist/client` — this adapter writes the static assets
-to the `dist` root. Pointing it a level deeper 404s the whole site.
-
-Set `GITHUB_TOKEN` in the Netlify site's environment. Without it the panel
-renders its "unavailable" state rather than failing the build, so a missing
-token is easy to miss.
-
-Hosting moved here from Vercel on 2026-10-14. Vercel Web Analytics was dropped
-rather than replaced — it was the only client-side script the site shipped.
+`GITHUB_TOKEN` is read from Vercel's runtime environment via `process.env`,
+not `import.meta.env`. Without it the panel renders its "unavailable" state
+rather than failing the build, so a missing token is easy to miss.
 
 Note: `npm audit` reports two critical advisories in `astro` 7.2.2 (an AVIF
 image-optimization RCE and a `base`-stripping authorization bypass), fixed in

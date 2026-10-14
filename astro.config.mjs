@@ -7,7 +7,7 @@ import { defineConfig } from 'astro/config';
 import { loadEnv } from 'vite';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
-import vercel from '@astrojs/vercel';
+import netlify from '@astrojs/netlify';
 import tailwindcss from '@tailwindcss/vite';
 
 /**
@@ -185,16 +185,18 @@ export default defineConfig({
 
 	// Static by default. Every route prerenders except the register (`/`),
 	// which opts into on-demand rendering itself via `export const prerender
-	// = false` — the Vercel adapter below is what makes that legal. That one
+	// = false` — the Netlify adapter below is what makes that legal. That one
 	// route renders the GitHub instrument panel server-side per request
 	// (cached at the edge for 5 minutes via a Cache-Control header, not via
 	// Astro's server islands — see src/pages/index.astro for why: server
 	// islands inject a client-side fetch to swap themselves in, which fails
 	// zero-client-JS, the more load-bearing constraint of the two).
 	output: 'static',
-	adapter: vercel({
-		webAnalytics: { enabled: true },
-	}),
+	// No options. The adapter's `imageCDN` default is harmless here (the site
+	// ships no <Image>), and web analytics is deliberately absent: it was the
+	// one client-side script the site shipped, and it went with Vercel rather
+	// than being replaced.
+	adapter: netlify(),
 
 	integrations: [
 		mdx(),

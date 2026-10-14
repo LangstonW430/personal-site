@@ -47,13 +47,24 @@ Every word stays functional. The register is dry. **Never** write "collection," 
 ## Stack — settled, do not propose alternatives
 
 - **Astro 5**, TypeScript strict
-- **Vercel** hosting, `@astrojs/vercel` adapter, `output: 'static'` with server islands enabled
+- **Netlify** hosting, `@astrojs/netlify` adapter, `output: 'static'` with one on-demand route
 - **Tailwind v4** — with defaults wiped, see below
 - **MDX in `src/content/`.** No CMS.
-- Live data: GitHub REST called server-side inside an Astro server island, token in Vercel env, `Cache-Control: s-maxage=300`. No client JS, no extra vendor.
+- Live data: GitHub REST called server-side on the one on-demand route, token in Netlify env, edge-cached 5 minutes. No client JS, no extra vendor.
 - Self-hosted variable fonts from `/public/fonts/`
 
-Rejected, with reasons — do not reintroduce: Next.js (site is ~90% static documents), Convex (was sized for a realtime feature that no longer exists), any CMS (content is authored in-repo), Cloudflare (Vercel chosen), Google Fonts CDN (third-party request, no subsetting control), shadcn/ui or any component library (defaults are recognizable on sight).
+Hosting moved from Vercel to Netlify on 2026-10-14. The adapter, `netlify.toml`
+and the colophon's `HOSTING` row all moved with it. Two things that did not
+survive the move and should not be reinstated without a reason:
+
+- **Vercel Web Analytics.** It was the one client-side script the site
+  shipped, which contradicted the zero-client-JS rule it sat next to. Dropped,
+  not replaced.
+- **A bare `Cache-Control: s-maxage=300`.** Netlify's CDN ignores `s-maxage`
+  there; edge lifetime is set with `Netlify-CDN-Cache-Control`, and
+  `Cache-Control` is left to the browser. `src/pages/index.astro` sends both.
+
+Rejected, with reasons — do not reintroduce: Next.js (site is ~90% static documents), Convex (was sized for a realtime feature that no longer exists), any CMS (content is authored in-repo), Cloudflare (Netlify chosen), Google Fonts CDN (third-party request, no subsetting control), shadcn/ui or any component library (defaults are recognizable on sight).
 
 ## Tailwind configuration — mandatory
 

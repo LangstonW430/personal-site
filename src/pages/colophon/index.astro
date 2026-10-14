@@ -10,13 +10,20 @@
  *
  *   CLIENT JS said "every route is prerendered". False — `/` sets
  *   `prerender = false` and renders on demand. The *claim* of no client JS
- *   survived the check (the production build emits zero .js: none in
- *   dist/client, none in .vercel/output/static, no <script> in any built
- *   HTML, and no hydration or server-island directive anywhere in src).
- *   Only the reason was wrong, so only the reason changed.
+ *   survived the check (the production build emits zero .js, no <script> in
+ *   any built HTML, and no hydration or server-island directive anywhere in
+ *   src). Only the reason was wrong, so only the reason changed.
  *
  *   HOSTING said "static output" and stopped, which omits the adapter that
  *   makes the one on-demand route legal.
+ *
+ * Re-checked on 2026-10-14, when hosting moved from Vercel to Netlify.
+ * HOSTING now names the Netlify adapter. CLIENT JS was re-verified against
+ * the Netlify build and still holds — and holds more cleanly than before:
+ * the Vercel adapter ran with `webAnalytics: { enabled: true }`, whose
+ * documented behaviour is to inject an insights script, so the claim was
+ * likely untrue for as long as that flag was set. Analytics went with
+ * Vercel rather than being replaced, so nothing injects a script now.
  *
  * TYPE became TYPEFACES: it sat four lines under "TypeScript strict" and
  * could be read as naming a type system.
@@ -32,7 +39,7 @@ const spec: { label: string; value: string }[] = [
 	{ label: 'Styling', value: 'Tailwind v4, default scales wiped' },
 	{ label: 'Typefaces', value: 'Commit Mono + Source Serif 4 Variable, self-hosted' },
 	{ label: 'Content', value: 'MDX in src/content/, no CMS' },
-	{ label: 'Hosting', value: 'Vercel — static output, @astrojs/vercel adapter for the one on-demand route' },
+	{ label: 'Hosting', value: 'Netlify — static output, @astrojs/netlify adapter for the one on-demand route' },
 	{ label: 'Client JS', value: 'None. One route server-renders, the rest prerender; neither ships a bundle.' },
 	{ label: 'Declined', value: 'Cloudflare, Convex, Next.js, shadcn/ui, Google Fonts CDN, CMS backend' },
 ];

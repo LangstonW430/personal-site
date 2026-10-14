@@ -1,7 +1,7 @@
 # personal-site
 
 A register of works. Astro 7, TypeScript strict, Tailwind v4 with its default
-scales wiped, static output on Vercel.
+scales wiped, static output on Netlify.
 
 Read `CLAUDE.md` before changing anything — it holds the stack decisions, the
 Catalog theme, the token system, the forbidden patterns, and the phase map, and
@@ -20,18 +20,29 @@ settled.
 
 ## Deploy
 
-Vercel, building from `main`. Framework preset **Astro**; the defaults are
-correct and need no override.
+Netlify, building from `main`. `netlify.toml` pins the build command and the
+publish directory, so neither depends on dashboard settings or autodetection.
 
-The `@astrojs/vercel` adapter is configured but nothing renders on demand yet. It
-is wired so the Phase 4 GitHub instrument panel can become a server island
-without a config change. Until then every route is prerendered.
+One route renders on demand: `/` sets `prerender = false` so the GitHub panel
+is built server-side per request. `@astrojs/netlify` compiles it to a function
+under `.netlify/v1/functions/ssr/`, which Netlify picks up on its own. Every
+other route is prerendered to `dist/`.
 
-Note: `npm audit` reports 3 high-severity advisories in `path-to-regexp`, reached
-through `@vercel/routing-utils` inside `@astrojs/vercel` 11.0.5 — the current
-release. It is a build-time dependency and none of it reaches the browser.
-`npm audit fix --force` would downgrade the adapter and break the build. Leave it
-until upstream ships a fix.
+`publish` is `dist`, not `dist/client` — this adapter writes the static assets
+to the `dist` root. Pointing it a level deeper 404s the whole site.
+
+Set `GITHUB_TOKEN` in the Netlify site's environment. Without it the panel
+renders its "unavailable" state rather than failing the build, so a missing
+token is easy to miss.
+
+Hosting moved here from Vercel on 2026-10-14. Vercel Web Analytics was dropped
+rather than replaced — it was the only client-side script the site shipped.
+
+Note: `npm audit` reports two critical advisories in `astro` 7.2.2 (an AVIF
+image-optimization RCE and a `base`-stripping authorization bypass), fixed in
+7.2.7. Neither path is reachable here — the site renders no images through
+Astro's image service and configures no `base` — but the upgrade is a plain
+`npm audit fix` and should be taken.
 
 ## Tailwind
 

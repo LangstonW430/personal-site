@@ -7,7 +7,8 @@ medium: ['Astro', 'TypeScript', 'Tailwind CSS', 'MDX']
 acquired: 2026-08-14
 status: active
 extent:
-  commits: 7
+  commits: 44
+  duration: 2 months
 condition: |-
   Active, mid-build. The register, record pages, colophon, contact, OG image generation and the schema guards are live, and the site is now indexable — the blanket robots disallow and the noindex tag came off on 2026-10-14, once the last placeholder field was gone. Still unbuilt: the writing section, a /now page, and an RSS feed.
 history:
@@ -17,6 +18,8 @@ history:
     note: 'Phase 0 shipped: tokens, Tailwind theme wipe, content schemas, font pipeline.'
   - date: 2026-08-16
     note: 'Phase 2a shipped: routes, register, record and accrual pages, before any real content existed.'
+  - date: 2026-10-14
+    note: 'Hosting moved from Vercel to Netlify; the crawl block and noindex tag came off the same day.'
 links:
   live: https://langstonwoods.com
   source: https://github.com/LangstonW430/personal-site
@@ -27,4 +30,4 @@ The site cataloguing itself, which is recursive and unavoidable — a register o
 
 The token system came first. Tailwind's default scales are wiped to `initial`, which makes `bg-slate-800` a build error rather than a convenient shortcut; two self-hosted faces and no third; no gradients and no box-shadow token in any of the four shadow namespaces, so a shadow is not discouraged but inexpressible. Six spacing values named by intent instead of by number.
 
-The content layer checks itself rather than trusting the author. The record loader throws on a reused accession number or on a directory name that disagrees with its own frontmatter — either one means there are two answers to "which record is this." The article loader injects each note's parent accession before validation, so it arrives as a typed field instead of a path re-parsed in a template. Everything ships static: OG images render at build through Satori and resvg, RSS and sitemap are generated, and no route serves client JavaScript.
+The content layer checks itself rather than trusting the author. The record loader throws on a reused accession number or on a directory name that disagrees with its own frontmatter — either one means there are two answers to "which record is this." The article loader injects each note's parent accession before validation, so it arrives as a typed field instead of a path re-parsed in a template. Almost everything ships static: OG images render at build through Satori and resvg, the sitemap is generated, and no route serves client JavaScript. The exception is the register itself, which renders on demand so the GitHub panel can be fetched server-side — one function in an otherwise static site, cached five minutes at the edge.

@@ -709,3 +709,27 @@ value fresh from Vercel's runtime on every invocation, verified the same
 way — build with a fake token, confirm it does *not* appear in the output.
 Anything server-only in this codebase that reads a secret should use
 `process.env`, not `import.meta.env`, on this evidence.
+
+**Amended 2026-10-14 — hosting moved to Netlify.** The reasoning above stands;
+two of its specifics no longer describe the build, and are left in place rather
+than rewritten because the decision they record is still the decision.
+
+`Cache-Control: public, s-maxage=300, stale-while-revalidate=300` was the whole
+mechanism on Vercel. Netlify's CDN does not read `s-maxage` from
+`Cache-Control` — it reads `Netlify-CDN-Cache-Control`, and treats
+`Cache-Control` as the browser's copy. Ported as written, the header would have
+compiled, deployed, and silently bought nothing: every request to `/` would
+have reached the GitHub API. `src/pages/index.astro` now sends the edge
+lifetime on `Netlify-CDN-Cache-Control` and `public, max-age=0,
+must-revalidate` on `Cache-Control`, which keeps the 5-minute window at the
+edge and keeps browsers off a stale panel.
+
+The `process.env` finding is unchanged and still load-bearing: it is a property
+of how Vite inlines `import.meta.env` at build time, not of any host. The token
+is now read from Netlify's runtime environment instead of Vercel's, and has to
+be set there — `GITHUB_TOKEN` does not travel with the repository.
+
+What did not survive the move is Vercel Web Analytics, which the adapter was
+configured to inject. It was the one client-side script the site shipped, which
+sat badly next to the zero-client-JS constraint this section is about. It was
+dropped rather than replaced.

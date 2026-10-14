@@ -16,9 +16,9 @@ pnpm-debug.log*
 # environment variables
 # Glob, not a list. astro.config.mjs bridges .env files into process.env via
 # Vite's loadEnv, which reads .env, .env.local and .env.<mode>[.local] — and
-# `netlify env:pull` writes .env by default. Naming files one at a time is how
-# a real credential ends up in a commit: the file that leaks is the variant
-# nobody thought to add.
+# `vercel env pull` writes .env.local by default. Naming files one at a time
+# is how a real credential ends up in a commit: the file that leaks is the
+# variant nobody thought to add.
 .env*
 !.env.example
 
@@ -28,6 +28,5 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# netlify — the adapter's build output (SSR function, edge middleware,
-# generated config), not the committed netlify.toml
-.netlify/
+# vercel
+.vercel/

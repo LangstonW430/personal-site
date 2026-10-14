@@ -7,7 +7,7 @@ export const formatDate = (d: Date): string => d.toISOString().slice(0, 10);
 
 /**
  * Date to the minute, e.g. "2026-08-18 18:12 UTC". Explicitly UTC and
- * explicitly labelled: this renders on a server whose timezone is the host's,
+ * explicitly labelled: this renders on a server whose timezone is Vercel's,
  * not the reader's, so an unlabelled "18:12" would be a different real moment
  * depending on where the page was built. Naming the zone costs four
  * characters and makes the figure checkable against GitHub itself.

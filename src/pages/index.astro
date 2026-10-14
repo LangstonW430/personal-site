@@ -89,7 +89,7 @@ try {
 	// `import.meta.env.X` at build time (verified: building with a fake
 	// GITHUB_TOKEN baked its literal value into the deployed function bundle),
 	// which is exactly wrong for a secret that has to be read fresh from
-	// Netlify's runtime environment on every invocation, rotatable without a
+	// Vercel's runtime environment on every invocation, rotatable without a
 	// rebuild. `process.env.GITHUB_TOKEN` is a genuine runtime lookup.
 	githubData = await fetchGithubPanel(GITHUB_USERNAME, allowlist, process.env.GITHUB_TOKEN);
 } catch {
@@ -99,24 +99,12 @@ try {
 }
 const githubCheckedAt = new Date();
 
-// 5-minute edge cache: a reload within the window is served from Netlify's
-// CDN, not a fresh round trip to the GitHub API. `stale-while-revalidate`
+// 5-minute edge cache: a reload within the window is served from Vercel's
+// cache, not a fresh round trip to the GitHub API. `stale-while-revalidate`
 // means a visitor who lands right as the cache expires still gets the
 // previous (briefly stale) render instantly while the next one refreshes in
 // the background, rather than blocking on a live fetch.
-//
-// Two headers, because Netlify's CDN ignores `s-maxage` in a plain
-// `Cache-Control` — it reads Netlify-CDN-Cache-Control for edge lifetime and
-// leaves Cache-Control for the browser. Sending only the latter (as the
-// Vercel build did, where s-maxage alone was enough) would quietly drop the
-// edge cache and hit the GitHub API on every single request.
-Astro.response.headers.set(
-	'Netlify-CDN-Cache-Control',
-	'public, s-maxage=300, stale-while-revalidate=300',
-);
-// Browsers revalidate every time; only the CDN holds the 5-minute copy, so a
-// visitor never sees a stale panel served from their own disk cache.
-Astro.response.headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
+Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=300');
 
 // A "Recent changes" panel stood here through Phase 3. Cut, not deferred:
 // every row it could build read "Accessioned", because the `Revised` half

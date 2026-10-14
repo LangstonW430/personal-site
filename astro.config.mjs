@@ -177,7 +177,11 @@ function linkedFileGuard({ file, label }) {
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://personal-site-sigma-bay.vercel.app',
+	// The production domain. This is what canonical tags, og:url, og:image and
+	// every sitemap entry are built against — a stale value here points search
+	// engines at a host that isn't this site, which is worse than having no
+	// canonical at all.
+	site: 'https://langstonwoods.com',
 
 	// Static by default. Every route prerenders except the register (`/`),
 	// which opts into on-demand rendering itself via `export const prerender

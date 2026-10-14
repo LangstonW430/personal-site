@@ -3,9 +3,11 @@
 # (CLAUDE.md's own project description; the GitHub account the panel on `/`
 # already reads from) — not invented here.
 #
-# Every field below carrying the literal [[UNWRITTEN]] string renders as
-# absent, not as that text — see src/lib/content.ts's isUnwritten(). Fill in
-# a real value and it appears; nothing else has to change.
+# Any field below set to the placeholder sentinel renders as absent, not as
+# that text — see src/lib/content.ts, which defines both the sentinel string
+# and isUnwritten(). Fill in a real value and it appears; nothing else has to
+# change. The literal string is deliberately not repeated here: scripts/
+# check-content.mjs greps these files for it and does not skip comments.
 
 name: Langston Woods
 # Same " · " join as gpa below and extent's "commits · duration" — three
@@ -28,7 +30,6 @@ graduation: "May 2029"
 # "commits · duration"), not a second GPA field.
 gpa: "3.6 overall · 3.9 major"
 email: "langstonw430@gmail.com"
-availability: "[[UNWRITTEN]]"
 
 # `detail` on each role is sourced from LinkedIn, trimmed of the generic
 # skills-list and soft-skill lines a register avoids, with a few measured

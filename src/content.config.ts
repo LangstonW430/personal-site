@@ -208,8 +208,7 @@ const profile = defineCollection({
 		// Not `.email()`/`.url()`-validated even though they hold an email and
 		// a URL respectively: a field carrying the literal [[UNWRITTEN]]
 		// sentinel has to pass schema validation too (isUnwritten() is what
-		// keeps it off the page, not the schema), so these stay plain strings
-		// the same way `availability` already does.
+		// keeps it off the page, not the schema), so these stay plain strings.
 		degree: z.string().min(1),
 		graduation: z.string().min(1),
 		gpa: z.string().min(1),
@@ -221,11 +220,6 @@ const profile = defineCollection({
 		// no unwritten state to handle.
 		githubProfile: z.url(),
 		linkedinProfile: z.url(),
-
-		// The live field — never a decoration. Prose, not a status enum,
-		// because "current availability" doesn't collapse cleanly into a
-		// fixed set of states without losing the nuance a client needs.
-		availability: z.string().min(1),
 
 		chronology: z
 			.array(

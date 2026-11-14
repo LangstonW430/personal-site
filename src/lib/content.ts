@@ -14,7 +14,7 @@ export function isUnwritten(value: string | null | undefined): boolean {
 
 export type ChronologyEntry = {
 	date?: Date;
-	kind: 'education' | 'freelance' | 'employment';
+	kind: 'education' | 'freelance' | 'employment' | 'research';
 	title: string;
 	org: string;
 	summary?: string;
@@ -25,6 +25,7 @@ export const CHRONOLOGY_KIND_LABEL: Record<ChronologyEntry['kind'], string> = {
 	education: 'Education',
 	freelance: 'Freelance',
 	employment: 'Employment',
+	research: 'Research',
 };
 
 // Currently one consumer: the homepage's Experience section. It was two

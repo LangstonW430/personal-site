@@ -27,29 +27,37 @@ degree: "B.S. Computer Science, AI Concentration; Math Minor"
 graduation: "May 2029"
 # Cumulative and major GPA read from the same field — the register's own
 # " · " join for a multi-part metadata value (medium.join(' · '), extent's
-# "commits · duration"), not a second GPA field.
+# "commits · duration"), not a second GPA field. The résumé states the
+# overall figure alone; that is the same number, not a disagreement.
 gpa: "3.6 overall · 3.9 major"
 email: "langstonw430@gmail.com"
 
 # `detail` on each role is sourced from LinkedIn, trimmed of the generic
 # skills-list and soft-skill lines a register avoids, with a few measured
 # numbers folded back in from the résumé where LinkedIn's own wording didn't
-# have them. Education is the one entry LinkedIn didn't cover, so it stays
-# résumé-sourced. LinkedIn itself is unreachable from this environment
-# (blocked by network egress policy) — this is Langston's own copy-paste of
-# it, not a live fetch.
+# have them. Education and research are the two entries LinkedIn didn't
+# cover, so they stay résumé-sourced. LinkedIn itself is unreachable from
+# this environment (blocked by network egress policy) — this is Langston's
+# own copy-paste of it, not a live fetch.
+#
+# Reconciled against the November 2026 résumé: two roles that read as
+# ongoing here had in fact ended, and the schema carries one `date` (the
+# start), so an end date goes in `summary` as a parenthetical — the form the
+# Rochester Regional Joint Board entry already used. Where that résumé
+# dropped a number it previously carried, this file drops it too; the site
+# does not get to stand behind a figure the résumé no longer does.
 chronology:
   - date: 2022-06-01
     kind: employment
     title: "Academic Intervention Specialist"
     org: "Vertus Charter High School"
-    summary: "Math/science support for at-risk students."
+    summary: "Math/science support for at-risk students (Jun. 2022 – Aug. 2026)."
     detail:
-      - Provide targeted one-on-one and small-group instruction in math and science to high school students to address learning gaps and strengthen foundational skills.
-      - Support students in building confidence, improving subject comprehension, and developing effective study strategies.
-      - Collaborate closely with classroom teachers to reinforce core instruction and develop individualized learning plans tailored to at-risk students.
-      - Monitor progress through ongoing assessment, adjusting instructional approach to keep students on track.
-      - 25+ students per summer session, average grade improvement of 15%, 80% reaching grade-level proficiency; 87% of surveyed teachers report significant academic improvement.
+      - Provided targeted one-on-one and small-group instruction in math and science to high school students to address learning gaps and strengthen foundational skills.
+      - Supported students in building confidence, improving subject comprehension, and developing effective study strategies.
+      - Collaborated closely with classroom teachers to reinforce core instruction and develop individualized learning plans tailored to at-risk students.
+      - Monitored progress through ongoing assessment, adjusting instructional approach to keep students on track.
+      - 25+ students per summer session, across 10+ collaborating teachers; 87% of surveyed educators reported significant academic improvement.
   - date: 2024-06-01
     kind: employment
     title: "Information Technology Intern"
@@ -67,26 +75,39 @@ chronology:
     detail:
       - B.S. Computer Science, AI concentration, with a Math minor, expected May 2029.
       - "Relevant coursework: Data Structures and Algorithms, Discrete Mathematics, Linear Algebra and Differential Equations."
-      - "Planned clusters: Computational Linguistics, Ethics of Technology."
-  - date: 2026-01-01
+      - "In progress: Computer Organization (CSC 252), Computation and Formal Systems (CSC 173)."
+  # Dated to agree with record 2026.01's `acquired`, not to the month-start
+  # every other entry here uses: the register already states the day the
+  # practice opened, and two surfaces naming different start dates for the
+  # same body of work is the kind of drift profile.yaml exists to prevent.
+  - date: 2026-04-09
     kind: freelance
-    title: "Web Designer"
-    org: "Self-employed"
+    title: "Founder / Web Developer"
+    org: "Langston Woods Software Services"
     summary: "Mobile-responsive websites for small businesses, from design through client-facing launch."
     detail:
       - Design and develop websites for small businesses with a focus on clean design, mobile responsiveness, and brand growth.
       - Work directly with business owners to build customized online experiences that improve visibility, customer engagement, and professionalism.
-      - Shipped production sites for small-business clients on Astro, deployed and maintained on Netlify with Sveltia CMS for client-managed content.
+      - Ship production sites on Astro — dimetech.net and mariashairemporium.com among them — deployed and maintained on Netlify with Sveltia CMS for client-managed content.
       - Own the full project lifecycle from scoping through launch and post-launch support.
   - date: 2026-06-01
     kind: employment
     title: "Marketing & AI Intern"
     org: "Thomas Media Group"
-    summary: "AI-powered workflow automation and technology infrastructure across CRM, design, and production tooling."
+    summary: "AI-powered workflow automation and technology infrastructure across CRM, design, and production tooling (Jun.–Aug. 2026)."
     detail:
-      - Design, test, and implement AI-powered tools and workflow automations to improve operational efficiency across internal business processes.
-      - "Support and optimize company technology infrastructure — CRM, project management, design, and AI platforms including HubSpot, Asana, Figma, Claude, ChatGPT, Qwilr, and Google Workspace."
-      - Collaborate with cross-functional teams to identify process bottlenecks, evaluate technical solutions, and build scalable internal systems.
-      - Create technical documentation, process guides, and knowledge bases for organization-wide adoption.
-      - Manage digital asset pipelines for multimedia content and production resources; maintain the audio/video hardware and software used in client-facing production environments.
-      - Assist with website maintenance and client-facing technical support; track deliverables through Asana across multiple concurrent initiatives.
+      - Built an n8n and Google Cloud SDK pipeline that takes a podcast episode dropped into Google Drive, generates a transcript and description for it, and publishes the result to YouTube and the podcast platforms.
+      - Designed, tested, and implemented AI-powered tools and workflow automations to improve operational efficiency across internal business processes.
+      - "Supported and optimized company technology infrastructure — CRM, project management, design, and AI platforms including HubSpot, Asana, Figma, Claude, ChatGPT, Qwilr, and Google Workspace."
+      - Collaborated with cross-functional teams to identify process bottlenecks, evaluate technical solutions, and build scalable internal systems.
+      - Created technical documentation, process guides, and knowledge bases for organization-wide adoption.
+      - Managed digital asset pipelines for multimedia content and production resources; maintained the audio/video hardware and software used in client-facing production environments.
+  - date: 2026-09-01
+    kind: research
+    title: "Undergraduate Researcher"
+    org: "Hangfeng He's Group, University of Rochester"
+    summary: "Counterfactual auditing of demographic bias in open-source LLMs on medical diagnosis questions."
+    detail:
+      - "Designed and ran a counterfactual audit for demographic bias in medical diagnosis: inserted race and gender cues into MedQA and DiversityMedQA exam questions and measured answer-flip rates and logprob-based confidence shifts across open-source LLMs."
+      - Served Gemma and Qwen models with Ollama on the University's CIRC GPU cluster under Slurm.
+      - Building a systematic, LLM-driven method to surface hidden biases beyond race and gender, and using each model's bias patterns to characterize its behavioral profile.

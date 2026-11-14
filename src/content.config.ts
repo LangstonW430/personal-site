@@ -225,7 +225,7 @@ const profile = defineCollection({
 			.array(
 				z.strictObject({
 					date: z.date().optional(),
-					kind: z.enum(['education', 'freelance', 'employment']),
+					kind: z.enum(['education', 'freelance', 'employment', 'research']),
 					// title/org replace what used to be one combined `note` string
 					// ("Title, Org — description") — split so the collapsed row can
 					// show position and organization as their own lines instead of

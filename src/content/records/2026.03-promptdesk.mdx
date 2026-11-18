@@ -4,10 +4,20 @@ title: PromptDesk
 summary: An AI-assisted CRM for solo freelancers and small service businesses — manages clients, projects, time and invoices, then renders that data into copyable prompts for whatever AI tool the user already pastes into.
 role: Sole developer
 medium: ['Next.js', 'TypeScript', 'Prisma', 'PostgreSQL', 'Supabase', 'Stripe']
-acquired: 2026-08-09
+acquired: 2026-06-02
 status: active
+extent:
+  commits: 106
+  duration: 5 months
 condition: |-
-  Active and moving fast. Core CRM, the prompt engine, invoicing and finance all work. Stripe is wired and tested against the sandbox; nothing has run through a live subscription yet. Onboarding, the visual system and the prompt templates are changing week to week, so any account of them dates quickly.
+  Active but paused, and the record should not pretend otherwise: three commits in the last eleven weeks, the most recent on 2026-10-25, still at version 0.1.0 with no tags. Core CRM, the prompt engine, invoicing and finance all work and are in real use. What is parked is specific. Forms was built and then unplugged — the domain layer, the components and the database tables are deliberately left in place and only the routes and the nav entry were removed, so the feature is a restore rather than a rebuild. A two-phase column migration stopped after phase one, leaving four columns on the table that nothing reads and a later migration that was never written to drop them. The MCP server's second phase, OAuth, is deferred, so claude.ai connectors are unsupported and Claude Desktop reaches it through the mcp-remote bridge. Rate limiting is in-process and the code says what that means: a real obstacle to one attacker hammering an endpoint, and not a guarantee across however many serverless instances happen to be warm.
+history:
+  - date: 2026-08-21
+    note: 'Invoicing moved onto Stripe, a security sweep closed the gaps it found, and an HTTP end-to-end suite went in against a real database.'
+  - date: 2026-10-24
+    note: 'Forms shelved — routes and nav entry removed, the domain layer and tables left in place to restore from.'
+  - date: 2026-10-25
+    note: 'An MCP server added, read-only first and then writes on tokens granted them.'
 links:
   source: https://github.com/LangstonW430/promptdesk
   live: https://promptdeskcrm.com
@@ -21,4 +31,6 @@ The prompt engine is a pure module — data in, string out, no database access a
 
 Underneath sits an ordinary CRM that has outgrown the word: projects carrying budgets, hourly rates, deliverable checklists and a per-project profit-and-loss; a weekly timesheet and running timer whose unbilled entries convert straight into an invoice; invoices that open on a public link and take card payment through Stripe Checkout; income and expenses over a selectable period with recurring charges projected forward and Stripe transactions synced in; an intake form builder with shareable links; CSV import; tags and file attachments on Supabase Storage.
 
-The one field nobody sets by hand is pipeline stage. Clients used to carry a status of their own next to their project status, the two described the same fact, and they drifted the moment either was edited alone. Stage is now computed from the client's projects — lead, contacted, proposal out, active, past, with archived reading as lost — so there is nothing to set and nothing to contradict. Around thirty Vitest files cover that derivation along with the invoice and finance math, which are the places where silent drift would go unnoticed longest.
+The one field nobody sets by hand is pipeline stage. Clients used to carry a status of their own next to their project status, the two described the same fact, and they drifted the moment either was edited alone. Stage is now computed from the client's projects — lead, contacted, proposal out, active, past, with archived reading as lost — so there is nothing to set and nothing to contradict. Forty-three Vitest files, just under seven thousand lines, cover that derivation along with the invoice and finance math, which are the places where silent drift would go unnoticed longest. A second suite sits apart from them and is kept apart deliberately — nine specs, about two thousand lines, driving real HTTP against the real app against a real Postgres, because the two have almost nothing in common.
+
+The last thing built here inverts the premise. The app still never calls a model API, but since 2026-10-25 a model can call the app: an MCP server exposing the client and project context over eleven tools behind access tokens, read-only at first and then with writes enabled per token. That is a different bargain from the one the rest of the record describes — the copyable prompt asks the user to carry data to the assistant, and the connector lets the assistant come and get it — and it is the same bargain struck a day earlier in the lifting tracker catalogued at 2026.08. Both stop short of the same place, an OAuth flow neither has written yet.

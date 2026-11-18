@@ -1,0 +1,41 @@
+---
+acc: '2026.08'
+title: Gym Tracker
+summary: A phone-first lifting tracker on Convex with a sideloaded iOS shell, and a 13-tool MCP server that lets Claude read the training history and write routines against revocable tokens, with every tool call traced.
+role: Sole developer
+# Five is the ceiling: the OG card renders this joined at 22px inside a fixed
+# 1200×630 frame and Satori overflows rather than shrinks. Next.js, Convex and
+# Capacitor are the app; MCP is the half that makes it unusual.
+medium: ['Next.js', 'TypeScript', 'Convex', 'MCP', 'Capacitor']
+acquired: 2026-10-24
+status: active
+extent:
+  commits: 26
+  duration: 3 weeks
+condition: |-
+  Active and in daily use, with the connector the least finished part of it. The token travels in the URL query string, because claude.ai custom connectors cannot set headers — SETUP.md says to treat the URL like a password, which is the honest framing rather than a mitigation. OAuth, which would replace that, is not built. Tokens have no expiry and nothing rate-limits them, and the scope field is enforced on every call but hard-coded to read-and-write at issue, so the read-only token the mechanism implies cannot actually be minted. Five test files cover the tool surface, the Convex functions and the shared math; the HTTP route itself is not among them, so the 401, the two 405s and the missing-config 500 are the untested edge, and there are no UI tests at all. CI builds the iOS app and never runs the suite. Sign-in is locked to an ALLOWED_EMAILS list and fails closed, so a fresh deployment admits nobody until that is set — deliberate, but it means the repo is readable and not really runnable by anyone else. The README still lists RIR among the logging features; the column came out of the interface on 2026-11-04 and now survives only as pass-through data in export, import and the connector's own output.
+locality: Rochester, N.Y.
+history:
+  - date: 2026-10-24
+    note: 'Repository initialized; the logging PWA, the Convex backend and the MCP connector were built in one day.'
+  - date: 2026-10-27
+    note: 'iOS shell added, with the rest timer as a lock-screen Live Activity — the closest a web app gets to a live countdown there.'
+  - date: 2026-11-14
+    note: 'Langfuse tracing added behind an export filter that admits tool spans only.'
+links:
+  source: https://github.com/LangstonW430/gym-app
+# No `live`: the app is deployed, but every URL committed to the repo is a
+# placeholder (`https://your-app.vercel.app`), so there is no deployment this
+# record can name without guessing at one.
+order: 8
+---
+
+The app is the ordinary half. Workouts are logged on a phone against a library of about 150 seeded exercises, with last session's numbers in grey behind the inputs, double-progression pre-fill, supersets, a plate calculator and a rest timer. Weights are stored in kilograms and converted only for display, so switching units never rewrites history, and personal records are recomputed from the sets themselves inside the same mutation that saves a set rather than being maintained as a separate tally that could drift. The in-progress workout lives in `localStorage` and syncs when the network returns, which is the right shape for a thing used in a basement gym with no signal.
+
+The unusual half is that Claude can use it. `lib/mcp-server.ts` registers thirteen tools against a Convex backend — eight that read (exercises, programs, routines, workout history, progress summaries, bodyweight) and five that write (create an exercise, a routine, a program, log a bodyweight, update a routine). None of them deletes, and that is a stated design rule rather than an omission: the header of `convex/mcp.ts` says logged history cannot be touched from the connector, and `update_routine`, the only write flagged destructive, archives the previous version and returns the new id instead of overwriting. A test asserts the absence negatively — no tool name matches `/delete|remove/` — so the rule fails the build rather than eroding quietly.
+
+The transport is stateless Streamable HTTP in the literal sense: `sessionIdGenerator: undefined`, a fresh server per request, `server.close()` in a `finally`, and `GET` and `DELETE` answered with 405 and an `Allow: POST`, because there is no standalone event stream and no session to delete. Tokens are 32 random bytes — 256 bits — base64url-encoded behind a `gt_` prefix, shown once and stored only as a SHA-256 hex digest; the table has no plaintext column. Verification hashes the presented token and looks it up by index, refusing anything revoked or out of scope, and revocation is a soft delete the profile screen exposes behind a confirm. The listing endpoint is asserted never to serialize the hash.
+
+Tracing is where the token problem resurfaces, and the answer is the part worth keeping. Langfuse is registered as the only span processor on the tracer provider, and `shouldExportSpan` admits a span only if its name starts with `tool:` — the comment gives the reason plainly, that Next.js and HTTP spans carry the request URL and the request URL can hold the connector token. Each tool call is forced onto its own root context so it never arrives as a child of the unexported request span, and a regex masking anything shaped like a token runs over the payload as a backstop. The test plants a real token in a fake request span's `http.url`, runs two tool calls through the processor, and asserts both that only the two `tool:` spans were exported and that the serialized export contains no `gt_` anywhere. A sibling test checks the tool results are byte-identical with tracing on and off.
+
+The iOS shell is a thin Capacitor WebView over the deployed site — `ios/www/index.html` is three lines and says so — carrying one thing the web cannot do, a Live Activity that keeps the rest timer counting on the lock screen. It is installed by sideloading a built `.ipa` through SideStore rather than TestFlight, which costs nothing and no Apple developer account, and the twelve commits on 2026-10-27 that got it working are mostly about safe-area insets, over-scroll colour and where to register the plugin on the scene's bridge controller.

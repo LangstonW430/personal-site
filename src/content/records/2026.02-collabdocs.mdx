@@ -1,13 +1,24 @@
 ---
 acc: '2026.02'
 title: CollabDocs
-summary: A shared document editor — a TipTap canvas with anchored comments, per-document roles and email invites, backed by Convex reactive queries and an explicit last-write-wins conflict rule.
+summary: A shared document editor — a TipTap canvas with anchored comments, per-document roles and invitations, backed by Convex reactive queries and an explicit last-write-wins conflict rule.
 role: Sole developer
 medium: ['Next.js', 'TypeScript', 'Convex', 'TipTap', 'Tailwind CSS']
 acquired: 2026-04-20
-status: active
+status: archived
+# Two bursts, not a run: eighteen commits over a week in April, four months of
+# nothing, then thirty-two in two days in August. The duration states the days
+# worked rather than the span, which would read as four months of effort.
+extent:
+  commits: 50
+  duration: 9 days across four months
 condition: |-
-  Untouched since April 2026. Editing, auth, comments, roles and invites work. Concurrent editing is last-write-wins by design, so two people typing in the same paragraph will lose one side's changes — that is the known limit, not a bug to be found. The table and task-list extensions are wired but thin on tests.
+  Archived. Editing, auth, comments, roles and invitations all work, and the August pass left it tested and documented — but nothing has landed since 2026-08-21 and it should not be expected to build cold. React is on 18.3.1 and Tailwind on 3.4.19, each a major version behind, and CI is pinned to a Node 20 that has since left support. An unmerged branch from 2026-08-23 carries a dashboard redesign that was begun and dropped; it is the last thing that happened here. Concurrent editing is last-write-wins by design, so two people typing in the same paragraph will lose one side's changes — the known limit, not a bug to be found. No deployment is recorded anywhere in the repository, and a fresh one cannot be signed into until three auth keys are set on it by hand. One sharp edge if you do run it: the demo seeder is destructive and deletes every document its target account owns.
+history:
+  - date: 2026-08-21
+    note: 'Two days of authorization fixes, backend validation parity, rate limiting, CI and an audit trail took it from April prototype to deployable; a dashboard redesign branched two days later and was never merged.'
+  - date: 2026-11-18
+    note: 'Marked archived — three months idle, dependencies a major version behind, superseded as the second project on the résumé.'
 links:
   source: https://github.com/LangstonW430/collaboration-app
 order: 2
@@ -17,4 +28,4 @@ Convex's reactive queries carry the document, so a save on one client lands in e
 
 The editor is TipTap with the extensions a working document tool needs — tables, task lists, text alignment, code blocks through lowlight, a character count — plus two written for this app: an image node that uploads to Convex storage, and a chart node rendering through Chart.js. Comments are a custom `CommentMark` that anchors a thread to a span and keeps the quoted excerpt with it, so a thread survives edits around it and can be resolved from the sidebar. Sharing runs on a collaborators table with editor and viewer roles against an invites table carrying pending, accepted and declined states.
 
-The parts usually skipped at this size are present: zod validation on every mutation, DOMPurify on rendered content, rate limiting, an audit log indexed by time, user and document, structured logging with request IDs, Sentry, and both Vitest and Playwright suites.
+The parts usually skipped at this size are present: zod validation on every mutation and enforced inside the Convex handlers rather than only in the client, DOMPurify on rendered content, rate limiting, an audit log indexed by time, user and document and readable only internally, structured logging with request IDs, Sentry, and twenty-seven Vitest files — fifteen in the front end, twelve running the Convex functions against an in-memory database — alongside four Playwright specs. One thing the invitation flow is not, despite the word: there is no mail transport in the repository. An invitation is addressed to an email and waits for that person on their own dashboard.

@@ -1,0 +1,47 @@
+---
+acc: '2026.07'
+title: Clinical Bias Audit
+summary: >-
+  A counterfactual audit of open-source LLMs answering clinical questions —
+  insert a race or gender cue, measure what changes. Race moves 4–7% of answers;
+  reordering the same options moves 18–20%, and a confident colleague's wrong
+  guess costs one model 49 points of accuracy.
+# The group goes in `role` rather than a field of its own: the schema has no
+# advisor, and the " · " join is what the register already uses for a
+# multi-part single value (medium, gpa, 2026.01's client).
+role: Undergraduate researcher · Hangfeng He's group
+medium: ['Ollama', 'Slurm', 'Gemma', 'Qwen', 'MedQA']
+# September is the official start and no day is recorded, so this is the
+# month-start convention profile.yaml's chronology already uses. The earliest
+# datable event is the 2026-09-29 meeting in `history` below.
+acquired: 2026-09-01
+status: active
+# No `commits`: the work lives on the CIRC cluster and not in version control,
+# so there is no count to state. The measured extent of the runs themselves —
+# 4,000 prompts, 16,356 scored rows — is in the body, attached to the rounds
+# that produced it.
+extent:
+  duration: 2 months
+condition: |-
+  Early, and the headline finding is the weakest thing here. The MedQA race result is Gemma alone, 7% of its prompts never came back and were not rerun, and it did not replicate on LiveClin — it may be an artifact of the blunt "The patient is of X descent" sentence rather than anything about the model. Gemma is usually more than 99.99% sure of its answer, which squeezes every probability shift toward zero; a log-odds version was proposed and there is no record of it being run. Everything ran at Ollama's default 4-bit quantization with no full-precision comparison, so the logprobs themselves may be distorted. Thinking is off, each perturbation has exactly one prompt wording, and everything is multiple choice. Nothing has been validated by a human: DiversityMedQA's race-irrelevant filter was GPT-4's judgment, and the LiveClin perturbations and neutral rewrites are mine, with no clinician over either. LiveClin's answer key is "A" in 75% of questions, which confounds anything positional — including the option-order finding that is currently the largest effect in the study. A third of the 1,363 cases mention a figure the models never saw; the findings hold on the 923 that don't. The cases are from early 2025 and may predate the models' training cutoffs, so contamination is not ruled out. Round two retracted round one's explanation of Gemma's small accuracy gains: a sentence that does nothing at all produces the same +2 to +3 points. At 400–500 items a round, nothing under about 2–3 points of flip rate can be distinguished from noise. The discovery system and the personality battery have had one round each, and Muse Glimmer has not completed a usable run.
+locality: Rochester, N.Y.
+history:
+  - date: 2026-09-29
+    note: 'Earliest datable meeting with the group. September is the official start; no earlier record of it exists.'
+  - date: 2026-11-14
+    note: 'Muse Glimmer rerunning after a first pass that returned no usable answers, leaving the personality battery incomplete.'
+# No `links`: the code and the result tables live on the CIRC cluster and are
+# not in a repository, so there is nothing to point at that anyone could open.
+featured: true
+order: 7
+---
+
+The method is counterfactual: take a clinical question, change one thing about the patient that should not matter, and measure what the model does differently. Four models were run through Ollama on BlueHive 3, all at the default 4-bit quantization with temperature 0, a fixed seed and reasoning off, so that a difference between two runs is the perturbation and not sampling. Gemma 4 31B answered every round; Qwen 3.8 27B answered every round but MedQA, which it failed on the cluster's older Ollama and never went back to once the datasets had moved on. Granite 4.2 30B and Muse Glimmer 30B appear only in the personality battery. DeepSeek was dropped for having no recent version that runs locally.
+
+The first round put 500 MedQA and DiversityMedQA items through six ethnicity conditions and two gender conditions — 4,000 prompts, of which 3,724 returned, leaving about 457 items behind each race comparison. Inserting a race flipped 4 to 7% of Gemma's answers, in both directions, and changed its accuracy not at all: every McNemar test came back at p = 1.0 after correction. What did move was confidence in the correct answer, down 0.9 points for African (p = 0.009) and 1.3 for Native American (p = 0.019), against +0.1 for Caucasian (p = 0.75). Native American drew the most flips at 6.8% and Caucasian the fewest at 4.2%. Gender swaps did nothing measurable. Carried over to about 400 recent LiveClin case reports, flip rates fell to 1.5–5.3%, the confidence finding vanished, and the two models turned out to share no bias at all — item-level correlation −0.02, which is to say that whatever each one is doing, it is not the same thing.
+
+The result that matters is the one nobody was looking for. Reordering the same options, with every word otherwise identical, changed 18 to 20% of Gemma's answers and 12% of Qwen's — four to six times the size of the race effect. Gemma's accuracy went *up* 4.4 points when the options were reversed or shuffled, and the second round traced that to the letter A rather than to first position, which is awkward, because LiveClin's own answer key is A in three quarters of its questions. A bias audit that reports a 5% demographic effect without reporting a 19% positional one is measuring its own framing.
+
+The same sweep found a second effect larger than race. Told that a colleague suspected a particular diagnosis, Qwen took the wrong suggestion 17.6% of the time against a 1.5% baseline and lost 10.1 points of accuracy; a merely plausible wrong answer cost it 29 points, and in the discovery system's first round an attending who "is certain" cost it 49 against 3.5 for a nurse saying the same thing. Hedged wording cost nothing. Gemma mostly resisted. Against that, the perturbations that sound like they ought to matter did not: a history of anxiety, limited English, typographical errors, time pressure and irrelevant clinical detail all came out near zero.
+
+What is being built on top is a way of finding these without guessing at them first — a model proposes candidate perturbations, each is run and scored, and what moves the needle is kept, so the search is not limited to the attributes someone thought to test. Round one covered 1,363 LiveClin cases and 16,356 scored rows; round two added fourteen tests on the 923 cases with no unseen figure in them. The personality battery that reads each model's pattern of susceptibility back as a behavioural profile is the newest piece and the least settled; its items were written by Claude Opus 5.5, which is not itself among the models under test.

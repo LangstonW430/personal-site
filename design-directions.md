@@ -585,7 +585,9 @@ no off-list utility is in use today.
 - Mono on fields, serif on prose. The split is not negotiable per-component.
 - Accession numbers are assigned in order of entry. The build enforces their
   format and uniqueness, not their permanence — the register was re-sequenced
-  once on 2026-09-27 (see CLAUDE.md). Treat that as an exception, not a habit.
+  on 2026-09-27 and again on 2026-11-20 (see CLAUDE.md, which records what each
+  one cost). Twice is the habit this bullet was written to prevent. Retire a
+  number and leave the gap; do not renumber a third time.
 - Never "collection," "curated," "showcase," "portfolio," or "journey."
 - Structural devices encode information or they do not ship.
 

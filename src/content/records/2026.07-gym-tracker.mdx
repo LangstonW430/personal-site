@@ -1,5 +1,5 @@
 ---
-acc: '2026.08'
+acc: '2026.07'
 title: Gym Tracker
 summary: A phone-first lifting tracker on Convex with a sideloaded iOS shell, and a 13-tool MCP server that lets Claude read the training history and write routines against revocable tokens, with every tool call traced.
 role: Sole developer
@@ -22,12 +22,15 @@ history:
     note: 'iOS shell added, with the rest timer as a lock-screen Live Activity — the closest a web app gets to a live countdown there.'
   - date: 2026-11-14
     note: 'Langfuse tracing added behind an export filter that admits tool spans only.'
+  - date: 2026-11-20
+    note: 'Entered the register as 2026.08 and renumbered when 2026.07 was withdrawn — that accession held the research, which is a role and belongs in the chronology rather than among the works.'
 links:
   source: https://github.com/LangstonW430/gym-app
 # No `live`: the app is deployed, but every URL committed to the repo is a
 # placeholder (`https://your-app.vercel.app`), so there is no deployment this
 # record can name without guessing at one.
-order: 8
+featured: true
+order: 7
 ---
 
 The app is the ordinary half. Workouts are logged on a phone against a library of about 150 seeded exercises, with last session's numbers in grey behind the inputs, double-progression pre-fill, supersets, a plate calculator and a rest timer. Weights are stored in kilograms and converted only for display, so switching units never rewrites history, and personal records are recomputed from the sets themselves inside the same mutation that saves a set rather than being maintained as a separate tally that could drift. The in-progress workout lives in `localStorage` and syncs when the network returns, which is the right shape for a thing used in a basement gym with no signal.

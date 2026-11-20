@@ -31,14 +31,26 @@ This is a structural conceit, not a decorative one. There is no paper texture, n
 Accession numbers are `YYYY.NN`, assigned in order of entry. Status is one of
 `ACTIVE` / `SHIPPED` / `ARCHIVED`.
 
-The register was re-sequenced once, on 2026-09-27, when four freelance records
-merged into `2026.01` and the remaining records were renumbered to close the
-gaps. That is a deliberate exception to the rule this section used to state
-absolutely, and it has a cost worth naming: a number no longer points at the
-same work forever, so `2026.04` means the Rochester map only until the next
-re-sequence. **Do not renumber again casually.** The value of an accession is
-that it is stable; spend that twice and it stops being an identifier and
-becomes a row number.
+The register has now been re-sequenced **twice**. On 2026-09-27, four freelance
+records merged into `2026.01` and the rest were renumbered to close the gaps
+that left. On 2026-11-20, the research with Hangfeng He's group was withdrawn
+from `2026.07` — it is a role, and roles belong in the chronology, not among the
+works — and Gym Tracker moved up from `2026.08` to fill the gap.
+
+The previous version of this paragraph said the first re-sequence was a
+one-time exception and warned that spending accession stability twice would
+turn an identifier into a row number. That warning was not heeded, and the
+sentence is left here rather than quietly rewritten, because the register's
+whole claim is that it records what happened instead of what was intended.
+
+So the cost is now real and should be stated plainly: **an accession number on
+this site does not durably identify a work.** `2026.07` meant the bias audit for
+about two days and means the lifting tracker now. Anything outside the repo that
+cited one — a link, a bookmark, a screenshot — is wrong, and nothing redirects.
+
+**A third re-sequence should not happen.** If a record has to leave the
+register, retire its number and leave the gap: a gap costs a reader one moment
+of curiosity, and a renumber costs every number its meaning.
 
 ### Register language
 

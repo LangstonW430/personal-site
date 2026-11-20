@@ -109,5 +109,8 @@ chronology:
     summary: "Counterfactual auditing of demographic bias in open-source LLMs on medical diagnosis questions."
     detail:
       - "Designed and ran a counterfactual audit for demographic bias in medical diagnosis: inserted race and gender cues into MedQA and DiversityMedQA exam questions and measured answer-flip rates and logprob-based confidence shifts across open-source LLMs."
-      - Served Gemma and Qwen models with Ollama on the University's CIRC GPU cluster under Slurm.
+      - Served Gemma and Qwen models with Ollama on the University's CIRC GPU cluster under Slurm, at fixed seed and temperature so a difference between runs is the perturbation and not sampling.
+      - Across 4,000 prompts, inserting a race flipped 4–7% of answers in both directions with no significant change in accuracy; gender swaps had no measurable effect.
+      - "Found a larger effect than the one under test: reordering the same answer options changed 18–20% of one model's answers, four to six times the size of the race effect — an audit reporting the demographic result without the positional one is measuring its own framing."
+      - 'Measured deference to authority as the other large effect: a colleague who "is certain" of a wrong diagnosis cost one model 49 points of accuracy, against 3.5 for a nurse suggesting the same thing.'
       - Building a systematic, LLM-driven method to surface hidden biases beyond race and gender, and using each model's bias patterns to characterize its behavioral profile.

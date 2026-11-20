@@ -219,6 +219,20 @@ costs nothing to write and cannot be generated without the underlying work. Pref
 
 Never write placeholder or lorem copy into a committed page. If real content doesn't exist yet, the page doesn't get built yet.
 
+### A specific must not expire on its own
+
+Density of specifics cuts both ways. A claim that becomes false while nobody touches it is worse than a vaguer claim that stays true, because nothing marks it wrong — it just sits there misinforming a reader until someone happens to reread the sentence. The register's whole credibility is that it says checkable things; a sentence that was checkable in July and is a lie by November spends that credibility rather than building it.
+
+Three shapes to watch, all of them found in `2026.01` in November 2026:
+
+- **The open-ended present.** "still in progress", "no brand guide exists yet", "no live link yet". Each one is a claim about today, written once and never revisited.
+- **The running tally.** "two shipped and stable, one in progress, seven archived" is wrong the moment any one of the ten moves, and the reader cannot tell which number went bad.
+- **The unanchored recency.** "not updated since" and "as of its ship date" both mean something only relative to when they were written.
+
+The fixes, in order of preference: state the durable version of the fact ("shipped June 2026" never expires; "shipped recently" expires immediately); anchor the perishable version to a date and let the date do the work ("on Astro 6 and Tailwind 3 as of 2026-06"); or move it into `condition`, which is the one field that is explicitly a dated snapshot of right now — and even there, date it.
+
+Before committing a record, reread it as if six months have passed. Every sentence that would need editing is a sentence that should have been written differently.
+
 ## Quality floor
 
 - Semantic HTML; readable and navigable with JavaScript disabled

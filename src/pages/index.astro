@@ -27,7 +27,7 @@ import { getCollection, getEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import GithubPanel from '../components/GithubPanel.astro';
 import RegisterTable from '../components/RegisterTable.astro';
-import Time from '../components/Time.astro';
+import ChronologyDates from '../components/ChronologyDates.astro';
 import { fetchGithubPanel, repoAllowlist, type GithubPanelData } from '../lib/github';
 import { CHRONOLOGY_KIND_LABEL, isUnwritten, sortedChronology } from '../lib/content';
 import { EXTERNAL_LINK_ATTRS } from '../lib/links';
@@ -222,9 +222,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
 											<span class="min-w-0 flex-1">
 												<span class="flex items-baseline gap-pair">
 													<span class="field-label shrink-0">{CHRONOLOGY_KIND_LABEL[entry.kind]}</span>
-													<span class="font-record font-typed text-xs text-ink-muted">
-														{entry.date ? <Time date={entry.date} /> : 'Date TBD'}
-													</span>
+													<ChronologyDates entry={entry} class="font-record font-typed text-xs text-ink-muted" />
 												</span>
 												<span class="chronology-title block font-prose text-md leading-display mt-hair">
 													{entry.title}
@@ -249,9 +247,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
 										<span class="min-w-0 flex-1">
 											<span class="flex items-baseline gap-pair">
 												<span class="field-label shrink-0">{CHRONOLOGY_KIND_LABEL[entry.kind]}</span>
-												<span class="font-record font-typed text-xs text-ink-muted">
-													{entry.date ? <Time date={entry.date} /> : 'Date TBD'}
-												</span>
+												<ChronologyDates entry={entry} class="font-record font-typed text-xs text-ink-muted" />
 											</span>
 											<span class="block font-prose text-md leading-display mt-hair">{entry.title}</span>
 											<span class="block font-record font-typed text-sm text-ink-muted mt-hair">{entry.org}</span>

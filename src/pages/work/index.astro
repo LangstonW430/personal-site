@@ -9,7 +9,14 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import RegisterTable from '../../components/RegisterTable.astro';
 
-const records = (await getCollection('records')).sort((a, b) => a.data.acc.localeCompare(b.data.acc));
+// Newest accession first. An accession book is written oldest-first, and this
+// read that way until 2026-11-20 — but a register is bound and read from the
+// front, while this is a page someone lands on and scans from the top. Oldest
+// first spent that position on the earliest work and pushed the most recent to
+// the bottom, and it disagreed with the homepage preview, which has always
+// shown the newest three. The accession numbers still say what the order of
+// entry was; they just no longer have to carry the reading order too.
+const records = (await getCollection('records')).sort((a, b) => b.data.acc.localeCompare(a.data.acc));
 ---
 
 <Base

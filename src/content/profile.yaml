@@ -40,18 +40,23 @@ email: "langstonw430@gmail.com"
 # this environment (blocked by network egress policy) — this is Langston's
 # own copy-paste of it, not a live fetch.
 #
-# Reconciled against the November 2026 résumé: two roles that read as
-# ongoing here had in fact ended, and the schema carries one `date` (the
-# start), so an end date goes in `summary` as a parenthetical — the form the
-# Rochester Regional Joint Board entry already used. Where that résumé
-# dropped a number it previously carried, this file drops it too; the site
-# does not get to stand behind a figure the résumé no longer does.
+# Reconciled against the November 2026 résumé, which turned up two roles that
+# read as ongoing here and had in fact ended. Those end dates first went into
+# `summary` as parentheticals, because the schema carried only a start — but
+# `summary` appears only once a reader expands the row, so every collapsed row
+# still showed a bare start date and the section read as four concurrent jobs.
+# The schema now carries `until`, the rows render a range, and the
+# parentheticals are gone as duplication.
+#
+# Where that résumé dropped a number it previously carried, this file drops it
+# too; the site does not get to stand behind a figure the résumé no longer does.
 chronology:
   - date: 2022-06-01
+    until: 2026-08-01
     kind: employment
     title: "Academic Intervention Specialist"
     org: "Vertus Charter High School"
-    summary: "Math/science support for at-risk students (Jun. 2022 – Aug. 2026)."
+    summary: "Math/science support for at-risk students."
     detail:
       - Provided targeted one-on-one and small-group instruction in math and science to high school students to address learning gaps and strengthen foundational skills.
       - Supported students in building confidence, improving subject comprehension, and developing effective study strategies.
@@ -59,10 +64,11 @@ chronology:
       - Monitored progress through ongoing assessment, adjusting instructional approach to keep students on track.
       - 25+ students per summer session, across 10+ collaborating teachers; 87% of surveyed educators reported significant academic improvement.
   - date: 2024-06-01
+    until: 2024-08-01
     kind: employment
     title: "Information Technology Intern"
     org: "Rochester Regional Joint Board"
-    summary: "Hardware/software support under the Lead IT Specialist (Jun.–Aug. 2024)."
+    summary: "Hardware/software support under the Lead IT Specialist."
     detail:
       - Collaborated directly with the Lead IT Specialist to support day-to-day IT operations across the organization.
       - Assisted with maintenance and troubleshooting of office hardware, including desktops, laptops, printers, and networking equipment.
@@ -91,10 +97,11 @@ chronology:
       - Ship production sites on Astro — dimetech.net and mariashairemporium.com among them — deployed and maintained on Netlify with Sveltia CMS for client-managed content.
       - Own the full project lifecycle from scoping through launch and post-launch support.
   - date: 2026-06-01
+    until: 2026-08-01
     kind: employment
     title: "Marketing & AI Intern"
     org: "Thomas Media Group"
-    summary: "AI-powered workflow automation and technology infrastructure across CRM, design, and production tooling (Jun.–Aug. 2026)."
+    summary: "AI-powered workflow automation and technology infrastructure across CRM, design, and production tooling."
     detail:
       - Built an n8n and Google Cloud SDK pipeline that takes a podcast episode dropped into Google Drive, generates a transcript and description for it, and publishes the result to YouTube and the podcast platforms.
       - Designed, tested, and implemented AI-powered tools and workflow automations to improve operational efficiency across internal business processes.

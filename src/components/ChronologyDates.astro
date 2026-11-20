@@ -1,0 +1,41 @@
+---
+/* The date line on a chronology row: "2026-06-01 → 2026-08-01", or
+ * "2026-09-01 → present" for something still running.
+ *
+ * A component rather than the same expression written into both branches of
+ * the row — the <details> one and the plain one — for the reason Time.astro
+ * itself exists: two copies of a format rule drift, and this is the rule that
+ * decides whether a reader thinks a job is still being done.
+ *
+ * `until` present is always rendered, even when it is in the future: a degree
+ * with an expected end date should say so rather than collapse to "present".
+ * Whether the entry sorts as ongoing is a separate question, and isOngoing()
+ * in lib/content.ts answers it.
+ *
+ * The arrow is decorative and hidden from assistive tech, which gets "to"
+ * instead — otherwise the range reads aloud as "2026-06-01 right arrow
+ * 2026-08-01".
+ */
+import Time from './Time.astro';
+import type { ChronologyEntry } from '../lib/content';
+
+interface Props {
+	entry: ChronologyEntry;
+	class?: string;
+}
+
+const { entry, class: className } = Astro.props;
+---
+
+{
+	entry.date ? (
+		<span class={className}>
+			<Time date={entry.date} />
+			<span aria-hidden="true"> → </span>
+			<span class="sr-only"> to </span>
+			{entry.until ? <Time date={entry.until} /> : 'present'}
+		</span>
+	) : (
+		<span class={className}>Date TBD</span>
+	)
+}

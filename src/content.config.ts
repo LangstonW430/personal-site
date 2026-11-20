@@ -223,8 +223,24 @@ const profile = defineCollection({
 
 		chronology: z
 			.array(
-				z.strictObject({
+				z
+					.strictObject({
 					date: z.date().optional(),
+					// When the role ended. Absent means it has not — which is what
+					// the row renders as "present" and what sorts it above the
+					// finished ones.
+					//
+					// This exists because the end date used to live inside
+					// `summary` as a parenthetical, and `summary` only appears once
+					// a reader expands the row. Three of six entries had ended and
+					// every collapsed row showed a bare start date, so the section
+					// read as four concurrent jobs. A date a reader has to click to
+					// discover is not stated.
+					//
+					// Month-start, like `date`: a role given as "Jun.–Aug. 2026" is
+					// 2026-06-01 to 2026-08-01. Neither end claims a precision the
+					// source has.
+					until: z.date().optional(),
 					kind: z.enum(['education', 'freelance', 'employment', 'research']),
 					// title/org replace what used to be one combined `note` string
 					// ("Title, Org — description") — split so the collapsed row can
@@ -242,7 +258,14 @@ const profile = defineCollection({
 					// five responsibilities, not one 90-word block a reader has to
 					// parse apart themselves.
 					detail: z.array(z.string().min(1)).min(1).optional(),
-				}),
+					})
+					// Same guard the records collection puts on completed/acquired,
+					// and for the same reason: a range that runs backwards is a
+					// typo, and it should fail the build rather than render.
+					.refine((e) => e.until === undefined || e.date === undefined || e.until >= e.date, {
+						message: '`until` cannot precede `date`',
+						path: ['until'],
+					}),
 			)
 			.default([]),
 	}),

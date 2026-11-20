@@ -64,6 +64,7 @@ Every word stays functional. The register is dry. **Never** write "collection," 
 - **MDX in `src/content/`.** No CMS.
 - Live data: GitHub REST called server-side inside an Astro server island, token in Vercel env, `Cache-Control: s-maxage=300`. No client JS, no extra vendor.
 - Self-hosted variable fonts from `/public/fonts/`
+- Analytics: Umami Cloud script in `Head.astro`, production domain only. The one client script and the one third-party request on the site — both stated on the Colophon. Outbound clicks are tagged via `track()` in `src/lib/links.ts`.
 
 Rejected, with reasons — do not reintroduce: Next.js (site is ~90% static documents), Convex (was sized for a realtime feature that no longer exists), any CMS (content is authored in-repo), Cloudflare (Vercel chosen), Google Fonts CDN (third-party request, no subsetting control), shadcn/ui or any component library (defaults are recognizable on sight).
 

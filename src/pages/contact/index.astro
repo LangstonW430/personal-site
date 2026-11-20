@@ -31,7 +31,7 @@
 import { getEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { isUnwritten } from '../../lib/content';
-import { EXTERNAL_LINK_ATTRS } from '../../lib/links';
+import { EXTERNAL_LINK_ATTRS, track } from '../../lib/links';
 
 const profile = await getEntry('profile', 'profile');
 if (!profile) throw new Error('src/content/profile.yaml is missing or failed to load.');
@@ -80,7 +80,7 @@ const VALUE = 'font-record font-typed text-sm leading-record mt-hair md:mt-0 bre
 							<div class={ROW}>
 								<dt class="field-label">Email</dt>
 								<dd class={VALUE}>
-									<a href={`mailto:${profile.data.email}`}>{profile.data.email}</a>
+									<a href={`mailto:${profile.data.email}`} {...track('email', { from: 'contact' })}>{profile.data.email}</a>
 								</dd>
 							</div>
 						)
@@ -89,7 +89,7 @@ const VALUE = 'font-record font-typed text-sm leading-record mt-hair md:mt-0 bre
 					<div class={ROW}>
 						<dt class="field-label">LinkedIn</dt>
 						<dd class={VALUE}>
-							<a href={profile.data.linkedinProfile} {...EXTERNAL_LINK_ATTRS}>
+							<a href={profile.data.linkedinProfile} {...EXTERNAL_LINK_ATTRS} {...track('linkedin', { from: 'contact' })}>
 								{bare(profile.data.linkedinProfile)}
 							</a>
 						</dd>
@@ -98,7 +98,7 @@ const VALUE = 'font-record font-typed text-sm leading-record mt-hair md:mt-0 bre
 					<div class={ROW}>
 						<dt class="field-label">GitHub</dt>
 						<dd class={VALUE}>
-							<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS}>
+							<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS} {...track('github', { from: 'contact' })}>
 								{bare(profile.data.githubProfile)}
 							</a>
 						</dd>
@@ -109,7 +109,7 @@ const VALUE = 'font-record font-typed text-sm leading-record mt-hair md:mt-0 bre
 							<div class={ROW}>
 								<dt class="field-label">Services</dt>
 								<dd class={VALUE}>
-									<a href={profile.data.services} {...EXTERNAL_LINK_ATTRS}>
+									<a href={profile.data.services} {...EXTERNAL_LINK_ATTRS} {...track('services', { from: 'contact' })}>
 										{bare(profile.data.services)}
 									</a>
 								</dd>
@@ -120,7 +120,7 @@ const VALUE = 'font-record font-typed text-sm leading-record mt-hair md:mt-0 bre
 					<div class={ROW}>
 						<dt class="field-label">Résumé</dt>
 						<dd class={VALUE}>
-							<a href={RESUME_PATH} {...EXTERNAL_LINK_ATTRS}>Download (PDF)</a>
+							<a href={RESUME_PATH} {...EXTERNAL_LINK_ATTRS} {...track('resume', { from: 'contact' })}>Download (PDF)</a>
 						</dd>
 					</div>
 				</dl>

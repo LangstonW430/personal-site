@@ -25,7 +25,7 @@
  */
 import Time from './Time.astro';
 import type { GithubPanelData } from '../lib/github';
-import { EXTERNAL_LINK_ATTRS } from '../lib/links';
+import { EXTERNAL_LINK_ATTRS, track } from '../lib/links';
 
 interface Props {
 	data: GithubPanelData | null;
@@ -101,7 +101,7 @@ const rows = withinWindow.length >= MIN_ROWS ? withinWindow : allRepos.slice(0, 
 						{rows.map((repo) => (
 							<li class="border-b border-rule last:border-b-0 pb-field last:pb-0">
 								<div class="flex items-baseline justify-between flex-wrap gap-x-field gap-y-hair">
-									<a href={repo.url} class="font-record font-typed text-sm text-stamp" {...EXTERNAL_LINK_ATTRS}>
+									<a href={repo.url} class="font-record font-typed text-sm text-stamp" {...EXTERNAL_LINK_ATTRS} {...track('panel-repo', { repo: repo.name })}>
 										{repo.owner}/{repo.name}
 									</a>
 									<p class="font-record font-typed text-xs">

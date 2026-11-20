@@ -30,7 +30,7 @@ import RegisterTable from '../components/RegisterTable.astro';
 import ChronologyDates from '../components/ChronologyDates.astro';
 import { fetchGithubPanel, repoAllowlist, type GithubPanelData } from '../lib/github';
 import { CHRONOLOGY_KIND_LABEL, isUnwritten, sortedChronology } from '../lib/content';
-import { EXTERNAL_LINK_ATTRS } from '../lib/links';
+import { EXTERNAL_LINK_ATTRS, track } from '../lib/links';
 
 export const prerender = false;
 
@@ -131,8 +131,8 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
 		<div class="flex items-baseline justify-between flex-wrap gap-x-entry gap-y-hair">
 			<h1 class="font-prose text-xl leading-display">{profile.data.name}</h1>
 			<p class="font-record font-typed text-sm">
-				<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS}>GitHub</a> ·{' '}
-				<a href={profile.data.linkedinProfile} {...EXTERNAL_LINK_ATTRS}>LinkedIn</a> ·{' '}
+				<a href={profile.data.githubProfile} {...EXTERNAL_LINK_ATTRS} {...track('github', { from: 'home' })}>GitHub</a> ·{' '}
+				<a href={profile.data.linkedinProfile} {...EXTERNAL_LINK_ATTRS} {...track('linkedin', { from: 'home' })}>LinkedIn</a> ·{' '}
 				<a href="/contact/">Contact</a>
 			</p>
 		</div>
@@ -194,7 +194,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
 						<div>
 							<dt class="field-label">Email</dt>
 							<dd class="font-record font-typed text-md mt-hair break-all">
-								<a href={`mailto:${profile.data.email}`}>{profile.data.email}</a>
+								<a href={`mailto:${profile.data.email}`} {...track('email', { from: 'home' })}>{profile.data.email}</a>
 							</dd>
 						</div>
 					)
@@ -203,7 +203,7 @@ Astro.response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-r
 				<div>
 					<dt class="field-label">Resume</dt>
 					<dd class="font-record font-typed text-md mt-hair">
-						<a href={RESUME_PATH} {...EXTERNAL_LINK_ATTRS}>Download (PDF)</a>
+						<a href={RESUME_PATH} {...EXTERNAL_LINK_ATTRS} {...track('resume', { from: 'home' })}>Download (PDF)</a>
 					</dd>
 				</div>
 			</dl>

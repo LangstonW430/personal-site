@@ -50,3 +50,31 @@ const ogImage = image ? new URL(image, Astro.site).toString() : undefined;
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 {ogImage && <meta name="twitter:image" content={ogImage} />}
+
+<!--
+  Umami Cloud, the one script the site ships. Cookieless: it sets no cookies and
+  stores no personal data, so it needs no consent banner. Loaded `defer`, so it never blocks the document; every page reads in
+  full with it blocked or with JavaScript off.
+
+  PROD-only so `astro dev` sends nothing, and `data-domains` so preview
+  deploys on *.vercel.app don't either — only langstonwoods.com is counted.
+  The website ID is public by design (it is in every page's source anyway).
+
+  It is a third-party request, which this project otherwise avoids (see the
+  font guard in astro.config.mjs). Proxying it through this domain would
+  fix that and cut ad-blocker losses, but @astrojs/vercel ignores
+  vercel.json rewrites, so it needs a build hook — deferred, not forgotten.
+
+  Outbound clicks are tagged with `track()` from src/lib/links.ts.
+-->
+{
+	import.meta.env.PROD && (
+		<script
+			is:inline
+			defer
+			src="https://cloud.umami.is/script.js"
+			data-website-id="ded85f29-3903-499c-b337-44e67f3f861a"
+			data-domains="langstonwoods.com"
+		></script>
+	)
+}

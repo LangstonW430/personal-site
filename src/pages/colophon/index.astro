@@ -21,6 +21,12 @@
  * TYPE became TYPEFACES: it sat four lines under "TypeScript strict" and
  * could be read as naming a type system.
  *
+ * 2026-11-20: CLIENT JS was false again, and had been for a while — the
+ *   adapter's `webAnalytics` option injected Vercel's tracker into every
+ *   page. Replaced with Umami and the field now says what ships. ANALYTICS
+ *   is the site's privacy statement; it lives here because a separate page
+ *   for two sentences would be an element added, not one needed.
+ *
  * DECLINED is last and is the only field here that isn't inventory. The
  * others are true of this site and of many sites; what a register refuses
  * to accession is the part that carries judgement.
@@ -33,7 +39,8 @@ const spec: { label: string; value: string }[] = [
 	{ label: 'Typefaces', value: 'Commit Mono + Source Serif 4 Variable, self-hosted' },
 	{ label: 'Content', value: 'MDX in src/content/, no CMS' },
 	{ label: 'Hosting', value: 'Vercel — static output, @astrojs/vercel adapter for the one on-demand route' },
-	{ label: 'Client JS', value: 'None. One route server-renders, the rest prerender; neither ships a bundle.' },
+	{ label: 'Client JS', value: 'One script: Umami analytics, loaded deferred. No bundle; every page reads in full without it.' },
+	{ label: 'Analytics', value: 'Umami Cloud. No cookies, no personal data, no cross-site tracking — page, referrer, country, device, and outbound clicks, in aggregate.' },
 	{ label: 'Declined', value: 'Cloudflare, Convex, Next.js, shadcn/ui, Google Fonts CDN, CMS backend' },
 ];
 
